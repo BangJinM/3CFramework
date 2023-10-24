@@ -1,25 +1,29 @@
-import { Asset, assetManager } from "cc";
+import { Asset, ImageAsset, SpriteFrame, assetManager } from "cc";
 import resourceManager from "./resource_index";
 import { AssetType, IResourcesManager, LoadAssetCompleteFunc } from "./BaseResourcesManager";
 
 class RemoteResourcesManager extends IResourcesManager {
     LoadAsset(url: string, type: AssetType, onComplete: LoadAssetCompleteFunc): void {
-        let asset = resourceManager.releaseManager.GetAsset(url)
-        if (asset) {
-            asset.addRef()
-            onComplete(null, asset)
-            return
-        }
-        this.AddLoadAssetCompleteFunc(url, onComplete)
         assetManager.loadRemote(url, type, function (error: Error | null, asset: Asset) {
+            if (error)
+                onComplete(error, null)
+            else
+                onComplete(null, asset)
+        }.bind(this))
+    }
+
+    public LoadSpriteFrame(url: string, onComplete: LoadAssetCompleteFunc): void {
+        if (this.CheckAssetStatus(url, onComplete))
+            return
+
+        this.LoadAsset(url, ImageAsset, function (error: Error, asset: ImageAsset) {
             if (error) {
                 this.ExcuteLoadAssetCompleteFunc(url, error, null)
                 return
             }
 
-            asset.addRef()
-            resourceManager.releaseManager.AddAsset(url, asset)
-            this.ExcuteLoadAssetCompleteFunc(url, null, asset)
+            let sp = SpriteFrame.createWithImage(asset)
+            this.ExcuteLoadAssetCompleteFunc(url, null, sp)
         }.bind(this))
     }
 }

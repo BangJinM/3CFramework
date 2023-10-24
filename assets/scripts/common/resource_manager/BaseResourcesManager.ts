@@ -16,7 +16,7 @@ export abstract class IResourcesManager {
     }
     /** 执行并删除正在加载资源的回调 */
     ExcuteLoadAssetCompleteFunc(url: string, error: Error | null, asset: Asset) {
-        if (!this.loadingAssets.get(url))
+        if (!this.loadingAssets.has(url))
             return
 
         let array = this.loadingAssets.get(url)
@@ -27,14 +27,44 @@ export abstract class IResourcesManager {
         this.loadingAssets.delete(url)
     }
 
+    GetLoadAssetCompleteFuncLength(url: string) {
+        if (!this.loadingAssets.get(url))
+            return 0
+
+        return this.loadingAssets.get(url).length
+    }
+
+    CheckAssetStatus(url: string, onComplete: LoadAssetCompleteFunc) {
+        this.AddLoadAssetCompleteFunc(url, function (error, asset) {
+            if (asset)
+                resourceManager.releaseManager.AddAsset(url, asset)
+            onComplete(error, asset)
+        })
+
+        let asset = resourceManager.releaseManager.GetAsset(url)
+        if (asset) {
+            this.ExcuteLoadAssetCompleteFunc(url, null, asset)
+            return true
+        }
+
+        if (this.GetLoadAssetCompleteFuncLength(url) > 1)
+            return true
+
+        return false
+    }
+
     /** 加载资源 */
     abstract LoadAsset(url: string, type: AssetType | null, onComplete: LoadAssetCompleteFunc);
     /** 加载Prefab */
     public LoadPrefab(url: string, onComplete: LoadAssetCompleteFunc) {
+        if (this.CheckAssetStatus(url, onComplete))
+            return
         this.LoadAsset(url, Prefab, onComplete)
     }
     /** 加载 Texture2D */
     public LoadTexture2D(url: string, onComplete: LoadAssetCompleteFunc) {
+        if (this.CheckAssetStatus(url, onComplete))
+            return
         this.LoadAsset(url, Texture2D, onComplete)
     }
     /** 加载SpriteFrame */
@@ -43,6 +73,8 @@ export abstract class IResourcesManager {
     }
     /** 加载场景 */
     public LoadScene(url: string, onComplete: LoadAssetCompleteFunc) {
+        if (this.CheckAssetStatus(url, onComplete))
+            return
         this.LoadAsset(url, Scene, onComplete)
     }
     /** 加载音频 */
@@ -51,19 +83,14 @@ export abstract class IResourcesManager {
     }
     /** 加载自定义图集 */
     public LoadCustomAtlas(url: string, onComplete: LoadAssetCompleteFunc) {
-        let asset = resourceManager.releaseManager.GetAsset(url)
-        if (asset) {
-            asset.addRef()
-            onComplete(null, asset)
+        if (this.CheckAssetStatus(url, onComplete))
             return
-        }
 
         let jsonError = null, jsonAsset = null
         let spriteFrameError = null, spriteFrame = null
         let loadCallBack = function (error: Error | null, asset: Asset) {
             if (jsonAsset && spriteFrame) {
                 asset = CustomAtlas.createWithSpritePlist(spriteFrame, jsonAsset)
-                asset.addRef()
                 resourceManager.releaseManager.AddAsset(url, asset)
             }
 
@@ -75,17 +102,17 @@ export abstract class IResourcesManager {
                     spriteFrame.decRef()
 
                 if (asset) {
-                    onComplete(null, asset)
+                    this.ExcuteLoadAssetCompleteFunc(url, null, asset)
                     return
                 }
 
                 if (spriteFrameError) {
-                    onComplete(spriteFrameError, null)
+                    this.ExcuteLoadAssetCompleteFunc(url, spriteFrameError, null)
                     return
                 }
 
                 if (jsonError) {
-                    onComplete(jsonError, null)
+                    this.ExcuteLoadAssetCompleteFunc(url, jsonError, null)
                     return
                 }
             }
@@ -106,6 +133,8 @@ export abstract class IResourcesManager {
     }
     /** 加载图集 */
     public LoadSpriteAtlas(url: string, onComplete: LoadAssetCompleteFunc) {
+        if (this.CheckAssetStatus(url, onComplete))
+            return
         this.LoadAsset(url, SpriteAtlas, onComplete)
     }
 }
