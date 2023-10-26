@@ -2,15 +2,13 @@ import * as cc from "cc";
 import { ReleaseComponent } from "./ReleaseComponent";
 import resourceManager from "./resource_index";
 import { LoadAssetCompleteFunc } from "./BaseResourcesManager";
-import { JsbUtil } from "../platform/JsbUtil";
-import GlobalLauncher from "../../launcher/config/GlobalLauncher";
 import { StringUtils } from "./StringUtils";
 
 function IsLocalAsset(path: string) {
     if (cc.sys.platform != cc.sys.Platform.WIN32)
         return false
 
-    if (!JsbUtil.isFileExist(path))
+    if (!cc.native.fileUtils.isFileExist(path))
         return false
 
     return true
@@ -41,6 +39,7 @@ export function InstantiatePrefab(prefab: cc.Prefab): cc.Node {
         return null
 
     let object = cc.instantiate(prefab)
+    ReleaseComponent.AddReleaseAsset(object, prefab)
     return object
 }
 
@@ -62,7 +61,7 @@ export function LoadSpriteFrame(node: cc.Node, name: string, callback: LoadAsset
         return resourceManager.localResourcesManager.LoadSpriteFrame(resPath, (error, asset) => { onComplete(node, error, asset, callback) })
 
     let remotePath = StringUtils.SubString(name, "res/")
-    remotePath = GlobalLauncher.EnvManager.GetUIURL() + newName
+    remotePath = EnvManager.GetUIURL() + newName
     if (newName.length == name.length)
         remotePath = StringUtils.AddStringToEnd(remotePath, ".png")
     return resourceManager.remoteResourcesManager.LoadSpriteFrame(remotePath, (error, asset) => { onComplete(node, error, asset, callback) })
@@ -78,7 +77,7 @@ export function LoadAudio(node: cc.Node, name: string, callback: LoadAssetComple
         return resourceManager.localResourcesManager.LoadAudio(resPath, (error, asset) => { onComplete(node, error, asset, callback) })
 
     let remotePath = StringUtils.SubString(name, "res/")
-    remotePath = GlobalLauncher.EnvManager.GetAudioURL() + remotePath
+    remotePath = EnvManager.GetAudioURL() + remotePath
     return resourceManager.remoteResourcesManager.LoadAudio(remotePath, (error, asset) => { onComplete(node, error, asset, callback) })
 }
 
@@ -94,6 +93,6 @@ export function LoadCustomAtlas(node: cc.Node, name: string, callback: LoadAsset
         return resourceManager.localResourcesManager.LoadCustomAtlas(name, (error, asset) => { onComplete(node, error, asset, callback) })
 
     let remotePath = StringUtils.SubString(name, "res/")
-    remotePath = GlobalLauncher.EnvManager.GetUIURL() + remotePath
+    remotePath = EnvManager.GetUIURL() + remotePath
     return resourceManager.remoteResourcesManager.LoadCustomAtlas(remotePath, (error, asset) => { onComplete(node, error, asset, callback) })
 }

@@ -1,10 +1,9 @@
-import { Asset, ImageAsset, SpriteFrame, assetManager } from "cc";
-import resourceManager from "./resource_index";
+import * as cc from "cc";
 import { AssetType, IResourcesManager, LoadAssetCompleteFunc } from "./BaseResourcesManager";
 
 class RemoteResourcesManager extends IResourcesManager {
     LoadAsset(url: string, type: AssetType, onComplete: LoadAssetCompleteFunc): void {
-        assetManager.loadRemote(url, type, function (error: Error | null, asset: Asset) {
+        cc.assetManager.loadRemote(url, type, function (error: Error | null, asset: cc.Asset) {
             if (error)
                 onComplete(error, null)
             else
@@ -16,13 +15,13 @@ class RemoteResourcesManager extends IResourcesManager {
         if (this.CheckAssetStatus(url, onComplete))
             return
 
-        this.LoadAsset(url, ImageAsset, function (error: Error, asset: ImageAsset) {
+        this.LoadAsset(url, cc.ImageAsset, function (error: Error, asset: cc.ImageAsset) {
             if (error) {
                 this.ExcuteLoadAssetCompleteFunc(url, error, null)
                 return
             }
 
-            let sp = SpriteFrame.createWithImage(asset)
+            let sp = cc.SpriteFrame.createWithImage(asset)
             this.ExcuteLoadAssetCompleteFunc(url, null, sp)
         }.bind(this))
     }

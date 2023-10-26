@@ -1,12 +1,12 @@
-import { Asset, Component, _decorator } from "cc";
+import * as cc from "cc";
 import resourceManager from "./resource_index";
-const { ccclass } = _decorator;
+const { ccclass } = cc._decorator;
 
 @ccclass("ReleaseComponent")
-export class ReleaseComponent extends Component {
-    private needAssets: Asset[] = new Array()
+export class ReleaseComponent extends cc.Component {
+    private needAssets: cc.Asset[] = new Array()
 
-    AddReleaseAsset(asset: Asset): ReleaseComponent {
+    AddReleaseAsset(asset: cc.Asset): ReleaseComponent {
         this.needAssets.push(asset)
         return this
     }

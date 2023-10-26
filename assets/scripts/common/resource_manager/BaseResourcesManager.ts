@@ -1,12 +1,13 @@
-import { Asset, AudioClip, Constructor, ImageAsset, Prefab, Scene, SpriteAtlas, SpriteFrame, Texture2D, error } from "cc";
+import * as cc from "cc";
 import { CustomAtlas } from "./other_assets/CustomAtlas";
-import resourceManager from "./resource_index";
+import ReleaseManager from "./ReleaseManager";
 
-export type AssetType = Constructor<any>
-export type LoadAssetCompleteFunc = (error: Error | null, assets: Asset) => void;
+export type AssetType = cc.Constructor<any>
+export type LoadAssetCompleteFunc = (error: Error | null, assets: cc.Asset) => void;
 
 export abstract class IResourcesManager {
     loadingAssets: Map<string, Function[]> = new Map()
+
     /** 正在加载资源的回调 */
     AddLoadAssetCompleteFunc(url: string, loadAssetCompleteFunc: LoadAssetCompleteFunc) {
         if (!this.loadingAssets.has(url))
@@ -15,7 +16,7 @@ export abstract class IResourcesManager {
         this.loadingAssets.get(url).push(loadAssetCompleteFunc)
     }
     /** 执行并删除正在加载资源的回调 */
-    ExcuteLoadAssetCompleteFunc(url: string, error: Error | null, asset: Asset) {
+    ExcuteLoadAssetCompleteFunc(url: string, error: Error | null, asset: cc.Asset) {
         if (!this.loadingAssets.has(url))
             return
 
@@ -37,11 +38,11 @@ export abstract class IResourcesManager {
     CheckAssetStatus(url: string, onComplete: LoadAssetCompleteFunc) {
         this.AddLoadAssetCompleteFunc(url, function (error, asset) {
             if (asset)
-                resourceManager.releaseManager.AddAsset(url, asset)
+                ReleaseManager.AddAsset(url, asset)
             onComplete(error, asset)
         })
 
-        let asset = resourceManager.releaseManager.GetAsset(url)
+        let asset = ReleaseManager.GetAsset(url)
         if (asset) {
             this.ExcuteLoadAssetCompleteFunc(url, null, asset)
             return true
@@ -59,27 +60,27 @@ export abstract class IResourcesManager {
     public LoadPrefab(url: string, onComplete: LoadAssetCompleteFunc) {
         if (this.CheckAssetStatus(url, onComplete))
             return
-        this.LoadAsset(url, Prefab, onComplete)
+        this.LoadAsset(url, cc.Prefab, onComplete)
     }
     /** 加载 Texture2D */
     public LoadTexture2D(url: string, onComplete: LoadAssetCompleteFunc) {
         if (this.CheckAssetStatus(url, onComplete))
             return
-        this.LoadAsset(url, Texture2D, onComplete)
+        this.LoadAsset(url, cc.Texture2D, onComplete)
     }
     /** 加载SpriteFrame */
     public LoadSpriteFrame(url: string, onComplete: LoadAssetCompleteFunc) {
-        this.LoadAsset(url, SpriteFrame, onComplete)
+        this.LoadAsset(url, cc.SpriteFrame, onComplete)
     }
     /** 加载场景 */
     public LoadScene(url: string, onComplete: LoadAssetCompleteFunc) {
         if (this.CheckAssetStatus(url, onComplete))
             return
-        this.LoadAsset(url, Scene, onComplete)
+        this.LoadAsset(url, cc.Scene, onComplete)
     }
     /** 加载音频 */
     public LoadAudio(url: string, onComplete: LoadAssetCompleteFunc) {
-        this.LoadAsset(url, AudioClip, onComplete)
+        this.LoadAsset(url, cc.AudioClip, onComplete)
     }
     /** 加载自定义图集 */
     public LoadCustomAtlas(url: string, onComplete: LoadAssetCompleteFunc) {
@@ -88,10 +89,10 @@ export abstract class IResourcesManager {
 
         let jsonError = null, jsonAsset = null
         let spriteFrameError = null, spriteFrame = null
-        let loadCallBack = function (error: Error | null, asset: Asset) {
+        let loadCallBack = function (error: Error | null, asset: cc.Asset) {
             if (jsonAsset && spriteFrame) {
                 asset = CustomAtlas.createWithSpritePlist(spriteFrame, jsonAsset)
-                resourceManager.releaseManager.AddAsset(url, asset)
+                ReleaseManager.AddAsset(url, asset)
             }
 
             if ((spriteFrameError || spriteFrame) && (jsonError || jsonAsset)) {
@@ -118,7 +119,7 @@ export abstract class IResourcesManager {
             }
         }.bind(this)
 
-        this.LoadAsset(url + ".png", ImageAsset, (error, asset: ImageAsset) => {
+        this.LoadAsset(url + ".png", cc.ImageAsset, (error, asset: cc.ImageAsset) => {
             spriteFrameError = error
             spriteFrame = asset
 
@@ -135,6 +136,6 @@ export abstract class IResourcesManager {
     public LoadSpriteAtlas(url: string, onComplete: LoadAssetCompleteFunc) {
         if (this.CheckAssetStatus(url, onComplete))
             return
-        this.LoadAsset(url, SpriteAtlas, onComplete)
+        this.LoadAsset(url, cc.SpriteAtlas, onComplete)
     }
 }
