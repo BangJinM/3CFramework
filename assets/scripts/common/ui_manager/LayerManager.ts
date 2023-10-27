@@ -1,6 +1,7 @@
 import * as cc from "cc";
 import { UIEnum } from "./UIEnum";
 import UIGraphManager from "./UIGraphManager";
+import { Mediator } from "../puremvc/patterns/mediator/Mediator";
 
 /** 界面属性 */
 export class LayerProperty {
@@ -9,7 +10,7 @@ export class LayerProperty {
     /** 界面节点 */
     public layerNode: cc.Node
     /** 节点ID */
-    public id: number
+    public mediator: Mediator
 }
 /** 界面管理 */
 class LayerManager {
@@ -24,15 +25,12 @@ class LayerManager {
         if (!layerProperty.uiType)
             return
 
-        if (!layerProperty.id)
-            return
-
         if (!this.uiNodes.has(layerProperty.uiType))
             this.uiNodes.set(layerProperty.uiType, [])
 
         let properties = this.uiNodes.get(layerProperty.uiType)
         for (const property of properties) {
-            if (property.id == layerProperty.id)
+            if (property.mediator.getMediatorName() == layerProperty.mediator.getMediatorName())
                 return
         }
 
@@ -59,7 +57,7 @@ class LayerManager {
         let properties = this.uiNodes.get(layerProperty.uiType)
         for (let index = 0; index < properties.length; index++) {
             let property = properties[index]
-            if (property.id == layerProperty.id)
+            if (property.mediator.getMediatorName() == layerProperty.mediator.getMediatorName())
                 layerIndex = index
         }
 

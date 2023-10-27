@@ -3,7 +3,7 @@ import { CustomAtlas } from "./other_assets/CustomAtlas";
 import ReleaseManager from "./ReleaseManager";
 
 export type AssetType = cc.Constructor<any>
-export type LoadAssetCompleteFunc = (error: Error | null, assets: cc.Asset) => void;
+export type LoadAssetCompleteFunc = (error: Error | null, asset: cc.Asset) => void;
 
 export abstract class IResourcesManager {
     loadingAssets: Map<string, Function[]> = new Map()

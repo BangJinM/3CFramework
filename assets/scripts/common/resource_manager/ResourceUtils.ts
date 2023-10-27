@@ -33,6 +33,10 @@ function onComplete(node: cc.Node, error: Error, asset: cc.Asset, callback: Load
     callback(error, asset)
 }
 
+export function LoadPrefab(url: string, callback: LoadAssetCompleteFunc) {
+    resourceManager.localResourcesManager.LoadPrefab(url, callback)
+}
+
 /** ！！！！ 不传Node需要手动释放asset */
 export function InstantiatePrefab(prefab: cc.Prefab): cc.Node {
     if (!prefab)
