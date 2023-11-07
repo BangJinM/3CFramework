@@ -1,13 +1,11 @@
-import { INotification } from "../common/puremvc/interfaces/INotification";
-import { BaseUIMediator } from "../common/ui_manager/BaseUIMediator";
-import { UIEnum } from "../common/ui_manager/UIEnum";
-import { NotificationTable } from "./config/NotificationTable";
+import { INotification } from "../../common/puremvc/interfaces/INotification";
+import { BaseUIMediator, GetClassName } from "../../common/ui_manager/BaseUIMediator";
+import { UIEnum } from "../../common/ui_manager/UIEnum";
+import { NotificationTable } from "../config/NotificationTable";
 
 export class TestMediator extends BaseUIMediator {
-    static NAME: string = "TestMediator"
-
     constructor() {
-        super(TestMediator.NAME)
+        super(TestMediator.name)
 
         this.uiData.prefabURL = "prefabs/layer/test"
         this.uiData.uiType = UIEnum.UI_NORMAL
@@ -19,7 +17,7 @@ export class TestMediator extends BaseUIMediator {
 
     handleNotification(notification: INotification): void {
         if (notification.getName() == NotificationTable.Test_Open) {
-            this.OpenLayer()
+            this.Open()
         }
         else if (notification.getName() == NotificationTable.Test_Close) { }
     }

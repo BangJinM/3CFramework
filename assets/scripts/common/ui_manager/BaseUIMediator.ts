@@ -13,56 +13,70 @@ export class UIData {
 }
 
 export enum UIStatus {
-    LOADING = 0,
+    UNUSED,
+    LOADING,
     FINISH,
     CLOSED
 }
 
+export function GetClassName(name) {
+    return (target) => {
+        target["NAME"] = name ? name : target.constructor.name
+    }
+}
+
 export class BaseUIMediator extends Mediator {
-    status: number = UIStatus.LOADING
+    status: number = UIStatus.UNUSED
     uiData: UIData = new UIData()
     layerProperty: LayerProperty = null
 
-    OpenLayerAsync() {
+    LoadPrefabSuccess(prefab: cc.Prefab) {
+        if (this.status != UIStatus.LOADING)
+            return
+
+        if (!prefab)
+            return
+
+        this.status = UIStatus.FINISH
+        let panel = InstantiatePrefab(prefab)
+        LayerManager.AddNode({ layerNode: panel, uiType: this.uiData.uiType, mediator: this })
+    }
+
+    Open() {
+        if (this.uiData.async)
+            this.OpenAsync()
+        else
+            this.OpenSync.call(this)
+    }
+
+    private OpenAsync() {
+        if (this.status != UIStatus.UNUSED)
+            return
         this.status = UIStatus.LOADING
         LoadPrefab(this.uiData.prefabURL, function (error: Error, asset: Prefab) {
             if (!asset)
-                return
+                this.status = UIStatus.CLOSED
 
-            if (this.status == UIStatus.CLOSED)
-                return
-            this.status = UIStatus.FINISH
-
-            let panel = InstantiatePrefab(asset)
-            LayerManager.AddNode({ layerNode: panel, uiType: this.uiData.uiType, mediator: this })
-        })
+            this.LoadPrefabSuccess(asset)
+        }.bind(this))
     }
 
-    async OpenLayer() {
-        let prefab = null
+    private async OpenSync() {
+        if (this.status != UIStatus.UNUSED)
+            return
         this.status = UIStatus.LOADING
+
+        let prefab = null
         await new Promise(function (success) {
             LoadPrefab(this.uiData.prefabURL, function (error: Error, asset: Asset) {
-                if (error) {
+                if (error)
                     this.status = UIStatus.CLOSED
-                    success()
-                    return
-                }
                 prefab = asset
                 success()
             }.bind(this))
         }.bind(this))
 
-        if (!prefab)
-            return
-
-        if (this.status == UIStatus.CLOSED)
-            return
-        this.status = UIStatus.FINISH
-
-        let panel = InstantiatePrefab(prefab)
-        this.layerProperty = { layerNode: panel, uiType: this.uiData.uiType, mediator: this }
-        LayerManager.AddNode(this.layerProperty)
+        this.LoadPrefabSuccess(prefab)
     }
 
     CloseLayer() {
@@ -77,6 +91,7 @@ export class BaseUIMediator extends Mediator {
         if (!this.layerProperty)
             return
 
+        this.status = UIStatus.UNUSED
         LayerManager.RemoveNode(this.layerProperty)
     }
 }

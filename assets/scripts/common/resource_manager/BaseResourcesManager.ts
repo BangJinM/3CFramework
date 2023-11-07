@@ -5,6 +5,14 @@ import ReleaseManager from "./ReleaseManager";
 export type AssetType = cc.Constructor<any>
 export type LoadAssetCompleteFunc = (error: Error | null, asset: cc.Asset) => void;
 
+
+export class RemoteLocalAssetData {
+    url: string
+    type: AssetType
+    loadAssetCompleteFunc: LoadAssetCompleteFunc
+    bundleName: string
+}
+
 export abstract class IResourcesManager {
     loadingAssets: Map<string, Function[]> = new Map()
 
