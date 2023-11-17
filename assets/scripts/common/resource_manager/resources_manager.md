@@ -5,13 +5,8 @@
         -包内的Bundle资源
         -远程、本地的Bundle资源
     
-    2.prefab
-        -内置的bundle中（resources）
-        -包内的bundle中
-    3.png、json，jpg等
-        -内置的bundle
-        -包内的bundle
-        -本地、远程的资源
+    2.bundle 中的资源
+    3.远程资源
 ```
 普通资源结构
 ```

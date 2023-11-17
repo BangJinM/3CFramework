@@ -1,4 +1,5 @@
 import { Asset, ImageAsset, Rect, Size, SpriteAtlas, SpriteFrame, Vec2, _decorator } from "cc";
+import { AssetCache } from "../ResourcesDefines";
 const { ccclass } = _decorator;
 
 // TODO 字符串提取效率问题
@@ -48,31 +49,28 @@ function GetOffsetData(str: string) {
 @ccclass('CustomAtlas')
 export class CustomAtlas extends SpriteAtlas {
     public spriteFrame: SpriteFrame = null
-    public imageAsset: ImageAsset = null
-    public plist: Asset = null
+    public imageAsset: AssetCache = null
+    public plist: AssetCache = null
 
-    private constructor() {
-        super()
-    }
-
-    static createWithSpritePlist(imageAsset: ImageAsset, plist: Asset): CustomAtlas {
+    static createWithSpritePlist(imageAsset: AssetCache, plist: AssetCache): CustomAtlas {
         let customAtlas: CustomAtlas = new CustomAtlas()
-        customAtlas.spriteFrame = SpriteFrame.createWithImage(imageAsset)
+        customAtlas.spriteFrame = SpriteFrame.createWithImage(imageAsset.data as ImageAsset)
         customAtlas.plist = plist;
         customAtlas.imageAsset = imageAsset
 
         customAtlas.createSpriteFrames()
 
-        customAtlas.plist.addRef()
+        customAtlas.plist.AddRef()
+        customAtlas.imageAsset.AddRef()
+        
         customAtlas.spriteFrame.addRef()
-        customAtlas.imageAsset.addRef()
 
         return customAtlas
     }
 
     private createSpriteFrames() {
         if (this.spriteFrame && this.plist) {
-            let frames = this.plist._nativeAsset?.frames
+            let frames = this.plist.data._nativeAsset?.frames
             if (frames) {
                 for (const key of Object.keys(frames)) {
                     let spriteFrame = new SpriteFrame()
@@ -106,12 +104,12 @@ export class CustomAtlas extends SpriteAtlas {
         }
 
         if (this.plist) {
-            this.plist.decRef()
+            this.plist.DecRef()
             this.plist = null
         }
 
         if (this.imageAsset) {
-            this.imageAsset.decRef()
+            this.imageAsset.DecRef()
             this.imageAsset = null
         }
     }

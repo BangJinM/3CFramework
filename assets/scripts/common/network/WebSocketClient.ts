@@ -1,3 +1,4 @@
+import { GlobalCommon } from "../GlobalCommon";
 import { IReceiver } from "./IReceiver";
 import { ISocket, SocketOptions } from "./ISocket";
 import { MessageManager } from "./MessageManager";
@@ -8,7 +9,8 @@ export class WebSocketClient {
     private messageReceiver: IReceiver = null
     private socketOptions: SocketOptions = null
 
-    constructor() {
+    constructor(messageReceiver) {
+        this.messageReceiver = messageReceiver
         this.socketOptions = new SocketOptions()
         this.socketOptions.openCb = this.OpenCb.bind(this)
         this.socketOptions.closeCb = this.CloseCb.bind(this)
@@ -60,7 +62,7 @@ export class WebSocketClient {
     }
     MessageCb = (e: MessageEvent) => {
         console.log('连接成功的默认回调::::', e)
-        MessageManager.Instance().Received(1, [])
+        this.messageReceiver.Received(1, [])
     }
     ErrorCb = (e: Event) => {
         console.log('错误的默认回调::::', e)

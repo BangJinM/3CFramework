@@ -1,9 +1,10 @@
 import * as cc from "cc";
 import { UIEnum } from "./UIEnum";
-import resourceManager from "../resource_manager/resource_index";
-import { InstantiatePrefab } from "../resource_manager/ResourceUtils";
+import { GlobalCommon } from "../GlobalCommon";
+import { ISingleton } from "../ISingleton";
+import { AssetCache } from "../resource_manager/ResourcesDefines";
 
-class UIGraphManager {
+export class UIGraphManager implements ISingleton {
     /** UICanvas */
     uiCanvasNode: cc.Node = null
     /** UI根目录 */
@@ -11,17 +12,21 @@ class UIGraphManager {
     /** 层级节点 */
     uiNodes: Map<string, cc.Node> = new Map()
 
+    Init() {
+    }
+    Update(deltaTime: number) {
+    }
+
     async InitUIRootNode() {
         if (!this.uiCanvasNode) {
-            let prefab = null
+            let prefab: AssetCache = null
             await new Promise((resolve) => {
-                resourceManager.localResourcesManager.LoadPrefab("prefabs/common/Canvas_UI", function (error, asset) {
+                GlobalCommon.resourcesManager.LoadAsset("prefabs/common/Canvas_UI", cc.Prefab, GlobalCommon.bundleManager.GetBundle("resources"), function (error, asset: AssetCache) {
                     prefab = asset
                     resolve(true)
                 })
             })
-
-            this.uiCanvasNode = InstantiatePrefab(prefab)
+            this.uiCanvasNode = cc.instantiate(prefab.data as cc.Prefab)
             cc.director.addPersistRootNode(this.uiCanvasNode)
         }
 
@@ -57,10 +62,12 @@ class UIGraphManager {
         return this.uiNodes.get(UIEnum[nodeType])
     }
 
-    Cleanup() {
+    Clean() {
+        cc.director.removePersistRootNode(this.uiCanvasNode)
+
+        this.uiCanvasNode = null
         this.uiRootNode = null
+
         this.uiNodes.clear()
     }
 }
-
-export default new UIGraphManager()

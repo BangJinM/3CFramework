@@ -1,15 +1,16 @@
 import * as cc from "cc";
 import { Mediator } from "../puremvc/patterns/mediator/Mediator";
 import { UIEnum } from "./UIEnum";
-import { InstantiatePrefab, LoadPrefab } from "../resource_manager/ResourceUtils";
 import { Asset } from "cc";
-import LayerManager, { LayerProperty } from "./LayerManager";
-import { Prefab } from "cc";
+import { LayerManager, LayerProperty } from "./LayerManager";
+import { GlobalCommon } from "../GlobalCommon";
+import { AssetCache } from "../resource_manager/ResourcesDefines";
 
 export class UIData {
     prefabURL: string = ""
     uiType: number = UIEnum.UI_NORMAL
     async: boolean = false
+    bundle: string = "resources"
 }
 
 export enum UIStatus {
@@ -25,12 +26,13 @@ export function GetClassName(name) {
     }
 }
 
+
 export class BaseUIMediator extends Mediator {
     status: number = UIStatus.UNUSED
     uiData: UIData = new UIData()
     layerProperty: LayerProperty = null
 
-    LoadPrefabSuccess(prefab: cc.Prefab) {
+    LoadPrefabSuccess(prefab: AssetCache) {
         if (this.status != UIStatus.LOADING)
             return
 
@@ -38,8 +40,8 @@ export class BaseUIMediator extends Mediator {
             return
 
         this.status = UIStatus.FINISH
-        let panel = InstantiatePrefab(prefab)
-        LayerManager.AddNode({ layerNode: panel, uiType: this.uiData.uiType, mediator: this })
+        let panel = cc.instantiate(prefab.data as cc.Prefab)
+        GlobalCommon.layerManager.AddNode({ layerNode: panel, uiType: this.uiData.uiType, mediator: this })
     }
 
     Open() {
@@ -53,12 +55,13 @@ export class BaseUIMediator extends Mediator {
         if (this.status != UIStatus.UNUSED)
             return
         this.status = UIStatus.LOADING
-        LoadPrefab(this.uiData.prefabURL, function (error: Error, asset: Prefab) {
-            if (!asset)
-                this.status = UIStatus.CLOSED
 
+        GlobalCommon.resourcesManager.LoadAsset(this.uiData.prefabURL, cc.Prefab, GlobalCommon.bundleManager.GetBundle(this.uiData.bundle), function (error, asset: AssetCache) {
+            if (error)
+                this.status = UIStatus.CLOSED
             this.LoadPrefabSuccess(asset)
         }.bind(this))
+
     }
 
     private async OpenSync() {
@@ -68,7 +71,7 @@ export class BaseUIMediator extends Mediator {
 
         let prefab = null
         await new Promise(function (success) {
-            LoadPrefab(this.uiData.prefabURL, function (error: Error, asset: Asset) {
+            GlobalCommon.resourcesManager.LoadAsset(this.uiData.prefabURL, cc.Prefab, GlobalCommon.bundleManager.GetBundle(this.uiData.bundle), function (error, asset: AssetCache) {
                 if (error)
                     this.status = UIStatus.CLOSED
                 prefab = asset
@@ -92,6 +95,6 @@ export class BaseUIMediator extends Mediator {
             return
 
         this.status = UIStatus.UNUSED
-        LayerManager.RemoveNode(this.layerProperty)
+        GlobalCommon.layerManager.RemoveNode(this.layerProperty)
     }
 }

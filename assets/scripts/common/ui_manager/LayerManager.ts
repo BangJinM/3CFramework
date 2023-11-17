@@ -1,7 +1,8 @@
 import * as cc from "cc";
 import { UIEnum } from "./UIEnum";
-import UIGraphManager from "./UIGraphManager";
 import { Mediator } from "../puremvc/patterns/mediator/Mediator";
+import { ISingleton } from "../ISingleton";
+import { GlobalCommon } from "../GlobalCommon";
 
 /** 界面属性 */
 export class LayerProperty {
@@ -13,7 +14,18 @@ export class LayerProperty {
     public mediator: Mediator
 }
 /** 界面管理 */
-class LayerManager {
+export class LayerManager implements ISingleton {
+    Init() {
+
+    }
+    Update(deltaTime: number) {
+    }
+    Clean() {
+        this.RemoveAllNode()
+    }
+    Destroy() {
+        this.Clean()
+    }
     /** 节点属性列表 */
     uiNodes: Map<number, LayerProperty[]> = new Map()
 
@@ -34,7 +46,7 @@ class LayerManager {
                 return
         }
 
-        let parent = UIGraphManager.GetUINode(layerProperty.uiType)
+        let parent = GlobalCommon.uiGraphManager.GetUINode(layerProperty.uiType)
         if (!parent)
             return
 
@@ -79,5 +91,3 @@ class LayerManager {
         }
     }
 }
-
-export default new LayerManager()
