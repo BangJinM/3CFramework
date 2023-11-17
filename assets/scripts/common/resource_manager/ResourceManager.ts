@@ -6,9 +6,9 @@ import { CustomAtlas } from "./other_assets/CustomAtlas";
 /** 资源管理类，所有在资源都会经由这个类，bundle中的资源，本地png，远程png */
 export class ResourceManager implements ISingleton {
     /** 已经加载完成的资源列表 */
-    assets: Map<string, AssetCache> = null
+    private assets: Map<string, AssetCache> = null
     /** 正在加载的资源列表 */
-    loadingAssets: Map<string, AssetLoadTask> = null
+    private loadingAssets: Map<string, AssetLoadTask> = null
 
     Init() {
         this.assets = new Map()
@@ -27,50 +27,38 @@ export class ResourceManager implements ISingleton {
         this.loadingAssets = null
     }
 
-    private loadAsset(url: string, assetType: AssetType, bundleCache: BundleCache, loadCallBack: LoadAssetCompleteFunc) {
-        if (this.assets.has(url)) {
-            let assetCache = this.assets.get(url)
+    private getAssetCache(url: string, assetType: AssetType, bundleCache: BundleCache, error: Error, asset: cc.Asset) {
+        let assetCache = null
+        if (!error) {
+            assetCache = new AssetCache()
+            assetCache.data = asset
+            assetCache.url = url
+            assetCache.type = assetType
             assetCache.AddRef()
-            loadCallBack(null, assetCache)
-            return
-        }
-        if (!this.loadingAssets.has(url)) {
-            this.loadingAssets.set(url, new AssetLoadTask)
-        }
-        let loadingAsset = this.loadingAssets.get(url)
-        loadingAsset.completeFuncs.push(loadCallBack)
-        this.loadingAssets.set(url, loadingAsset)
 
-        let getAssetCache = function (error: Error, asset: cc.Asset) {
-            let assetCache = null
-            if (!error) {
-                assetCache = new AssetCache()
-                assetCache.data = asset
-                assetCache.url = url
-                assetCache.type = assetType
-                assetCache.AddRef()
-                
-                asset.addRef()
+            asset.addRef()
 
-                if (bundleCache) {
-                    bundleCache.AddRef()
-                    assetCache.bundle = bundleCache
-                }
-
-                this?.assets?.set(assetCache.url, assetCache)
+            if (bundleCache) {
+                bundleCache.AddRef()
+                assetCache.bundle = bundleCache
             }
-            return assetCache
-        }.bind(this)
+
+            this?.assets?.set(assetCache.url, assetCache)
+        }
+        return assetCache
+    }
+
+    private loadAnyAsset(url: string, assetType: AssetType, bundleCache: BundleCache, loadCallBack: LoadAssetCompleteFunc) {
 
         if (bundleCache) {
             bundleCache.bundle.load(url, function (error: Error, asset: cc.Asset) {
-                let assetCache = getAssetCache(error, asset)
+                let assetCache = this.getAssetCache(url, assetType, bundleCache, error, asset)
                 this?.loadAssetCompleteFunc(url, error, assetCache)
             }.bind(this))
         }
         else {
             cc.assetManager.loadRemote(url, function (error, asset) {
-                let assetCache = getAssetCache(error, asset)
+                let assetCache = this.getAssetCache(url, assetType, bundleCache, error, asset)
                 this?.loadAssetCompleteFunc(url, error, assetCache)
             }.bind(this))
         }
@@ -139,7 +127,7 @@ export class ResourceManager implements ISingleton {
                     sfAssetCache.DecRef()
 
                 if (customAtlas) {
-                    this.loadAssetCompleteFunc(url, null, customAtlas)
+                    this.loadAssetCompleteFunc(url, null, this.getAssetCache(url, CustomAtlas, bundleCache, error, customAtlas))
                     return
                 }
 
@@ -155,13 +143,13 @@ export class ResourceManager implements ISingleton {
             }
         }.bind(this)
 
-        this.loadAsset(url + ".png", cc.ImageAsset, bundleCache, (error: Error, asset: AssetCache) => {
+        this.LoadAsset(url + ".png", cc.ImageAsset, bundleCache, (error: Error, asset: AssetCache) => {
             sfLoadError = error
             sfAssetCache = asset
 
             loadCallBack()
         })
-        this.loadAsset(url + ".plist", null, bundleCache, (error: Error, asset: AssetCache) => {
+        this.LoadAsset(url + ".plist", null, bundleCache, (error: Error, asset: AssetCache) => {
             jsonLoadError = error
             jsonAssetCache = asset
 
@@ -170,10 +158,23 @@ export class ResourceManager implements ISingleton {
     }
 
     LoadAsset(url: string, assetType: AssetType, bundleCache: BundleCache, loadCallBack: LoadAssetCompleteFunc) {
+        if (this.assets.has(url)) {
+            let assetCache = this.assets.get(url)
+            assetCache.AddRef()
+            loadCallBack(null, assetCache)
+            return
+        }
+        if (!this.loadingAssets.has(url)) {
+            this.loadingAssets.set(url, new AssetLoadTask)
+        }
+        let loadingAsset = this.loadingAssets.get(url)
+        loadingAsset.completeFuncs.push(loadCallBack)
+        this.loadingAssets.set(url, loadingAsset)
+
         if (assetType == CustomAtlas)
             this.loadCustomAtlas(url, bundleCache, loadCallBack)
         else
-            this.loadAsset(url, assetType, bundleCache, loadCallBack)
+            this.loadAnyAsset(url, assetType, bundleCache, loadCallBack)
 
     }
 }
