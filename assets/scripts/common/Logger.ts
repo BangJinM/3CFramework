@@ -1,19 +1,25 @@
-import { log } from "cc";
 import { ISingleton } from "./ISingleton";
-import { GlobalCommon } from "./GlobalCommon";
 
+/** 日志等级 */
 export enum LoggerLevel {
+    /** 调试 */
     DEBUG = 0,
+    /** 详情 */
     INFO,
+    /** 警告 */
     WARN,
+    /** 报错 */
     ERROR
 }
 
 export class Logger implements ISingleton {
+    /** 最大日志数量，超过清空 */
     private static MAXSIZE = 1000
+    /** 当前日志等级 */
     private static LOGGERLEVEL = LoggerLevel.DEBUG
+    /** 每次打印最大数量 */
     private static OUTPUTSIZE = 5
-
+    /** 日志列表 */
     private static logInfos = []
 
     Init() {
