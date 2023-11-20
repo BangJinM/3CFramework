@@ -12,6 +12,7 @@ import { CustomAnimationManager } from "./common/animation/CustomAnimationManage
 import { Vec3 } from "cc";
 import { InputManager } from "./common/InputManager";
 import { LocalStorageManager } from "./common/LocalStorageManager";
+import { Logger } from "./common/Logger";
 const { ccclass } = cc._decorator;
 
 @ccclass("Main")
@@ -42,6 +43,9 @@ export class Main extends cc.Component {
         GlobalCommon.localStorageManager = new LocalStorageManager
         GlobalCommon.localStorageManager.Init()
 
+        GlobalCommon.logger = new Logger
+        GlobalCommon.logger.Init()
+
         await new Promise((resolve) => {
             GlobalCommon.bundleManager.LoadBundle("resources", function () {
                 resolve(true)
@@ -49,7 +53,7 @@ export class Main extends cc.Component {
         })
 
         await GlobalCommon.uiGraphManager.InitUIRootNode()
-        console.log("Main onLoading")
+        Logger.info("Main onLoading")
 
         GlobalCommon.Facade = Facade.getInstance("3cframework")
         GlobalCommon.Facade.registerMediator(new TestMediator)
@@ -59,11 +63,11 @@ export class Main extends cc.Component {
         GlobalCommon.Facade.sendNotification(NotificationTable.Test_Open)
 
         GlobalCommon.resourcesManager.LoadAsset("http://10.40.3.98/res/h5/anim/hair/hair_9999_1_2", CustomAtlas, null, function () {
-            console.log("ddddddddddddd")
+            Logger.info("ddddddddddddd")
         }.bind(this))
 
         // GlobalCommon.resourcesManager.LoadAsset("models/MOB14008/MOB14008", Prefab, GlobalCommon.bundleManager.GetBundle("resources"), function (error, assetCache: AssetCache) {
-        //     console.log("ddddddddddddd")
+        //     Logger.info("ddddddddddddd")
         //     let monster = cc.instantiate(assetCache.data as Prefab)
         //     cc.director.getScene().addChild(monster)
 
@@ -89,6 +93,7 @@ export class Main extends cc.Component {
         GlobalCommon.customAnimationManager.Update(dt)
         GlobalCommon.inputManager.Update(dt)
         GlobalCommon.localStorageManager.Update(dt)
+        GlobalCommon.logger.Update(dt)
     }
 
     onDestroy() {
@@ -99,5 +104,6 @@ export class Main extends cc.Component {
         GlobalCommon.customAnimationManager.Clean()
         GlobalCommon.inputManager.Clean()
         GlobalCommon.localStorageManager.Clean()
+        GlobalCommon.logger.Clean()
     }
 }

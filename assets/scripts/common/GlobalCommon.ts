@@ -1,5 +1,6 @@
 import { InputManager } from "./InputManager";
 import { LocalStorageManager } from "./LocalStorageManager";
+import { Logger } from "./Logger";
 import { SingletonManager } from "./SingletonManager";
 import { CustomAnimationManager } from "./animation/CustomAnimationManager";
 import { MessageManager } from "./network/MessageManager";
@@ -28,4 +29,6 @@ export class GlobalCommon {
     static inputManager: InputManager = null
     /** 本地化管理 */
     static localStorageManager: LocalStorageManager = null
+    /** 输出管理 */
+    static logger: Logger = null
 }

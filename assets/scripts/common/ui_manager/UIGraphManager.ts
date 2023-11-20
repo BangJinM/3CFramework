@@ -3,6 +3,7 @@ import { UIEnum } from "./UIEnum";
 import { GlobalCommon } from "../GlobalCommon";
 import { ISingleton } from "../ISingleton";
 import { AssetCache } from "../resource_manager/ResourcesDefines";
+import { Logger } from "../Logger";
 
 export class UIGraphManager implements ISingleton {
     /** UICanvas */
@@ -43,7 +44,7 @@ export class UIGraphManager implements ISingleton {
 
             childNode.layer = cc.Layers.Enum.UI_2D
 
-            console.log("InitUIRootNode ", name)
+            Logger.info("InitUIRootNode " + name)
         }
     }
 
@@ -55,7 +56,7 @@ export class UIGraphManager implements ISingleton {
 
         this.uiNodes.clear()
         await this.InitUIRootNode()
-        console.log("ddadas")
+        Logger.info("ddadas")
     }
 
     GetUINode(nodeType: UIEnum) {
