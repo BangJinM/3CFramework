@@ -1,180 +1,192 @@
 import * as cc from "cc";
-import { ISingleton } from "../ISingleton";
-import { AssetCache, AssetLoadTask, AssetType, BundleCache, LoadAssetCompleteFunc } from "./ResourcesDefines";
+import { AssetCache, AssetType, BundleCache, LoadAssetCompleteFunc } from "./ResourcesDefines";
 import { CustomAtlas } from "./other_assets/CustomAtlas";
+import Global from "../config/Global";
 
 /** 资源管理类，所有在资源都会经由这个类，bundle中的资源，本地png，远程png */
-export class ResourceManager implements ISingleton {
-    /** 已经加载完成的资源列表 */
-    private assets: Map<string, AssetCache> = null
+export class ResourceManager {
     /** 正在加载的资源列表 */
-    private loadingAssets: Map<string, AssetLoadTask> = null
+    private loadingAssets: Map<string, Map<string, Function[]>> = new Map()
 
     Init() {
-        this.assets = new Map()
-        this.loadingAssets = new Map()
     }
+
     Update(deltaTime: number) {
-        for (const assetCache of this.assets.values()) {
-            if (assetCache.GetRef() <= 0) {
-                this.DeleteAsset(assetCache)
-            }
-        }
     }
     Clean() {
-        this.DeleteAllAsset()
-        this.assets = null
-        this.loadingAssets = null
     }
 
-    private getAssetCache(url: string, assetType: AssetType, bundleCache: BundleCache, error: Error, asset: cc.Asset) {
-        let assetCache = null
-        if (!error) {
-            assetCache = new AssetCache()
-            assetCache.data = asset
-            assetCache.url = url
-            assetCache.type = assetType
-            assetCache.AddRef()
-
-            asset.addRef()
-
-            if (bundleCache) {
-                bundleCache.AddRef()
-                assetCache.bundle = bundleCache
+    private loadAnyAsset(url: string, assetType: AssetType = cc.Asset, bundleCache: BundleCache, opt, onComplete?) {
+        let loadOnCompleteFunc = function (error: Error, asset: cc.Asset) {
+            if (error) {
+                this.loadAssetCompleteFunc(error, null, url, assetType)
+                return
             }
-
-            this?.assets?.set(assetCache.url, assetCache)
-        }
-        return assetCache
-    }
-
-    private loadAnyAsset(url: string, assetType: AssetType, bundleCache: BundleCache, loadCallBack: LoadAssetCompleteFunc) {
+            let assetCache = AssetCache.Create(url, assetType, bundleCache, [])
+            Global.GameCacheManager.AddAssetCache(asset, assetCache)
+            this?.loadAssetCompleteFunc(error, asset, url, assetType)
+        }.bind(this)
 
         if (bundleCache) {
-            bundleCache.bundle.load(url, function (error: Error, asset: cc.Asset) {
-                let assetCache = this.getAssetCache(url, assetType, bundleCache, error, asset)
-                this?.loadAssetCompleteFunc(url, error, assetCache)
-            }.bind(this))
+            bundleCache.bundle.load(url, onComplete ? onComplete : loadOnCompleteFunc)
         }
         else {
-            cc.assetManager.loadRemote(url, function (error, asset) {
-                let assetCache = this.getAssetCache(url, assetType, bundleCache, error, asset)
-                this?.loadAssetCompleteFunc(url, error, assetCache)
-            }.bind(this))
+            cc.assetManager.loadRemote(url, opt, onComplete ? onComplete : loadOnCompleteFunc)
         }
     }
 
-    private loadAssetCompleteFunc(url: string, error: Error, asset: AssetCache) {
-        let loadingAsset = this.loadingAssets.get(url)
+    private loadAssetCompleteFunc(error: Error, asset: cc.Asset, url, assetType) {
+        let loadingAsset = this.loadingAssets.get(assetType.name)
         if (!loadingAsset)
             return
 
-        for (const iterator of loadingAsset.completeFuncs) {
+        asset?.addRef()
+        let funcs = loadingAsset.get(url)
+        for (const iterator of funcs) {
             iterator(error, asset)
         }
 
-        this.loadingAssets.delete(url)
+        asset?.decRef()
+        loadingAsset.delete(url)
     }
 
-    /** 引用次数减1 */
-    public ReleaseAsset(asset: AssetCache, immediately?: boolean) {
-        if (!asset["__ReleaseManager__url__"])
-            return
+    private checkLoadingAsset(assetType: AssetType, url: string, func: Function) {
+        let loading = false
 
-        asset.DecRef()
-        if (immediately) {
-            this.DeleteAsset(asset)
+        if (!this.loadingAssets.has(assetType.name)) {
+            this.loadingAssets.set(assetType.name, new Map())
         }
-    }
 
-    /** 释放所有资源 */
-    public ReleaseAllAsset() {
-        for (const iterator of this.assets.values()) {
-            this.ReleaseAsset(iterator)
+        let funcMap = this.loadingAssets.get(assetType.name)
+        if (funcMap.has(url)) {
+            funcMap.get(url).push(func)
+            loading = true
         }
-    }
-
-    /** 释放所有资源 */
-    public DeleteAllAsset() {
-        for (const iterator of this.assets.values()) {
-            this.DeleteAsset(iterator)
+        else {
+            funcMap.set(url, [func])
         }
-    }
-    /** 释放资源 */
-    public DeleteAsset(asset: AssetCache) {
-        cc.assetManager.releaseAsset(asset.data)
-        if (asset.bundle) {
-            asset.bundle.DecRef()
-        }
-        this.assets.delete(asset.url)
+        return loading
     }
 
     /** 加载自定义图集 */
-    private loadCustomAtlas(url: string, bundleCache: BundleCache, onComplete: LoadAssetCompleteFunc) {
-        let jsonLoadError = null, jsonAssetCache = null
-        let sfLoadError = null, sfAssetCache = null
-        let loadCallBack = function (error: Error | null, asset: cc.Asset) {
-            let customAtlas = null
-            if (jsonAssetCache && sfAssetCache) {
-                customAtlas = CustomAtlas.createWithSpritePlist(sfAssetCache, jsonAssetCache)
+    private loadCustomAtlas(url: string, bundleCache: BundleCache, opt, onComplete) {
+        let laods = [
+            {
+                url: url + ".png",
+                assetType: cc.ImageAsset,
+                bundleCache: bundleCache
+            },
+            {
+                url: url + ".plist",
+                assetType: cc.Asset,
+                bundleCache: bundleCache
             }
+        ]
 
-            if ((sfLoadError || sfAssetCache) && (jsonLoadError || jsonAssetCache)) {
-                if (jsonAssetCache)
-                    jsonAssetCache.DecRef()
-
-                if (sfAssetCache)
-                    sfAssetCache.DecRef()
-
-                if (customAtlas) {
-                    this.loadAssetCompleteFunc(url, null, this.getAssetCache(url, CustomAtlas, bundleCache, error, customAtlas))
-                    return
-                }
-
-                if (sfLoadError) {
-                    this.loadAssetCompleteFunc(url, sfLoadError, null)
-                    return
-                }
-
-                if (jsonLoadError) {
-                    this.loadAssetCompleteFunc(url, jsonLoadError, null)
-                    return
-                }
+        let loadCallBack = function (error: Error | null, assets: cc.Asset[]) {
+            if (error) {
+                this.loadAssetCompleteFunc(error, null, url, CustomAtlas)
+                return
             }
+            let customAtlas = CustomAtlas.createWithSpritePlist(assets[0] as cc.ImageAsset, assets[1])
+            // for (const iterator of assets) {
+            //     iterator.decRef()
+            // }
+
+            let assetCache = AssetCache.Create(url, CustomAtlas, bundleCache, assets)
+            Global.GameCacheManager.AddAssetCache(customAtlas, assetCache)
+            this.loadAssetCompleteFunc(null, customAtlas, url, CustomAtlas)
         }.bind(this)
 
-        this.LoadAsset(url + ".png", cc.ImageAsset, bundleCache, (error: Error, asset: AssetCache) => {
-            sfLoadError = error
-            sfAssetCache = asset
-
-            loadCallBack()
-        })
-        this.LoadAsset(url + ".plist", null, bundleCache, (error: Error, asset: AssetCache) => {
-            jsonLoadError = error
-            jsonAssetCache = asset
-
-            loadCallBack()
-        })
+        this.LoadAssets(laods, opt, loadCallBack)
     }
 
-    LoadAsset(url: string, assetType: AssetType, bundleCache: BundleCache, loadCallBack: LoadAssetCompleteFunc) {
-        if (this.assets.has(url)) {
-            let assetCache = this.assets.get(url)
-            assetCache.AddRef()
-            loadCallBack(null, assetCache)
+    /** 加载图片SpriteFrame */
+    private loadSpriteFrame(url: string, bundleCache: BundleCache, opt, onComplete: LoadAssetCompleteFunc) {
+        let loadOnCompleteFunc = function (error: Error, asset: cc.Asset) {
+            if (error) {
+                this?.loadAssetCompleteFunc(error, null, url, cc.SpriteFrame)
+                return
+            }
+            let spriteFrame = cc.SpriteFrame.createWithImage(asset as cc.ImageAsset)
+            let assetCache = AssetCache.Create(url, cc.SpriteFrame, bundleCache, [asset])
+            Global.GameCacheManager.AddAssetCache(spriteFrame, assetCache)
+            this?.loadAssetCompleteFunc(error, spriteFrame, url, cc.SpriteFrame)
+            /** 释放图片资源 */
+            // asset.decRef()
+        }.bind(this)
+
+        let asset = Global.GameCacheManager.GetAssetCache(cc.ImageAsset, url)
+        if (asset) {
+            loadOnCompleteFunc(null, asset)
             return
         }
-        if (!this.loadingAssets.has(url)) {
-            this.loadingAssets.set(url, new AssetLoadTask)
+
+        if (this.checkLoadingAsset(cc.ImageAsset, url, loadOnCompleteFunc))
+            return
+
+        this.loadAnyAsset(url, cc.ImageAsset, bundleCache, opt)
+    }
+
+    /** 加载单个资源 */
+    LoadAsset(url: string, assetType: AssetType, bundleCache: BundleCache, opt, loadCallBack: LoadAssetCompleteFunc) {
+        let asset = Global.GameCacheManager.GetAssetCache(assetType, url)
+        if (asset) {
+            // asset.addRef()
+            loadCallBack(null, asset)
+            return
         }
-        let loadingAsset = this.loadingAssets.get(url)
-        loadingAsset.completeFuncs.push(loadCallBack)
-        this.loadingAssets.set(url, loadingAsset)
+
+        if (this.checkLoadingAsset(assetType, url, loadCallBack))
+            return
 
         if (assetType == CustomAtlas)
-            this.loadCustomAtlas(url, bundleCache, loadCallBack)
+            this.loadCustomAtlas(url, bundleCache, opt, loadCallBack)
+        else if (assetType == cc.SpriteFrame)
+            this.loadSpriteFrame(url, bundleCache, opt, loadCallBack)
         else
-            this.loadAnyAsset(url, assetType, bundleCache, loadCallBack)
+            this.loadAnyAsset(url, assetType, bundleCache, opt)
+    }
 
+    /** 
+     * 批量加载资源 
+     * 如果有一个资源加载失败，清理全部的资源
+     */
+    LoadAssets(urlTypes: { bundleCache: BundleCache, url: string, assetType: AssetType }[], opt, onComplete: LoadAssetCompleteFunc) {
+        let results = {}
+        let count = 0
+        let lastError: Error = null
+
+        let loadCompleted = function (url, error: Error, asset: cc.Asset) {
+            if (error)
+                lastError = error
+
+            count++
+            results[url] = { error: error, asset: asset }
+            asset?.addRef()
+
+            if (count >= urlTypes.length) {
+                for (const key in results) {
+                    results[key].asset?.decRef()
+                }
+                if (lastError) {
+                    onComplete(lastError, [])
+                    return
+                } else {
+                    let temp = []
+                    for (const urlType of urlTypes) {
+                        temp.push(results[urlType.url].asset)
+                    }
+                    onComplete(error, temp)
+                }
+            }
+        }
+
+        for (const key in urlTypes) {
+            let value = urlTypes[key]
+            this.LoadAsset(value.url, value.assetType, value.bundleCache, opt, function (error, asset: cc.Asset) {
+                loadCompleted(value.url, error, asset)
+            })
+        }
     }
 }

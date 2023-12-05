@@ -1,20 +1,22 @@
 import * as cc from "cc";
-import { ISingleton } from "../ISingleton";
 import { BundleCache, BundleLoadTask, LoadBundleCompleteFunc } from "./ResourcesDefines";
-export class BundleManager implements ISingleton {
-    bundles: Map<string, BundleCache> = null
-    loadingBundles: Map<string, BundleLoadTask> = null
+export class BundleManager {
+    private bundles: Map<string, BundleCache> = new Map()
+    private loadingBundles: Map<string, BundleLoadTask> = new Map()
 
     Init() {
-        this.bundles = new Map()
-        this.loadingBundles = new Map()
     }
+
     Update(deltaTime: number) {
     }
     Clean() {
         for (const bundle of this.bundles.values()) {
-
+            if (bundle.GetRef() <= 0) {
+                bundle.bundle.releaseAll()
+            }
         }
+        this.loadingBundles.clear()
+        this.bundles.clear()
     }
     AddBundle(bundleName: string, bundleCache) {
         this.bundles.set(bundleName, bundleCache)
@@ -47,11 +49,11 @@ export class BundleManager implements ISingleton {
         }.bind(this)
 
         cc.assetManager.loadBundle(url, {}, function (error, bundle) {
-            this?.LoadBundleComplete(url, error, getBundle(error, bundle))
+            this?.loadBundleComplete(url, error, getBundle(error, bundle))
         }.bind(this))
     }
 
-    LoadBundleComplete(url: string, error: Error, bundle: BundleCache) {
+    private loadBundleComplete(url: string, error: Error, bundle: BundleCache) {
         let loadingBundle = this.loadingBundles.get(url)
         if (!loadingBundle)
             return
