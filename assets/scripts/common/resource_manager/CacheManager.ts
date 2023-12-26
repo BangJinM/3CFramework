@@ -1,5 +1,6 @@
 import * as cc from "cc";
-import { AssetCache, AssetType } from "./ResourcesDefines";
+import { AssetCache, AssetType, USE_SPRITE_BUNDLE_LOAD } from "./ResourcesDefines";
+// import AppLog from "../util/AppLog";
 
 /** 缓存管理类 */
 export class CacheManager {
@@ -26,18 +27,22 @@ export class CacheManager {
         }
     }
     Clean() {
+        this.DeleteAllAsset()
         this.assetCaches = {}
     }
 
     AddAssetCache(asset: cc.Asset, assetCache: AssetCache) {
-        if (!this.assetCaches[assetCache.type.name]) {
-            this.assetCaches[assetCache.type.name] = new Map()
+        let key = cc.js.getClassName(assetCache.type)
+        if (!this.assetCaches[key]) {
+            this.assetCaches[key] = new Map()
         }
 
-        let assetCacheMap: Map<string, cc.Asset> = this.assetCaches[assetCache.type.name]
+        let assetCacheMap: Map<string, cc.Asset> = this.assetCaches[key]
         if (assetCacheMap.has(assetCache.url)) {
             return
         }
+
+        // AppLog.log("add asset cache", assetCache.url)
 
         asset.addRef()
         assetCacheMap.set(assetCache.url, asset)
@@ -45,7 +50,8 @@ export class CacheManager {
     }
 
     GetAssetCache(assetType: AssetType, url: string): cc.Asset {
-        let assetCacheMap: Map<string, cc.Asset> = this.assetCaches[assetType.name]
+        let key = cc.js.getClassName(assetType)
+        let assetCacheMap: Map<string, cc.Asset> = this.assetCaches[key]
         if (!assetCacheMap) {
             return null
         }
@@ -69,11 +75,24 @@ export class CacheManager {
             iterator.decRef()
         }
 
-        if (this.assetCaches[assetCache.type.name].has(assetCache.url)) {
-            this.assetCaches[assetCache.type.name].delete(assetCache.url)
+        let key = cc.js.getClassName(assetCache.type)
+        if (this.assetCaches[key].has(assetCache.url)) {
+            this.assetCaches[key].delete(assetCache.url)
         }
 
         asset.decRef()
+
+        // 如果是bundle资源, bundle中的spriteframe和texture 是直接加载,卸载交由assetManager处理
+        if (USE_SPRITE_BUNDLE_LOAD && assetCache.bundle) {
+            if (asset instanceof cc.SpriteFrame) {
+                return
+            }
+            else if (asset instanceof cc.Texture2D) {
+                return
+            }
+        }
+
+        // AppLog.log("资源释放", assetCache.url)
         cc.assetManager.releaseAsset(asset)
     }
 

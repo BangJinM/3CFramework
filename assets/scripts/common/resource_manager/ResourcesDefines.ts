@@ -1,8 +1,12 @@
 import * as cc from "cc";
+import { AssetRefComponent } from "./custom_component/AssetRefComponent";
 
 export type AssetType = cc.Constructor<cc.Asset>
 export type LoadAssetCompleteFunc = (error: Error | null, asset: cc.Asset | cc.Asset[]) => void;
 export type LoadBundleCompleteFunc = (error: Error | null, asset: BundleCache) => void;
+
+/** 使用bundle.load直接加载spriteframe */
+export let USE_SPRITE_BUNDLE_LOAD = true
 
 /** 资源下载任务 */
 export class AssetLoadTask {
@@ -81,12 +85,24 @@ function ObserverPropertySetter<T>(target: T, propertyKey: string, beforeSetterF
 
     Object.defineProperty(target, propertyKey, {
         get: oldSpriteFrameGet,
-        set: function (value: cc.SpriteAtlas | null) {
-            if (beforeSetterFunc)
-                beforeSetterFunc.call(this, value)
+        set: function (value: any | null) {
+            let oldValue = oldSpriteFrameGet.call(this)
+            if (oldValue === value)
+                return
+
+            let refComp: AssetRefComponent = null
+            refComp = this.node.getComponent(AssetRefComponent)
+            if (refComp) {
+                refComp.DelAsset(oldValue)
+            }
+
             oldSpriteFrameSet.call(this, value)
-            if (afterSetterFunc)
-                afterSetterFunc.call(this, value)
+
+            if (value && value["__asset_cache__"]) {
+                if (!refComp)
+                    refComp = this.node.addComponent(AssetRefComponent)
+                refComp.AddAsset(value)
+            }
         },
         enumerable: true,
         configurable: true
@@ -95,16 +111,20 @@ function ObserverPropertySetter<T>(target: T, propertyKey: string, beforeSetterF
 
 
 /**
- * 增加SpriteFame引用监听
+ * 增加Sprite资源监听
  * @description 为什么要用这种方式 
- * @description 第一个方案是CustomSprite继承Sprite
- * @description 第二个方案是运行时注入Sprite的Setter和OnDestroy
+ * @description 第一个方案是CustomSprite继承Sprite x
+ * @description 第二个方案是运行时注入Sprite的Setter和OnDestroy x
+ * @description 第三个方案是全程交给业务层管理使用SpriteFrameRefComponent √
  * @description 在一个方案中缺陷是 在Button中，得先移除老的Sprite再新增CustomSprite，会移除Sprite失败，CustomSprite和Sprite同时存在
  * @param sprite 
  * @returns 
  */
-export function ObserverSpriteProperty(sprite: cc.Sprite) {
+export function ObserverSpriteProperty(sprite) {
     if (!sprite)
+        return
+
+    if (!cc.isValid(sprite.node))
         return
 
     if (sprite["__overwrite_flag__"])
@@ -112,42 +132,11 @@ export function ObserverSpriteProperty(sprite: cc.Sprite) {
 
     sprite["__overwrite_flag__"] = true
 
-    ObserverPropertySetter<cc.Sprite>(sprite, "spriteFrame", function () {
-        if (this._spriteFrame && this._spriteFrame["__asset_cache__"]) {
-            this._spriteFrame.decRef()
-        }
-    }, function () {
-        if (this._spriteFrame && this._spriteFrame["__asset_cache__"]) {
-            this._spriteFrame.addRef()
-        }
-    })
-
-    ObserverPropertySetter<cc.Sprite>(sprite, "spriteAtlas", function () {
-        if (this._atlas && this._atlas["__asset_cache__"]) {
-            this._atlas.decRef()
-        }
-    }, function () {
-        if (this._atlas && this._atlas["__asset_cache__"]) {
-            this._atlas.addRef()
-        }
-    })
-
-    const onDestroy = sprite.onDestroy
-    sprite.onDestroy = function () {
-        if (this._spriteFrame && this._spriteFrame["__asset_cache__"]) {
-            this._spriteFrame.decRef()
-        }
-
-        if (this._atlas && this._atlas["__asset_cache__"]) {
-            this._atlas.addRef()
-        }
-
-        //调用之前的onDestroy
-        onDestroy?.call(this);
-    };
+    ObserverPropertySetter<cc.Sprite>(sprite, "spriteFrame")
+    ObserverPropertySetter<cc.Sprite>(sprite, "spriteAtlas")
 }
 
-/** 增加SpriteFrame引用监听 */
+/** 增加Button资源监听 */
 export function ObserverButtonProperty(button: cc.Button) {
     if (!button)
         return
@@ -157,65 +146,23 @@ export function ObserverButtonProperty(button: cc.Button) {
 
     button["__overwrite_flag__"] = true
 
-    ObserverPropertySetter<cc.Button>(button, "normalSprite", function () {
-        if (this._normalSprite && this._normalSprite["__asset_cache__"]) {
-            this._normalSprite.decRef()
-        }
-    }, function () {
-        if (this._normalSprite && this._normalSprite["__asset_cache__"]) {
-            this._normalSprite.addRef()
-        }
-    })
+    ObserverPropertySetter<cc.Button>(button, "normalSprite")
+    ObserverPropertySetter<cc.Button>(button, "pressedSprite")
+    ObserverPropertySetter<cc.Button>(button, "hoverSprite")
+    ObserverPropertySetter<cc.Button>(button, "disabledSprite")
+}
 
-    ObserverPropertySetter<cc.Button>(button, "pressedSprite", function () {
-        if (this._pressedSprite && this._pressedSprite["__asset_cache__"]) {
-            this._pressedSprite.decRef()
-        }
-    }, function () {
-        if (this._pressedSprite && this._pressedSprite["__asset_cache__"]) {
-            this._pressedSprite.addRef()
-        }
-    })
+/** 增加Label资源监听 */
+export function ObserverLabelProperty(label: cc.Label) {
+    if (!label)
+        return
 
-    ObserverPropertySetter<cc.Button>(button, "hoverSprite", function () {
-        if (this._hoverSprite && this._hoverSprite["__asset_cache__"]) {
-            this._hoverSprite.decRef()
-        }
-    }, function () {
-        if (this._hoverSprite && this._hoverSprite["__asset_cache__"]) {
-            this._hoverSprite.addRef()
-        }
-    })
+    if (label["__overwrite_flag__"])
+        return
 
-    ObserverPropertySetter<cc.Button>(button, "disabledSprite", function () {
-        if (this._disabledSprite && this._disabledSprite["__asset_cache__"]) {
-            this._disabledSprite.decRef()
-        }
-    }, function () {
-        if (this._disabledSprite && this._disabledSprite["__asset_cache__"]) {
-            this._disabledSprite.addRef()
-        }
-    })
+        label["__overwrite_flag__"] = true
 
-    const onDestroy = button.onDestroy
-    button.onDestroy = function () {
-        if (this._normalSprite && this._normalSprite["__asset_cache__"]) {
-            this._normalSprite.addRef()
-        }
-
-        if (this._pressedSprite && this._pressedSprite["__asset_cache__"]) {
-            this._pressedSprite.addRef()
-        }
-
-        if (this._hoverSprite && this._hoverSprite["__asset_cache__"]) {
-            this._hoverSprite.addRef()
-        }
-
-        if (this._disabledSprite && this._disabledSprite["__asset_cache__"]) {
-            this._disabledSprite.addRef()
-        }
-
-        //调用之前的onDestroy
-        onDestroy?.call(this);
-    };
+    ObserverPropertySetter<cc.Label>(label, "font")
+    ObserverPropertySetter<cc.Label>(label, "fontAtlas")
+    ObserverPropertySetter<cc.Label>(label, "fontEx")
 }

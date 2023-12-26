@@ -48,28 +48,19 @@ function GetOffsetData(str: string) {
 @ccclass('CustomAtlas')
 export class CustomAtlas extends SpriteAtlas {
     public spriteFrame: SpriteFrame = null
-    public imageAsset: ImageAsset = null
-    public plist: Asset = null
 
-    static createWithSpritePlist(imageAsset: ImageAsset, plist: Asset): CustomAtlas {
+    static createWithSpritePlist(spriteFrame: SpriteFrame, plist: Asset): CustomAtlas {
         let customAtlas: CustomAtlas = new CustomAtlas()
-        customAtlas.spriteFrame = SpriteFrame.createWithImage(imageAsset)
-        customAtlas.plist = plist;
-        customAtlas.imageAsset = imageAsset
-
-        customAtlas.createSpriteFrames()
-
-        customAtlas.plist.addRef()
-        customAtlas.imageAsset.addRef()
-
+        customAtlas.spriteFrame = spriteFrame
         customAtlas.spriteFrame.addRef()
 
+        customAtlas.createSpriteFrames(plist)
         return customAtlas
     }
 
-    private createSpriteFrames() {
-        if (this.spriteFrame && this.plist) {
-            let frames = this.plist._nativeAsset?.frames
+    private createSpriteFrames(plist: Asset) {
+        if (this.spriteFrame && plist) {
+            let frames = plist._nativeAsset?.frames
             if (frames) {
                 for (const key of Object.keys(frames)) {
                     let spriteFrame = new SpriteFrame()
@@ -93,6 +84,7 @@ export class CustomAtlas extends SpriteAtlas {
         if (this.spriteFrames) {
             for (const key of Object.keys(this.spriteFrames)) {
                 this.spriteFrames[key].decRef()
+                this.spriteFrames[key].destroy()
             }
             this.spriteFrames = null
         }
@@ -100,16 +92,6 @@ export class CustomAtlas extends SpriteAtlas {
         if (this.spriteFrame) {
             this.spriteFrame.decRef()
             this.spriteFrame = null
-        }
-
-        if (this.plist) {
-            this.plist.decRef()
-            this.plist = null
-        }
-
-        if (this.imageAsset) {
-            this.imageAsset.decRef()
-            this.imageAsset = null
         }
     }
 
