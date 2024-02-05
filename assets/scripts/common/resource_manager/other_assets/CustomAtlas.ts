@@ -1,5 +1,5 @@
-import { Asset, ImageAsset, Rect, Size, SpriteAtlas, SpriteFrame, Vec2, _decorator } from "cc";
-const { ccclass } = _decorator;
+import * as cc from "cc";
+const { ccclass } = cc._decorator;
 
 // TODO 字符串提取效率问题
 function GetFrameData(str: string) {
@@ -15,7 +15,7 @@ function GetFrameData(str: string) {
     if (newList_1.length < 2 || newList_2.length < 2) {
         return null;
     }
-    return new Rect(parseInt(newList_1[0]), parseInt(newList_1[1]), parseInt(newList_2[0]), parseInt(newList_2[1]));
+    return new cc.Rect(parseInt(newList_1[0]), parseInt(newList_1[1]), parseInt(newList_2[0]), parseInt(newList_2[1]));
 }
 
 function GetSizeData(str: string) {
@@ -29,7 +29,7 @@ function GetSizeData(str: string) {
     if (newList_0.length < 2) {
         return null;
     }
-    return new Size(parseInt(newList_0[0]), parseInt(newList_0[1]));
+    return new cc.Size(parseInt(newList_0[0]), parseInt(newList_0[1]));
 }
 function GetOffsetData(str: string) {
     if (str.length < 5) {
@@ -42,14 +42,29 @@ function GetOffsetData(str: string) {
     if (newList_0.length < 2) {
         return null;
     }
-    return new Vec2(parseInt(newList_0[0]), parseInt(newList_0[1]));
+    return new cc.Vec2(parseInt(newList_0[0]), parseInt(newList_0[1]));
+}
+
+/**
+ * 格式化fName， 并获取customAtlas中的资源
+ * @param customAtlas CustomAtlas
+ * @param fName 子SpriteFrame名字
+ */
+export function GetCustomAtlasSpriteFrame(customAtlas: CustomAtlas, fName: string, ext = ".png"): cc.SpriteFrame {
+    if (!customAtlas)
+        return null
+
+    if (fName.indexOf(ext) == -1)
+        fName += ext
+
+    return customAtlas.getSpriteFrame(fName)
 }
 
 @ccclass('CustomAtlas')
-export class CustomAtlas extends SpriteAtlas {
-    public spriteFrame: SpriteFrame = null
+export class CustomAtlas extends cc.SpriteAtlas {
+    public spriteFrame: cc.SpriteFrame = null
 
-    static createWithSpritePlist(spriteFrame: SpriteFrame, plist: Asset): CustomAtlas {
+    static createWithSpritePlist(spriteFrame: cc.SpriteFrame, plist: cc.Asset): CustomAtlas {
         let customAtlas: CustomAtlas = new CustomAtlas()
         customAtlas.spriteFrame = spriteFrame
         customAtlas.spriteFrame.addRef()
@@ -58,12 +73,12 @@ export class CustomAtlas extends SpriteAtlas {
         return customAtlas
     }
 
-    private createSpriteFrames(plist: Asset) {
+    private createSpriteFrames(plist: cc.Asset) {
         if (this.spriteFrame && plist) {
             let frames = plist._nativeAsset?.frames
             if (frames) {
                 for (const key of Object.keys(frames)) {
-                    let spriteFrame = new SpriteFrame()
+                    let spriteFrame = new cc.SpriteFrame()
                     let spriteFrameInfo = frames[key]
                     spriteFrame.reset({
                         texture: this.spriteFrame.texture,

@@ -1,6 +1,7 @@
 import * as cc from "cc";
 import { BundleCache, BundleLoadTask, LoadBundleCompleteFunc } from "./ResourcesDefines";
-export class BundleManager {
+import { ISingleton } from "../ISingleton";
+export class BundleManager implements ISingleton {
     private bundles: Map<string, BundleCache> = new Map()
     private loadingBundles: Map<string, BundleLoadTask> = new Map()
 

@@ -1,4 +1,5 @@
 import * as cc from "cc";
+import { ASSET_CACHE_FLAG } from "../ResourcesDefines";
 const { ccclass, property } = cc._decorator;
 
 //79b4bca3-f66c-488c-9761-6c74513a1132
@@ -31,7 +32,7 @@ export class AssetRefComponent extends cc.Component {
      * 添加资源
      */
     AddAsset(asset: cc.Asset) {
-        if (!asset || !asset["__asset_cache__"])
+        if (!asset || !asset[ASSET_CACHE_FLAG])
             return
 
         if (!cc.isValid(this))
@@ -44,12 +45,12 @@ export class AssetRefComponent extends cc.Component {
      * 删除资源
      */
     DelAsset(asset: cc.Asset) {
-        if (!asset || !asset["__asset_cache__"])
+        if (!asset || !asset[ASSET_CACHE_FLAG])
             return
 
         let resultIndex = -1
         for (let index = 0; index < this.assets.length; index++) {
-            if (asset["__asset_cache__"].url == this.assets[index]["__asset_cache__"].url) {
+            if (asset[ASSET_CACHE_FLAG].url == this.assets[index][ASSET_CACHE_FLAG].url) {
                 resultIndex = index
             }
         }

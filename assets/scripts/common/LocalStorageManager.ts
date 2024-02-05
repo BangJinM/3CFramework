@@ -1,20 +1,16 @@
-import * as cc from "cc";
 import { ISingleton } from "./ISingleton";
 
+/** 持久化存储 */
 export class LocalStorageManager implements ISingleton {
-    private KEY_CONFIG: string = 'template';
-    private KEY_GLOBAL_CONFIG: string = 'template_global';
+    private KEY_CONFIG: string = 'local_data';
 
-    /** 全局数据 */
-    private globalData = {}
     /** 玩家数据 */
     private userData = {}
-    /** 玩家唯一ID */
+    /** 玩家唯一ID，为空则为全局数据 */
     private userKey = ""
     /** 时间 */
     deltaTime = 0
 
-    globalMark = false
     userMark = false
 
     Init() {
@@ -22,92 +18,59 @@ export class LocalStorageManager implements ISingleton {
     }
 
     Update(deltaTime: number) {
-        this.deltaTime += deltaTime
-        if (this.deltaTime > 10) {
-            this.deltaTime = 0
-
-            if (this.globalMark) {
-                this.SaveGlobalData()
-            }
-            if (this.userMark) {
-                this.SaveUserData()
-            }
-        }
     }
     Clean() {
-        this.globalData = {}
+        // this.SaveUserData()
+
         this.userData = {}
         this.userKey = ""
-        this.globalMark = false
         this.userMark = false
     }
 
-    SetUserID(userKey: string) {
+    SetKey(userKey: string) {
         this.userKey = userKey
+        let userData = this.GetUserData() || "{}"
+        this.userData = JSON.parse(userData)
     }
-    /** 玩家数据，必须得等玩家初始化完成后才能使用 */
-    SetUserData(key: string, value: string) {
-        if (!this.userKey)
-            return
+
+    SetUserData(key, value) {
         this.userData[key] = value
-        this.userMark = true
-    }
-    /** 玩家数据，必须得等玩家初始化完成后才能使用 */
-    GetUserData(key: string) {
-        if (!this.userKey)
-            return ""
-
-        return this.userData[key] || ""
-    }
-
-    /** 全局数据，此设备下的所有账号公用 */
-    SetGlobalData(key, value) {
-        this.globalData[key] = value
-        this.globalMark = true
-    }
-    /** 全局数据，此设备下的所有账号公用 */
-    GetGlobalData(key: string) {
-        return this.globalData[key] || ""
+        // this.userMark = true
+        this.SaveUserData()
     }
 
     SaveUserData() {
-        if (!this.userKey)
-            return
         var str = JSON.stringify(this.userData)
-        this.save(this.userKey + this.KEY_CONFIG, str)
+        this.save(this.KEY_CONFIG + this.userKey, str)
         this.userMark = false
     }
-    SaveGlobalData() {
-        var str = JSON.stringify(this.globalData)
-        this.save(this.KEY_GLOBAL_CONFIG, str)
-        this.globalMark = false
-    }
-    
-    /** 保存数据 */
-    private save(key: string, value: string) {
-        if (cc.sys.isNative) {
-            cc.native.fileUtils.writeStringToFile(value, this.getConfigPath() + "/" + key);
-        } else {
-            localStorage.setItem(key, value)
-        }
+
+    GetUserData(): string {
+        return localStorage.getItem(this.KEY_CONFIG + this.userKey) || ""
     }
 
-    /**
-     * 获取配置文件路径
-     * @returns 获取配置文件路径
-     */
-    private getConfigPath() {
-        let platform: any = cc.sys.platform;
+    private save(key: string, value) {
+        localStorage.setItem(key, value)
+    }
 
-        if (platform === cc.sys.OS.WINDOWS)
-            return "src/conf";
-        else if (platform === cc.sys.OS.LINUX)
-            return "./conf";
-        else
-            if (cc.sys.isNative) {
-                return cc.native.fileUtils.getWritablePath() + "conf"
-            } else {
-                return "src/conf";
-            }
+    GetUserDataByKey(key) {
+        return this.userData[key]
+    }
+
+    GetStringForKey(key: string, defaultValue = "") {
+        return this.GetUserDataByKey(key) || defaultValue
+    }
+
+    GetIntegerForKey(key, defaultValue = 0) {
+        let result = this.GetUserDataByKey(key)
+        if (!result)
+            return defaultValue
+
+        return Number(result)
+    }
+
+    GetJsonForKey(key) {
+        let jsonStr = this.GetStringForKey(key, "{}")
+        return JSON.parse(jsonStr)
     }
 }

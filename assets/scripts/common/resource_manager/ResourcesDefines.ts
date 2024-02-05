@@ -5,8 +5,12 @@ export type AssetType = cc.Constructor<cc.Asset>
 export type LoadAssetCompleteFunc = (error: Error | null, asset: cc.Asset | cc.Asset[]) => void;
 export type LoadBundleCompleteFunc = (error: Error | null, asset: BundleCache) => void;
 
-/** 使用bundle.load直接加载spriteframe */
+/** 使用bundle.load直接加载spriteFrame */
 export let USE_SPRITE_BUNDLE_LOAD = true
+/** 延迟卸载资源 */
+export let DELAY_RELEASE_ASSET = true
+export let ASSET_CACHE_FLAG = "user_data_asset_cache_flag__"
+export let OBSERVER_XX_PROPERTY_FLAG = "user_data_observer_xx_property_flag__"
 
 /** 资源下载任务 */
 export class AssetLoadTask {
@@ -33,15 +37,17 @@ export class CacheRef {
 
 export class AssetCache {
     /** 路径 */
-    url: string
+    url: string | null = null
     /** 资源类型 */
-    type: AssetType
+    type: AssetType | null = null
     /** bundle缓存 */
-    bundle: BundleCache
+    bundle: BundleCache | null = null
     /** 依赖的资源 */
     depends: cc.Asset[] = []
+    /** 这个资源未使用时，可用，releaseTime<= 0卸载资源 */
+    releaseTime = 0
 
-    static Create(url: string, type: AssetType, bundle: BundleCache, depends?: cc.Asset[]) {
+    static Create(url: string, type: AssetType, bundle: BundleCache | null, depends: cc.Asset[]) {
         let asset = new AssetCache()
         asset.url = url
         asset.type = type
@@ -68,13 +74,13 @@ export class AssetCache {
 
 export class BundleCache extends CacheRef {
     /** 路径或者名字 */
-    url: string
+    url: string | null = null
     /** bundle */
-    bundle: cc.AssetManager.Bundle
+    bundle: cc.AssetManager.Bundle | null = null
 }
 
 /** 设置需要监听的get 和set */
-function ObserverPropertySetter<T>(target: T, propertyKey: string, beforeSetterFunc?: Function, afterSetterFunc?: Function) {
+function ObserverPropertySetter<T extends cc.Component>(target: T, propertyKey: string, beforeSetterFunc?: Function, afterSetterFunc?: Function) {
     let descriptor = Object.getOwnPropertyDescriptor(target.constructor.prototype, propertyKey)
 
     if (!descriptor)
@@ -86,22 +92,22 @@ function ObserverPropertySetter<T>(target: T, propertyKey: string, beforeSetterF
     Object.defineProperty(target, propertyKey, {
         get: oldSpriteFrameGet,
         set: function (value: any | null) {
-            let oldValue = oldSpriteFrameGet.call(this)
+            let oldValue = oldSpriteFrameGet?.call(this)
             if (oldValue === value)
                 return
 
-            let refComp: AssetRefComponent = null
+            let refComp: AssetRefComponent | null = null
             refComp = this.node.getComponent(AssetRefComponent)
             if (refComp) {
                 refComp.DelAsset(oldValue)
             }
 
-            oldSpriteFrameSet.call(this, value)
+            oldSpriteFrameSet?.call(this, value)
 
-            if (value && value["__asset_cache__"]) {
+            if (value && value[ASSET_CACHE_FLAG]) {
                 if (!refComp)
                     refComp = this.node.addComponent(AssetRefComponent)
-                refComp.AddAsset(value)
+                refComp?.AddAsset(value)
             }
         },
         enumerable: true,
@@ -120,17 +126,17 @@ function ObserverPropertySetter<T>(target: T, propertyKey: string, beforeSetterF
  * @param sprite 
  * @returns 
  */
-export function ObserverSpriteProperty(sprite) {
+export function ObserverSpriteProperty(sprite: cc.Sprite) {
     if (!sprite)
         return
 
     if (!cc.isValid(sprite.node))
         return
 
-    if (sprite["__overwrite_flag__"])
+    if (sprite[OBSERVER_XX_PROPERTY_FLAG])
         return
 
-    sprite["__overwrite_flag__"] = true
+    sprite[OBSERVER_XX_PROPERTY_FLAG] = true
 
     ObserverPropertySetter<cc.Sprite>(sprite, "spriteFrame")
     ObserverPropertySetter<cc.Sprite>(sprite, "spriteAtlas")
@@ -141,10 +147,10 @@ export function ObserverButtonProperty(button: cc.Button) {
     if (!button)
         return
 
-    if (button["__overwrite_flag__"])
+    if (button[OBSERVER_XX_PROPERTY_FLAG])
         return
 
-    button["__overwrite_flag__"] = true
+    button[OBSERVER_XX_PROPERTY_FLAG] = true
 
     ObserverPropertySetter<cc.Button>(button, "normalSprite")
     ObserverPropertySetter<cc.Button>(button, "pressedSprite")
@@ -157,12 +163,24 @@ export function ObserverLabelProperty(label: cc.Label) {
     if (!label)
         return
 
-    if (label["__overwrite_flag__"])
+    if (label[OBSERVER_XX_PROPERTY_FLAG])
         return
 
-        label["__overwrite_flag__"] = true
+    label[OBSERVER_XX_PROPERTY_FLAG] = true
 
     ObserverPropertySetter<cc.Label>(label, "font")
     ObserverPropertySetter<cc.Label>(label, "fontAtlas")
     ObserverPropertySetter<cc.Label>(label, "fontEx")
+}
+
+/** 增加AudioSource资源监听 */
+export function ObserverAudioSourceProperty(audioSource: cc.AudioSource) {
+    if (!audioSource)
+        return
+
+    if (audioSource[OBSERVER_XX_PROPERTY_FLAG])
+        return
+
+    audioSource[OBSERVER_XX_PROPERTY_FLAG] = true
+    ObserverPropertySetter<cc.AudioSource>(audioSource, "clip")
 }

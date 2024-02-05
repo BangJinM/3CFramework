@@ -1,21 +1,25 @@
 import * as cc from "cc";
 import { AssetCache, AssetType, BundleCache, LoadAssetCompleteFunc, USE_SPRITE_BUNDLE_LOAD } from "./ResourcesDefines";
 import { CustomAtlas } from "./other_assets/CustomAtlas";
-import Global from "../config/Global";
-// import AppLog from "../util/AppLog";
+import { CacheManager } from "./CacheManager";
+import { ISingleton } from "../ISingleton";
 
 /** 资源管理类，所有在资源都会经由这个类，bundle中的资源，本地png，远程png */
-export class ResourceManager {
+export class ResourceManager implements ISingleton {
+    private cacheManager: CacheManager = null
+
     /** 正在加载的资源列表 */
     private loadingAssets: Map<string, Map<string, Function[]>> = new Map()
 
-    Init() {
+    constructor(cacheManager: CacheManager) {
+        this.cacheManager = cacheManager
     }
 
-    Update(deltaTime: number) {
-    }
-    Clean() {
-    }
+    Init() { }
+
+    Update(deltaTime: number) { }
+
+    Clean() { }
 
     private loadAnyAsset(url: string, assetType: AssetType = cc.Asset, bundleCache: BundleCache, opt, onComplete?) {
         let loadOnCompleteFunc = function (error: Error, asset: cc.Asset) {
@@ -24,7 +28,7 @@ export class ResourceManager {
                 return
             }
             let assetCache = AssetCache.Create(url, assetType, bundleCache, [])
-            Global.GameCacheManager.AddAssetCache(asset, assetCache)
+            this.cacheManager?.AddAssetCache(asset, assetCache)
             this?.loadAssetCompleteFunc(error, asset, url, assetType)
         }.bind(this)
 
@@ -77,15 +81,21 @@ export class ResourceManager {
     }
 
     /** 加载自定义图集 */
-    private loadCustomAtlas(url: string, bundleCache: BundleCache, opt) {
-        let laods = [
+    private loadCustomAtlas(url: string, bundleCache: BundleCache | null, opt) {
+        let index = url.lastIndexOf(".")
+        let plistUrl = ""
+        if (index >= 0) {
+            plistUrl = url.substring(0, index) + ".plist"
+        }
+
+        let loads = [
             {
-                url: url + ".png",
+                url: url,
                 assetType: cc.SpriteFrame,
                 bundleCache: bundleCache
             },
             {
-                url: url + ".plist",
+                url: plistUrl,
                 assetType: cc.Asset,
                 bundleCache: bundleCache
             }
@@ -99,11 +109,11 @@ export class ResourceManager {
             let customAtlas = CustomAtlas.createWithSpritePlist(assets[0] as cc.SpriteFrame, assets[1])
 
             let assetCache = AssetCache.Create(url, CustomAtlas, bundleCache, [assets[0]])
-            Global.GameCacheManager.AddAssetCache(customAtlas, assetCache)
+            this.cacheManager?.AddAssetCache(customAtlas, assetCache)
             this.loadAssetCompleteFunc(null, customAtlas, url, CustomAtlas)
         }.bind(this)
 
-        this.LoadAssets(laods, opt, loadCallBack)
+        this.LoadAssets(loads, opt, loadCallBack)
     }
 
     private loadBundleTexture2D(url: string, bundleCache: BundleCache, opt) {
@@ -113,7 +123,7 @@ export class ResourceManager {
                 return
             }
             let assetCache = AssetCache.Create(url, cc.Texture2D, bundleCache, [])
-            Global.GameCacheManager.AddAssetCache(asset, assetCache)
+            this.cacheManager?.AddAssetCache(asset, assetCache)
             this?.loadAssetCompleteFunc(error, asset, url, cc.Texture2D)
         }.bind(this)
 
@@ -131,11 +141,11 @@ export class ResourceManager {
             const texture = new cc.Texture2D();
             texture.image = asset as cc.ImageAsset
             let assetCache = AssetCache.Create(url, cc.Texture2D, bundleCache, [asset])
-            Global.GameCacheManager.AddAssetCache(texture, assetCache)
+            this.cacheManager?.AddAssetCache(texture, assetCache)
             this?.loadAssetCompleteFunc(error, texture, url, cc.Texture2D)
         }.bind(this)
 
-        let asset = Global.GameCacheManager.GetAssetCache(cc.ImageAsset, url)
+        let asset = this.cacheManager?.GetAssetCache(cc.ImageAsset, url)
         if (asset) {
             loadOnCompleteFunc(null, asset)
             return
@@ -156,7 +166,7 @@ export class ResourceManager {
                 return
             }
             let assetCache = AssetCache.Create(url, cc.SpriteFrame, bundleCache, [])
-            Global.GameCacheManager.AddAssetCache(asset, assetCache)
+            this.cacheManager?.AddAssetCache(asset, assetCache)
             this?.loadAssetCompleteFunc(error, asset, url, cc.SpriteFrame)
         }.bind(this)
 
@@ -175,12 +185,12 @@ export class ResourceManager {
             spriteFrame.texture = asset as cc.Texture2D;
 
             let assetCache = AssetCache.Create(url, cc.SpriteFrame, bundleCache, [asset])
-            Global.GameCacheManager.AddAssetCache(spriteFrame, assetCache)
+            this.cacheManager?.AddAssetCache(spriteFrame, assetCache)
 
             this?.loadAssetCompleteFunc(error, spriteFrame, url, cc.SpriteFrame)
         }.bind(this)
 
-        let asset = Global.GameCacheManager.GetAssetCache(cc.Texture2D, url)
+        let asset = this.cacheManager?.GetAssetCache(cc.Texture2D, url)
         if (asset) {
             loadOnCompleteFunc(null, asset)
             return
@@ -189,9 +199,48 @@ export class ResourceManager {
         this.LoadAsset(url, cc.Texture2D, bundleCache, opt, loadOnCompleteFunc)
     }
 
+    LoadSkeletonData(url: string, opt) {
+        let loads = [
+            {
+                url: url + ".png",
+                assetType: cc.Texture2D,
+                bundleCache: null,
+            },
+            {
+                url: url + ".json",
+                assetType: cc.Asset,
+                bundleCache: null,
+            },
+            {
+                url: url + ".atlas",
+                assetType: cc.Texture2D,
+                bundleCache: null,
+            }
+        ]
+
+        let loadCallBack = function (error: Error | null, assets: cc.Asset[]) {
+            if (error) {
+                this.loadAssetCompleteFunc(error, null, url, CustomAtlas)
+                return
+            }
+            let asset = new cc.sp.SkeletonData();
+            asset.skeletonJson = assets[1].nativeAsset;
+            asset.atlasText = assets[0].nativeAsset;
+            asset.textures = [assets[0] as cc.Texture2D];
+            asset.textureNames = ['1.png'];
+            asset._uuid = url; // 可以传入任意字符串，但不能为空
+
+            let assetCache = AssetCache.Create(url, cc.sp.SkeletonData, null, assets)
+            this.cacheManager?.AddAssetCache(asset, assetCache)
+            this.loadAssetCompleteFunc(null, asset, url, cc.sp.SkeletonData)
+        }.bind(this)
+
+        this.LoadAssets(loads, opt, loadCallBack)
+    }
+
     /** 加载单个资源 */
-    LoadAsset(url: string, assetType: AssetType, bundleCache: BundleCache, opt, loadCallBack: LoadAssetCompleteFunc) {
-        let asset = Global.GameCacheManager.GetAssetCache(assetType, url)
+    LoadAsset(url: string, assetType: AssetType, bundleCache: BundleCache | null, opt, loadCallBack: LoadAssetCompleteFunc) {
+        let asset = this.cacheManager?.GetAssetCache(assetType, url)
         if (asset) {
             // asset.addRef()
             loadCallBack(null, asset)
@@ -213,6 +262,9 @@ export class ResourceManager {
                 this.loadBundleTexture2D(url, bundleCache, opt)
             else
                 this.loadRemoteTexture2D(url, bundleCache, opt)
+        else if (assetType == cc.sp?.SkeletonData) {
+            this.LoadSkeletonData(url, opt)
+        }
         else
             this.loadAnyAsset(url, assetType, bundleCache, opt)
     }
@@ -221,10 +273,10 @@ export class ResourceManager {
      * 批量加载资源 
      * 如果有一个资源加载失败，清理全部的资源
      */
-    LoadAssets(urlTypes: { bundleCache: BundleCache, url: string, assetType: AssetType }[], opt, onComplete: LoadAssetCompleteFunc) {
+    LoadAssets(urlTypes: { bundleCache: BundleCache | null, url: string, assetType: AssetType }[], opt, onComplete: LoadAssetCompleteFunc) {
         let results = {}
         let count = 0
-        let lastError: Error = null
+        let lastError: Error | null = null
 
         let loadCompleted = function (url, error: Error, asset: cc.Asset) {
             if (error)
