@@ -40,7 +40,7 @@ export class FindAStar {
         if (this.sceneGridManager.CheckObstacle(endPoint.x, endPoint.y))
             return points
 
-        let endKey = this.GetGrid(endPoint.x, endPoint.y).key
+        let endGrid = this.GetGrid(endPoint.x, endPoint.y)
         let currentNode = this.GetGrid(beginPoint.x, beginPoint.y)
         this.NoFound(currentNode, beginPoint.x, beginPoint.y, endPoint.x, endPoint.y, 0, null)
 
@@ -51,9 +51,11 @@ export class FindAStar {
         let time = 0
         while (this.sortArray.length() > 0) {
             currentNode = this.sortArray.getMinGrid() as AStarNode
-            if (!currentNode || currentNode.key == endKey)
+            if (!currentNode)
                 break
             currentNode.status = 2
+            if (endGrid.status == 2)
+                break
             for ([offsetX, offsetY, tempPower] of around) {
                 x = currentNode.mapX + offsetX
                 y = currentNode.mapY + offsetY
