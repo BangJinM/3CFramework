@@ -1,0 +1,146 @@
+{
+  "ver": "2.3.12",
+  "importer": "fbx",
+  "imported": true,
+  "uuid": "1fba9dad-218e-436d-899f-93977cec3a7c",
+  "files": [],
+  "subMetas": {
+    "4df00": {
+      "importer": "gltf-mesh",
+      "uuid": "1fba9dad-218e-436d-899f-93977cec3a7c@4df00",
+      "displayName": "",
+      "id": "4df00",
+      "name": "ACMA00040.mesh",
+      "userData": {
+        "gltfIndex": 0,
+        "triangleCount": 1649
+      },
+      "ver": "1.1.1",
+      "imported": true,
+      "files": [
+        ".bin",
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "438fe": {
+      "importer": "gltf-skeleton",
+      "uuid": "1fba9dad-218e-436d-899f-93977cec3a7c@438fe",
+      "displayName": "",
+      "id": "438fe",
+      "name": "UnnamedSkeleton.skeleton",
+      "userData": {
+        "gltfIndex": 0,
+        "jointsLength": 27
+      },
+      "ver": "1.0.1",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "3dbff": {
+      "importer": "texture",
+      "uuid": "1fba9dad-218e-436d-899f-93977cec3a7c@3dbff",
+      "displayName": "",
+      "id": "3dbff",
+      "name": "贴图 #16.texture",
+      "userData": {
+        "wrapModeS": "repeat",
+        "wrapModeT": "repeat",
+        "minfilter": "linear",
+        "magfilter": "linear",
+        "mipfilter": "none",
+        "anisotropy": 0,
+        "isUuid": false,
+        "imageUuidOrDatabaseUri": "db://assets/resources/player/models/body/ACMA00040.tga"
+      },
+      "ver": "1.0.22",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "283b1": {
+      "importer": "gltf-material",
+      "uuid": "1fba9dad-218e-436d-899f-93977cec3a7c@283b1",
+      "displayName": "",
+      "id": "283b1",
+      "name": "ACMA00040.material",
+      "userData": {
+        "gltfIndex": 0
+      },
+      "ver": "1.0.14",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "22d7e": {
+      "importer": "gltf-scene",
+      "uuid": "1fba9dad-218e-436d-899f-93977cec3a7c@22d7e",
+      "displayName": "",
+      "id": "22d7e",
+      "name": "ACMA00040.prefab",
+      "userData": {
+        "gltfIndex": 0
+      },
+      "ver": "1.0.14",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    }
+  },
+  "userData": {
+    "imageMetas": [
+      {
+        "name": "贴图 #16",
+        "uri": "db://assets/resources/player/models/body/ACMA00040.tga"
+      }
+    ],
+    "fbx": {
+      "smartMaterialEnabled": true
+    },
+    "redirect": "1fba9dad-218e-436d-899f-93977cec3a7c@22d7e",
+    "lods": {
+      "enable": false,
+      "hasBuiltinLOD": false,
+      "options": [
+        {
+          "screenRatio": 0.25,
+          "faceCount": 1
+        },
+        {
+          "screenRatio": 0.125,
+          "faceCount": 0.25
+        },
+        {
+          "screenRatio": 0.01,
+          "faceCount": 0.1
+        }
+      ]
+    },
+    "assetFinder": {
+      "meshes": [
+        "1fba9dad-218e-436d-899f-93977cec3a7c@4df00"
+      ],
+      "skeletons": [
+        "1fba9dad-218e-436d-899f-93977cec3a7c@438fe"
+      ],
+      "textures": [
+        "1fba9dad-218e-436d-899f-93977cec3a7c@3dbff"
+      ],
+      "materials": [
+        "1fba9dad-218e-436d-899f-93977cec3a7c@283b1"
+      ],
+      "scenes": [
+        "1fba9dad-218e-436d-899f-93977cec3a7c@22d7e"
+      ]
+    }
+  }
+}

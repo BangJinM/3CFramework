@@ -1,0 +1,100 @@
+{
+  "ver": "2.3.12",
+  "importer": "fbx",
+  "imported": true,
+  "uuid": "7e2d7331-089d-4e36-8ff2-90477e21a591",
+  "files": [
+    "__original-animation-0.cconb"
+  ],
+  "subMetas": {
+    "d4bb9": {
+      "importer": "gltf-animation",
+      "uuid": "7e2d7331-089d-4e36-8ff2-90477e21a591@d4bb9",
+      "displayName": "",
+      "id": "d4bb9",
+      "name": "Stand02_knife.animation",
+      "userData": {
+        "gltfIndex": 0,
+        "wrapMode": 2,
+        "sample": 30,
+        "span": {
+          "from": 0,
+          "to": 2.3333332538604736
+        },
+        "events": []
+      },
+      "ver": "1.0.17",
+      "imported": true,
+      "files": [
+        ".cconb"
+      ],
+      "subMetas": {}
+    },
+    "ee576": {
+      "importer": "gltf-scene",
+      "uuid": "7e2d7331-089d-4e36-8ff2-90477e21a591@ee576",
+      "displayName": "",
+      "id": "ee576",
+      "name": "@Stand02_knife.prefab",
+      "userData": {
+        "gltfIndex": 0
+      },
+      "ver": "1.0.14",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    }
+  },
+  "userData": {
+    "imageMetas": [],
+    "fbx": {
+      "smartMaterialEnabled": true
+    },
+    "animationImportSettings": [
+      {
+        "name": "Take 001",
+        "duration": 2.3333332538604736,
+        "fps": 30,
+        "splits": [
+          {
+            "name": "Stand02_knife",
+            "from": 0,
+            "to": 2.3333332538604736,
+            "wrapMode": 2,
+            "previousId": "d4bb9"
+          }
+        ]
+      }
+    ],
+    "redirect": "7e2d7331-089d-4e36-8ff2-90477e21a591@ee576",
+    "lods": {
+      "enable": false,
+      "hasBuiltinLOD": false,
+      "options": [
+        {
+          "screenRatio": 0.25,
+          "faceCount": 1
+        },
+        {
+          "screenRatio": 0.125,
+          "faceCount": 0.25
+        },
+        {
+          "screenRatio": 0.01,
+          "faceCount": 0.1
+        }
+      ]
+    },
+    "assetFinder": {
+      "meshes": [],
+      "skeletons": [],
+      "textures": [],
+      "materials": [],
+      "scenes": [
+        "7e2d7331-089d-4e36-8ff2-90477e21a591@ee576"
+      ]
+    }
+  }
+}
