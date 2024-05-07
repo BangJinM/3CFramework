@@ -7,7 +7,6 @@ import { AssetCache } from "../resource_manager/ResourcesDefines";
 export class UIData {
     prefabURL: string = ""
     uiType: number = UIEnum.UI_NORMAL
-    async: boolean = false
     bundle: string = "resources"
 }
 
@@ -37,37 +36,34 @@ export class BaseUIMediator extends Mediator {
         this.layerManager = layerManager
     }
 
-    // LoadPrefabSuccess(prefab: AssetCache) {
-    //     if (this.status != UIStatus.LOADING)
-    //         return
+    LoadPrefabSuccess(prefab: AssetCache) {
+        // if (this.status != UIStatus.LOADING)
+        //     return
 
-    //     if (!prefab)
-    //         return
+        // if (!prefab)
+        //     return
 
-    //     this.status = UIStatus.FINISH
-    //     let panel = cc.instantiate(prefab.data as cc.Prefab)
-    //     this.layerManager.AddNode({ layerNode: panel, uiType: this.uiData.uiType, mediator: this })
-    // }
+        // this.status = UIStatus.FINISH
+        // let panel = cc.instantiate(prefab.data as cc.Prefab)
+        // this.layerManager.AddNode({ layerNode: panel, uiType: this.uiData.uiType, mediator: this })
+    }
 
-    // Open() {
-    //     if (this.uiData.async)
-    //         this.OpenAsync()
-    //     else
-    //         this.OpenSync.call(this)
-    // }
+    Open() {
+        this.OpenAsync()
+    }
 
-    // private OpenAsync() {
-    //     if (this.status != UIStatus.UNUSED)
-    //         return
-    //     this.status = UIStatus.LOADING
+    private OpenAsync() {
+        if (this.status != UIStatus.UNUSED)
+            return
+        this.status = UIStatus.LOADING
 
-    //     GlobalCommon.resourcesManager.LoadAsset(this.uiData.prefabURL, cc.Prefab, GlobalCommon.bundleManager.GetBundle(this.uiData.bundle), function (error, asset: AssetCache) {
-    //         if (error)
-    //             this.status = UIStatus.CLOSED
-    //         this.LoadPrefabSuccess(asset)
-    //     }.bind(this))
+        // GlobalCommon.resourcesManager.LoadAsset(this.uiData.prefabURL, cc.Prefab, GlobalCommon.bundleManager.GetBundle(this.uiData.bundle), function (error, asset: AssetCache) {
+        //     if (error)
+        //         this.status = UIStatus.CLOSED
+        //     this.LoadPrefabSuccess(asset)
+        // }.bind(this))
 
-    // }
+    }
 
     // private async OpenSync() {
     //     if (this.status != UIStatus.UNUSED)
@@ -87,19 +83,19 @@ export class BaseUIMediator extends Mediator {
     //     this.LoadPrefabSuccess(prefab)
     // }
 
-    // CloseLayer() {
-    //     if (!this.uiData)
-    //         return
+    CloseLayer() {
+        if (!this.uiData)
+            return
 
-    //     if (this.status == UIStatus.LOADING) {
-    //         this.status = UIStatus.CLOSED
-    //         return
-    //     }
+        if (this.status == UIStatus.LOADING) {
+            this.status = UIStatus.CLOSED
+            return
+        }
 
-    //     if (!this.layerProperty)
-    //         return
+        if (!this.layerProperty)
+            return
 
-    //     this.status = UIStatus.UNUSED
-    //     GlobalCommon.layerManager.RemoveNode(this.layerProperty)
-    // }
+        this.status = UIStatus.UNUSED
+        LayerManager.GetInstance().RemoveNode(this.layerProperty)
+    }
 }

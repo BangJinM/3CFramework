@@ -7,12 +7,12 @@ export class Global {
     static uiGraphManager: UIGraphManager = null
     static CacheManager: CacheManager = null
 
-    static async LoadingInit() {
+    static async Init() {
         Global.uiGraphManager = UIGraphManager.GetInstance()
         await Global.uiGraphManager.Init()
     }
 
-    static LoadingClean() {
+    static Clean() {
         Global.uiGraphManager.Clean()
         Global.uiGraphManager.node.destroy()
         Global.uiGraphManager = null

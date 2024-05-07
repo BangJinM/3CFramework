@@ -1,8 +1,16 @@
 import * as cc from "cc";
+import { GetManagerPersistNode } from "./utils/CocosUtils";
 
-export function set_manager_instance(name: string) {
+export function set_manager_instance() {
     return (target) => {
+        target.GetInstance = function () {
+            if (!target.instance) {
+                let node = GetManagerPersistNode(target.name)
+                target.instance = node.addComponent(target)
+            }
 
+            return target.instance
+        }
     }
 }
 
@@ -13,6 +21,11 @@ export abstract class ISingleton extends cc.Component {
 
     protected onDestroy(): void {
         this.Clean()
+    }
+
+    /** 单例获取方法，实际方法通过set_manager_instance装饰器设置 */
+    static GetInstance: Function = function () {
+        throw ("GetInstance is not implemented")
     }
 
     /** 单例初始化 */

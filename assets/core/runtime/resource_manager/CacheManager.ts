@@ -1,5 +1,5 @@
 import * as cc from "cc";
-import { ISingleton } from "../ISingleton";
+import { ISingleton, set_manager_instance } from "../ISingleton";
 import { ASSET_CACHE_FLAG, AssetCache, AssetType, BundleCache, USE_SPRITE_BUNDLE_LOAD, spriteAtlasPipeLine } from "./ResourcesDefines";
 
 
@@ -56,6 +56,7 @@ export class AssetMap {
 }
 
 /** 缓存管理类 */
+@set_manager_instance()
 export class CacheManager extends ISingleton {
     private delayTime = 0
     private observers = new Map()

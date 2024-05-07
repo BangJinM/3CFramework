@@ -1,18 +1,9 @@
 import * as cc from "cc";
-import { ISingleton } from "./ISingleton";
+import { ISingleton, set_manager_instance } from "./ISingleton";
 import { GetManagerPersistNode } from "./utils/CocosUtils";
 
+@set_manager_instance()
 export class InputManager extends ISingleton {
-    private static instance: InputManager = null
-
-    public static GetInstance() {
-        if (!InputManager.instance) {
-            let node = GetManagerPersistNode("InputManager")
-            InputManager.instance = node.addComponent(InputManager)
-        }
-        return InputManager.instance
-    }
-
     Init() {
         cc.input.on(cc.Input.EventType.KEY_DOWN, this.keyDown, this)
         cc.input.on(cc.Input.EventType.KEY_UP, this.keyUp, this)

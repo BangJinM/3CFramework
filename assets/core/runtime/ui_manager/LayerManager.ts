@@ -2,7 +2,6 @@ import * as cc from "cc";
 import { UIEnum } from "./UIEnum";
 import { Mediator } from "../puremvc/patterns/mediator/Mediator";
 import { ISingleton, set_manager_instance } from "../ISingleton";
-import { GetManagerPersistNode } from "../utils/CocosUtils";
 
 /** 界面属性 */
 export class LayerProperty {
@@ -14,18 +13,8 @@ export class LayerProperty {
     public mediator: Mediator
 }
 /** 界面管理 */
-@set_manager_instance("LayerManager")
+@set_manager_instance()
 export class LayerManager extends ISingleton {
-    private static instance: LayerManager = null
-
-    public static GetInstance() {
-        if (!LayerManager.instance) {
-            let node = GetManagerPersistNode("LayerManager")
-            LayerManager.instance = node.addComponent(LayerManager)
-        }
-        return LayerManager.instance
-    }
-
     /** 节点属性列表 */
     uiNodes: Map<number, LayerProperty[]> = new Map()
     uiGraphManager: any;

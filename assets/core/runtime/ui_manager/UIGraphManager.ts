@@ -1,21 +1,12 @@
 import * as cc from "cc";
 import { UIEnum } from "./UIEnum";
-import { ISingleton } from "../ISingleton";
+import { ISingleton, set_manager_instance } from "../ISingleton";
 import { LayerProperty } from "./LayerManager";
 import { GetManagerPersistNode } from "../utils/CocosUtils";
 
 /** UI 根节点 管理 */
+@set_manager_instance()
 export class UIGraphManager extends ISingleton {
-    private static instance: UIGraphManager = null
-
-    public static GetInstance() {
-        if (!UIGraphManager.instance) {
-            let node = GetManagerPersistNode("UIGraphManager")
-            UIGraphManager.instance = node.addComponent(UIGraphManager)
-        }
-        return UIGraphManager.instance
-    }
-
     uiCameraNode: cc.Node = null
     /** UICanvas */
     uiCanvasNode: cc.Node = null
