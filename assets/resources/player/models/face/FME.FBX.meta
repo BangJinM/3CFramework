@@ -1,5 +1,5 @@
 {
-  "ver": "2.3.12",
+  "ver": "2.3.13",
   "importer": "fbx",
   "imported": true,
   "uuid": "72ad11da-d4d7-4d77-a7d9-4fcbcd6d23e1",
@@ -104,7 +104,7 @@
       "uuid": "72ad11da-d4d7-4d77-a7d9-4fcbcd6d23e1@4594e",
       "displayName": "",
       "id": "4594e",
-      "name": "FME.prefab",
+      "name": "FME.FBX.prefab",
       "userData": {
         "gltfIndex": 0
       },
@@ -126,7 +126,6 @@
     "fbx": {
       "smartMaterialEnabled": true
     },
-    "redirect": "72ad11da-d4d7-4d77-a7d9-4fcbcd6d23e1@4594e",
     "lods": {
       "enable": false,
       "hasBuiltinLOD": false,

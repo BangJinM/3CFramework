@@ -1,5 +1,5 @@
 {
-  "ver": "2.3.12",
+  "ver": "2.3.13",
   "importer": "fbx",
   "imported": true,
   "uuid": "217a992e-c979-4730-945d-56d1ce79f57c",
@@ -35,7 +35,7 @@
       "uuid": "217a992e-c979-4730-945d-56d1ce79f57c@0ce38",
       "displayName": "",
       "id": "0ce38",
-      "name": "@Attack01_knife.prefab",
+      "name": "@Attack01_knife.FBX.prefab",
       "userData": {
         "gltfIndex": 0
       },
@@ -68,7 +68,6 @@
         ]
       }
     ],
-    "redirect": "217a992e-c979-4730-945d-56d1ce79f57c@0ce38",
     "lods": {
       "enable": false,
       "hasBuiltinLOD": false,

@@ -1,5 +1,5 @@
 {
-  "ver": "2.3.12",
+  "ver": "2.3.13",
   "importer": "fbx",
   "imported": true,
   "uuid": "5db5a333-45a9-44c7-93b8-e3ccc740e8bc",
@@ -12,7 +12,7 @@
       "uuid": "5db5a333-45a9-44c7-93b8-e3ccc740e8bc@54741",
       "displayName": "",
       "id": "54741",
-      "name": "@Walk_knife.prefab",
+      "name": "@Walk_knife.FBX.prefab",
       "userData": {
         "gltfIndex": 0
       },
@@ -68,7 +68,6 @@
         ]
       }
     ],
-    "redirect": "5db5a333-45a9-44c7-93b8-e3ccc740e8bc@54741",
     "lods": {
       "enable": false,
       "hasBuiltinLOD": false,

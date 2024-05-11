@@ -1,0 +1,8 @@
+{
+"localDebug": true,
+"version": "1.0.0.10",
+"port": 8090,
+"relative": "3CFramework/remote-assets",
+"packageUrl": "http://localhost", 
+"output": "D:/Desktop/chfs/share"
+}

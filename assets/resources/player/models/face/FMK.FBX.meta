@@ -1,5 +1,5 @@
 {
-  "ver": "2.3.12",
+  "ver": "2.3.13",
   "importer": "fbx",
   "imported": true,
   "uuid": "2c950925-3a66-4bd8-8fbd-40c8080dfebc",
@@ -104,7 +104,7 @@
       "uuid": "2c950925-3a66-4bd8-8fbd-40c8080dfebc@ec386",
       "displayName": "",
       "id": "ec386",
-      "name": "FMK.prefab",
+      "name": "FMK.FBX.prefab",
       "userData": {
         "gltfIndex": 0
       },
@@ -126,7 +126,6 @@
     "fbx": {
       "smartMaterialEnabled": true
     },
-    "redirect": "2c950925-3a66-4bd8-8fbd-40c8080dfebc@ec386",
     "lods": {
       "enable": false,
       "hasBuiltinLOD": false,

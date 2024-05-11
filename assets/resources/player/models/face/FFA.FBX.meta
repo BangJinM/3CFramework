@@ -1,5 +1,5 @@
 {
-  "ver": "2.3.12",
+  "ver": "2.3.13",
   "importer": "fbx",
   "imported": true,
   "uuid": "d4f18141-59da-44d3-8834-416328dbda6a",
@@ -129,7 +129,7 @@
       "uuid": "d4f18141-59da-44d3-8834-416328dbda6a@1c2df",
       "displayName": "",
       "id": "1c2df",
-      "name": "FFA.prefab",
+      "name": "FFA.FBX.prefab",
       "userData": {
         "gltfIndex": 0
       },
@@ -167,7 +167,6 @@
         ]
       }
     ],
-    "redirect": "d4f18141-59da-44d3-8834-416328dbda6a@1c2df",
     "lods": {
       "enable": false,
       "hasBuiltinLOD": false,

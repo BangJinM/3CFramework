@@ -1,5 +1,5 @@
 {
-  "ver": "2.3.12",
+  "ver": "2.3.13",
   "importer": "fbx",
   "imported": true,
   "uuid": "7e2d7331-089d-4e36-8ff2-90477e21a591",
@@ -35,7 +35,7 @@
       "uuid": "7e2d7331-089d-4e36-8ff2-90477e21a591@ee576",
       "displayName": "",
       "id": "ee576",
-      "name": "@Stand02_knife.prefab",
+      "name": "@Stand02_knife.FBX.prefab",
       "userData": {
         "gltfIndex": 0
       },
@@ -68,7 +68,6 @@
         ]
       }
     ],
-    "redirect": "7e2d7331-089d-4e36-8ff2-90477e21a591@ee576",
     "lods": {
       "enable": false,
       "hasBuiltinLOD": false,

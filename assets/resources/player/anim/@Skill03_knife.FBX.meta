@@ -1,5 +1,5 @@
 {
-  "ver": "2.3.12",
+  "ver": "2.3.13",
   "importer": "fbx",
   "imported": true,
   "uuid": "766e8210-1fcf-4068-95c7-9bb148558cd8",
@@ -35,7 +35,7 @@
       "uuid": "766e8210-1fcf-4068-95c7-9bb148558cd8@f4028",
       "displayName": "",
       "id": "f4028",
-      "name": "@Skill03_knife.prefab",
+      "name": "@Skill03_knife.FBX.prefab",
       "userData": {
         "gltfIndex": 0
       },
@@ -68,7 +68,6 @@
         ]
       }
     ],
-    "redirect": "766e8210-1fcf-4068-95c7-9bb148558cd8@f4028",
     "lods": {
       "enable": false,
       "hasBuiltinLOD": false,
