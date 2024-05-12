@@ -7,6 +7,14 @@
     }
   },
   "script": {
-    "preserveSymlinks": true
-  }
+    "preserveSymlinks": true,
+    "importMap": "project://import-map.json"
+  },
+  "custom_joint_texture_layouts": [],
+  "layer": [
+    {
+      "name": "UI_LAUNCHER",
+      "value": 1
+    }
+  ]
 }

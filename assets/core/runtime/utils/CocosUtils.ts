@@ -37,3 +37,7 @@ export function GetManagerPersistNode(name: string) {
     }
     return managerNode
 }
+
+export function ClonePrefab(prefab: cc.Prefab) {
+    return cc.instantiate(prefab)
+}

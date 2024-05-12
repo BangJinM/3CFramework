@@ -12,7 +12,6 @@ export class UIGraphManager extends ISingleton {
     uiCanvasNode: cc.Node = null
     /** UI根目录 */
     uiRootNode: cc.Node = null
-    uiNode: cc.Node = null
     /** 层级节点 */
     uiNodes: Map<string, cc.Node> = new Map()
 
@@ -44,15 +43,10 @@ export class UIGraphManager extends ISingleton {
             canvas.alignCanvasWithScreen = true
         }
 
-        if (!this.uiNode) {
-            this.uiNode = new cc.Node("ui_node")
-            this.uiRootNode.addChild(this.uiNode)
-        }
-
         for (let index = 0; index < UIEnum.UI_MAX; index++) {
             let name = UIEnum[index]
             let childNode = new cc.Node(name)
-            this.uiNode.addChild(childNode)
+            this.uiCanvasNode.addChild(childNode)
             this.uiNodes.set(name, childNode)
             childNode.layer = cc.Layers.Enum.UI_2D
         }
@@ -63,8 +57,6 @@ export class UIGraphManager extends ISingleton {
     }
 
     Clean() {
-        cc.director.removePersistRootNode(this.uiRootNode)
-
         this.uiRootNode.destroy()
         this.uiRootNode.removeFromParent()
         this.uiNodes.clear()
@@ -72,6 +64,5 @@ export class UIGraphManager extends ISingleton {
         this.uiCameraNode = null
         this.uiCanvasNode = null
         this.uiRootNode = null
-        this.uiNode = null
     }
 }

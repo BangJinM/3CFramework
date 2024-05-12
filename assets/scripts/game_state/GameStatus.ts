@@ -6,6 +6,6 @@ export class GameStatus {
         this.NAME = name
     }
 
-    OnEnter() { }
-    OnExit() { }
+    async OnEnter() { }
+    async OnExit() { }
 }

@@ -4,3 +4,4 @@ export * from "./ui_manager"
 
 export * from "./ISingleton"
 export * from "./utils"
+export * from "./hot_update"

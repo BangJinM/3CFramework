@@ -1,15 +1,25 @@
 import * as cc from "cc";
+import { AssetType, BundleCache, GetPipeline, asyncify } from "core";
 import { Global } from "./Global";
-import { AssetType, GetPipeline, asyncify } from "core";
+
+function GetTask(fName: string, type: AssetType, options): cc.AssetManager.Task {
+    return cc.AssetManager.Task.create({
+        input: {
+            url: fName,
+            type: type,
+        },
+        options: options
+    })
+}
 
 /** 缓存资源 */
 function LoadCacheAsset(task: cc.AssetManager.Task): [boolean, Promise<any>] {
-    let { fName, type } = task.input
+    let { url, type } = task.input
     let { needCache } = task.options
 
     if (!needCache) return [false, null]
 
-    let asset = Global.CacheManager.GetAssetData(type, fName);
+    let asset = Global.CacheManager.GetAssetData(type, url);
     if (!asset) return [false, null]
     let promise = new Promise(function (success) {
         success(asset)
@@ -24,12 +34,12 @@ function LoadCacheAsset(task: cc.AssetManager.Task): [boolean, Promise<any>] {
   * @returns 
   */
 function LoadLocalAsset(task: cc.AssetManager.Task): [boolean, Promise<any>] {
-    let { fName, type } = task.input
+    let { url, type } = task.input
     let { needCache } = task.options
 
     if (cc.sys.platform == cc.sys.Platform.WIN32) {
-        if (cc.native.fileUtils.isFileExist(fName)) {
-            console.log("windows" + fName + " isFileExist")
+        if (cc.native.fileUtils.isFileExist(url)) {
+            console.log("windows" + url + " isFileExist")
             return [true, new Promise((success, fail) => {
 
             })]
@@ -41,9 +51,12 @@ function LoadLocalAsset(task: cc.AssetManager.Task): [boolean, Promise<any>] {
 
 /** 判断resources包  */
 function LoadBundleAsset(task: cc.AssetManager.Task): [boolean, Promise<any>] {
-    let { fName, type } = task.input
-    let { needCache } = task.options
-    let assetInfo = cc.resources.getInfoWithPath(fName, type)
+    let { url, type } = task.input
+    let { bundle } = task.options
+
+    if (!bundle) return [false, null]
+
+    let assetInfo = bundle.bundle.getInfoWithPath(url, type)
     if (assetInfo) {
         return [true, new Promise((success) => {
             task.onComplete = asyncify(function (error, asset) {
@@ -58,15 +71,16 @@ function LoadBundleAsset(task: cc.AssetManager.Task): [boolean, Promise<any>] {
 
 /** 远程  */
 function LoadRemoteAsset(task: cc.AssetManager.Task): [boolean, Promise<any>] {
-    let { fName, type } = task.input
+    let { url, type } = task.input
     let { needCache } = task.options
     return [true, new Promise((success) => {
 
     })]
 }
 
-export function LoadAssetByName(fName: string, type: AssetType, needCache: boolean = true) {
-    let task = GetTask(fName, type, needCache)
+export function LoadAssetByName(fName: string, type: AssetType, bundle: BundleCache = null, needCache: boolean = true) {
+    let task = GetTask(fName, type, { bundle: bundle })
+    return LoadAssetByTask(task)
 }
 
 export function LoadAssetByTask(task: cc.AssetManager.Task) {
@@ -74,13 +88,13 @@ export function LoadAssetByTask(task: cc.AssetManager.Task) {
     let [cache, cachePromise] = LoadCacheAsset(task)
     if (cache) return cachePromise
 
-    // 本地加载
-    let [local, localPromise] = LoadLocalAsset(task)
-    if (local) return localPromise
-
     // bundle加载
     let [bundle, bundlePromise] = LoadBundleAsset(task)
     if (bundle) return bundlePromise
+
+    // 本地加载
+    let [local, localPromise] = LoadLocalAsset(task)
+    if (local) return localPromise
 
     // 网络加载
     let [remote, remotePromise] = LoadRemoteAsset(task)
@@ -89,15 +103,4 @@ export function LoadAssetByTask(task: cc.AssetManager.Task) {
 
 export function LoadSpriteFrame(fName: string, type: AssetType) {
 
-}
-
-
-function GetTask(fName: string, type: AssetType, options): cc.AssetManager.Task {
-    return cc.AssetManager.Task.create({
-        input: {
-            url: fName,
-            type: type,
-        },
-        options: options
-    })
 }

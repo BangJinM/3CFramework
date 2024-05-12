@@ -250,7 +250,7 @@ export const normalPipeline = new cc.AssetManager.Pipeline('normal load pipeline
 function TextureLoader(task, done) {
     let { url, type } = task.input
     let { bundle, urlExt, options, cacheManager } = task.options
-
+''
     let onComplete = asyncify(function (error, result) {
         task.output = { result: result, url: url, type: type }
         done(error);

@@ -1,6 +1,9 @@
 import * as cc from "cc";
 import { GetManagerPersistNode } from "./utils/CocosUtils";
 
+/**
+ * 单例类装饰
+ */
 export function set_manager_instance() {
     return (target) => {
         target.GetInstance = function () {
@@ -14,6 +17,9 @@ export function set_manager_instance() {
     }
 }
 
+/**
+ * 单例
+ */
 export abstract class ISingleton extends cc.Component {
     protected update(dt: number): void {
         this.Update(dt)

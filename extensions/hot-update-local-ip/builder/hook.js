@@ -6,8 +6,6 @@ const fs = require("fs");
 const path = require("path");
 const { exec } = require('child_process');
 
-const remote_port = 8090;
-
 function getIPAdress() {
     var interfaces = os.networkInterfaces();
     for (var devName in interfaces) {
@@ -21,7 +19,7 @@ function getIPAdress() {
     }
 }
 
-let tempConfig = '{\n"localDebug": true,\n"version": "1.0.0.10",\n"port": 8090,\n"relative": "3CFramework/remote-assets",\n"packageUrl": "http://localhost", \n"output": "D:/Desktop/chfs/share"\n}'
+let tempConfig = '{\n"localDebug": true,\n"version": "1.0.0.10",\n"port": 8090,\n"relative": "3CFramework/remote-assets",\n"packageUrl": "http://localhost"}'
 
 exports.onBeforeBuild = function (options, result) {
     var dir = path.join(Editor.Project.path, "assets/hot_update");
@@ -61,7 +59,7 @@ exports.onAfterBuild = function (options, result) {
         cmd += ` -s ${path.join(result.dest, resdir)}`
         cmd += ` -d ${path.join(Editor.Project.path, "assets")}`
 
-        if (!jsonData.output) jsonData.output = "./build/output"
+        if (!jsonData.output) jsonData.output = path.join(Editor.Project.path, "./output")
         cmd += ` -o ${path.join(jsonData.output, jsonData.relative)}`
         console.error(cmd);
 

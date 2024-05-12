@@ -1,4 +1,4 @@
-import { ISingleton } from "./ISingleton";
+import { ISingleton, set_manager_instance } from "./ISingleton";
 
 /** 日志等级 */
 export enum LoggerLevel {
@@ -12,6 +12,7 @@ export enum LoggerLevel {
     ERROR
 }
 
+@set_manager_instance()
 export class Logger extends ISingleton {
     /** 最大日志数量，超过清空 */
     private static MAXSIZE = 1000
