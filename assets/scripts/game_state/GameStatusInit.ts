@@ -19,7 +19,11 @@ export class GameStatusInit extends GameStatus {
         promise.then(function (asset: cc.Prefab) {
             if (!asset) return
             let updateL = core.ClonePrefab(asset)
-            Global.uiGraphManager.GetUINode(core.UIEnum.UI_NORMAL).addChild(updateL)
+            let property = new core.LayerProperty()
+            property.layerNode = updateL
+            property.name = "UpdatePanel"
+            property.uiType = core.UIEnum.UI_NORMAL
+            core.LayerManager.GetInstance().AddNode(property)
         })
     }
 }

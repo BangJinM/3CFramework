@@ -1,7 +1,7 @@
 import * as cc from "cc";
 import { UIEnum } from "./UIEnum";
 import { ISingleton, set_manager_instance } from "../ISingleton";
-import { LayerProperty } from "./LayerManager";
+import { LayerProperty } from "./LayerProperty";
 import { GetManagerPersistNode } from "../utils/CocosUtils";
 
 /** UI 根节点 管理 */

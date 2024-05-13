@@ -1,17 +1,7 @@
-import * as cc from "cc";
-import { UIEnum } from "./UIEnum";
-import { Mediator } from "../puremvc/patterns/mediator/Mediator";
 import { ISingleton, set_manager_instance } from "../ISingleton";
+import { LayerProperty } from "./LayerProperty";
+import { UIGraphManager } from "./UIGraphManager";
 
-/** 界面属性 */
-export class LayerProperty {
-    /** 界面类型 */
-    public uiType: UIEnum
-    /** 界面节点 */
-    public layerNode: cc.Node
-    /** 节点ID */
-    public mediator: Mediator
-}
 /** 界面管理 */
 @set_manager_instance()
 export class LayerManager extends ISingleton {
@@ -31,10 +21,8 @@ export class LayerManager extends ISingleton {
         this.Clean()
     }
 
-    constructor(uiGraphManager) {
+    constructor() {
         super()
-
-        this.uiGraphManager = uiGraphManager
     }
 
     /** 添加界面节点 */
@@ -50,11 +38,11 @@ export class LayerManager extends ISingleton {
 
         let properties = this.uiNodes.get(layerProperty.uiType)
         for (const property of properties) {
-            if (property.mediator.getMediatorName() == layerProperty.mediator.getMediatorName())
+            if (property.name == layerProperty.name)
                 return
         }
 
-        let parent = this.uiGraphManager.GetUINode(layerProperty.uiType)
+        let parent = UIGraphManager.GetInstance().GetUINode(layerProperty.uiType)
         if (!parent)
             return
 
@@ -77,7 +65,7 @@ export class LayerManager extends ISingleton {
         let properties = this.uiNodes.get(layerProperty.uiType)
         for (let index = 0; index < properties.length; index++) {
             let property = properties[index]
-            if (property.mediator.getMediatorName() == layerProperty.mediator.getMediatorName())
+            if (property.name == layerProperty.name)
                 layerIndex = index
         }
 

@@ -1,7 +1,8 @@
 import * as cc from "cc";
 import { Mediator } from "../puremvc/patterns/mediator/Mediator";
 import { UIEnum } from "./UIEnum";
-import { LayerManager, LayerProperty } from "./LayerManager";
+import { LayerManager } from "./LayerManager";
+import { LayerProperty } from "./LayerProperty";
 import { AssetCache } from "../resource_manager/ResourcesDefines";
 
 export class UIData {
