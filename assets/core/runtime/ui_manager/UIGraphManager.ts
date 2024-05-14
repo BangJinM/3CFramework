@@ -2,18 +2,27 @@ import * as cc from "cc";
 import { UIEnum } from "./UIEnum";
 import { ISingleton, set_manager_instance } from "../ISingleton";
 import { LayerProperty } from "./LayerProperty";
-import { GetManagerPersistNode } from "../utils/CocosUtils";
 
 /** UI 根节点 管理 */
 @set_manager_instance()
+@cc._decorator.ccclass("UIGraphManager")
 export class UIGraphManager extends ISingleton {
-    uiCameraNode: cc.Node = null
-    /** UICanvas */
-    uiCanvasNode: cc.Node = null
     /** UI根目录 */
+    @cc._decorator.property({ type: cc.Node })
     uiRootNode: cc.Node = null
+    /** UI Camera */
+    @cc._decorator.property({ type: cc.Node })
+    uiCameraNode: cc.Node = null
+    /** UI Canvas */
+    @cc._decorator.property({ type: cc.Node })
+    uiCanvasNode: cc.Node = null
+
     /** 层级节点 */
-    uiNodes: Map<string, cc.Node> = new Map()
+    @cc._decorator.property({ type: Map<string, cc.Node> })
+    uiRootNodes: Map<string, cc.Node> = new Map()
+    /** 节点属性列表 */
+    @cc._decorator.property({ type: Map })
+    uiOpenNodes: Map<number, LayerProperty[]> = new Map()
 
     Init() {
         this.InitUIRootNode()
@@ -47,22 +56,87 @@ export class UIGraphManager extends ISingleton {
             let name = UIEnum[index]
             let childNode = new cc.Node(name)
             this.uiCanvasNode.addChild(childNode)
-            this.uiNodes.set(name, childNode)
+            this.uiRootNodes.set(name, childNode)
             childNode.layer = cc.Layers.Enum.UI_2D
         }
     }
 
     GetUINode(nodeType: UIEnum) {
-        return this.uiNodes.get(UIEnum[nodeType])
+        return this.uiRootNodes.get(UIEnum[nodeType])
     }
 
     Clean() {
+        this.RemoveAllNode()
+
         this.uiRootNode.destroy()
         this.uiRootNode.removeFromParent()
-        this.uiNodes.clear()
+        this.uiRootNodes.clear()
 
         this.uiCameraNode = null
         this.uiCanvasNode = null
         this.uiRootNode = null
     }
+
+    /** 添加界面节点 */
+    AddNode(layerProperty: LayerProperty) {
+        if (!layerProperty.layerNode)
+            return
+
+        if (!layerProperty.uiType)
+            return
+
+        if (!this.uiOpenNodes.has(layerProperty.uiType))
+            this.uiOpenNodes.set(layerProperty.uiType, [])
+
+        let properties = this.uiOpenNodes.get(layerProperty.uiType)
+        for (const property of properties) {
+            if (property.name == layerProperty.name)
+                return
+        }
+
+        let parent = UIGraphManager.GetInstance().GetUINode(layerProperty.uiType)
+        if (!parent)
+            return
+
+        properties.push(layerProperty)
+        parent.addChild(layerProperty.layerNode)
+    }
+
+    /** 移除界面节点 */
+    RemoveNode(layerProperty: LayerProperty) {
+        if (!layerProperty.uiType)
+            return
+
+        if (!this.uiOpenNodes.has(layerProperty.uiType))
+            return
+
+        if (!layerProperty.layerNode)
+            return
+
+        let layerIndex = -1
+        let properties = this.uiOpenNodes.get(layerProperty.uiType)
+        for (let index = 0; index < properties.length; index++) {
+            let property = properties[index]
+            if (property.name == layerProperty.name)
+                layerIndex = index
+        }
+
+        if (layerIndex < 0)
+            return
+
+        properties.slice(layerIndex, 1)
+
+        layerProperty.layerNode.removeFromParent()
+        layerProperty.layerNode.destroy()
+    }
+
+    /** 移除所有界面节点 */
+    RemoveAllNode() {
+        for (const properties of this.uiOpenNodes.values()) {
+            for (const property of properties.values()) {
+                this.RemoveNode(property)
+            }
+        }
+    }
+
 }

@@ -23,7 +23,7 @@ export class GameStatusInit extends GameStatus {
             property.layerNode = updateL
             property.name = "UpdatePanel"
             property.uiType = core.UIEnum.UI_NORMAL
-            core.LayerManager.GetInstance().AddNode(property)
+            core.UIGraphManager.GetInstance().AddNode(property)
         })
     }
 }

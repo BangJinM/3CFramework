@@ -1,18 +1,9 @@
-import { ISingleton, GetManagerPersistNode } from "core";
+import { ISingleton, set_manager_instance } from "core";
 import { GameStatus } from "./GameStatus";
 import { GameStatusInit } from "./GameStatusInit";
 
+@set_manager_instance()
 export class GameStatusManager extends ISingleton {
-    private static instance: GameStatusManager = null
-
-    public static GetInstance() {
-        if (!GameStatusManager.instance) {
-            let node = GetManagerPersistNode("GameStatusManager")
-            GameStatusManager.instance = node.addComponent(GameStatusManager)
-        }
-        return GameStatusManager.instance
-    }
-
     gameStatuses: Map<string, GameStatus> = new Map()
     curStatus: GameStatus = null
     lastStatus: GameStatus = null

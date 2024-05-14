@@ -8,10 +8,9 @@ export function set_manager_instance() {
     return (target) => {
         target.GetInstance = function () {
             if (!target.instance) {
-                let node = GetManagerPersistNode(target.name)
+                let node = GetManagerPersistNode(`__${target.name}__`)
                 target.instance = node.addComponent(target)
             }
-
             return target.instance
         }
     }
