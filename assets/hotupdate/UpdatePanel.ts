@@ -5,7 +5,9 @@ import { LoadAssetByName, LoadBundle } from '../Launcher/MainScripts/common/Reso
 const { ccclass, property } = _decorator;
 
 @ccclass('UpdatePanel')
-export class UpdatePanel extends Component {
+export class UpdatePanel extends cc.Component {
+    @property(cc.Label)
+    info: cc.Label = null!;
 
     // @property(Label)
     // info: Label = null!;
@@ -30,8 +32,8 @@ export class UpdatePanel extends Component {
     // @property(Node)
     // updateBtn: Node = null!;
 
-    @property(Node)
-    btnStart: Node = null
+    @property(cc.Node)
+    updateUI: cc.Node = null!;
 
     // @property(HotUpdate)
     // hotUpdate: HotUpdate = null;

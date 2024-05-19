@@ -4,6 +4,7 @@ import { UIEnum } from "./UIEnum";
 import { LayerManager } from "./LayerManager";
 import { LayerProperty } from "./LayerProperty";
 import { AssetCache } from "../resource_manager/ResourcesDefines";
+import { UIGraphManager } from "./UIGraphManager";
 
 export class UIData {
     prefabURL: string = ""
@@ -29,13 +30,6 @@ export class BaseUIMediator extends Mediator {
     status: number = UIStatus.UNUSED
     uiData: UIData = new UIData()
     layerProperty: LayerProperty = null
-    layerManager: LayerManager;
-
-    constructor(layerManager: LayerManager, mediatorName: string = null, viewComponent: any = null) {
-        super(mediatorName, viewComponent)
-
-        this.layerManager = layerManager
-    }
 
     LoadPrefabSuccess(prefab: AssetCache) {
         // if (this.status != UIStatus.LOADING)
@@ -97,6 +91,6 @@ export class BaseUIMediator extends Mediator {
             return
 
         this.status = UIStatus.UNUSED
-        LayerManager.GetInstance().RemoveNode(this.layerProperty)
+        UIGraphManager.GetInstance().RemoveNode(this.layerProperty)
     }
 }

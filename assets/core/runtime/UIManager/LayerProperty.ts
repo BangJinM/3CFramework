@@ -1,7 +1,6 @@
 import * as cc from "cc";
 import { UIEnum } from "./UIEnum";
 
-
 @cc._decorator.ccclass("LayerProperty")
 /** 界面属性 */
 export class LayerProperty {
