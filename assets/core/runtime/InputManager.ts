@@ -1,6 +1,6 @@
 import * as cc from "cc";
 import { ISingleton, set_manager_instance } from "./ISingleton";
-import { GetManagerPersistNode } from "./utils/CocosUtils";
+import { GetManagerPersistNode } from "./Utils/CocosUtils";
 
 @set_manager_instance()
 export class InputManager extends ISingleton {

@@ -1,106 +1,111 @@
 
-import { _decorator, Component, Node, Label, ProgressBar, game } from 'cc';
-import { HotUpdate } from '../core/runtime/hot_update/HotUpdate';
-import { native } from 'cc';
+import { _decorator, Component, Node, Label, ProgressBar, game, Button, director, Scene, AssetManager } from 'cc';
+import * as Core from "Core"
+import { LoadAssetByName, LoadBundle } from '../Launcher/MainScripts/common/ResourceUtils';
 const { ccclass, property } = _decorator;
 
 @ccclass('UpdatePanel')
 export class UpdatePanel extends Component {
 
-    @property(Label)
-    info: Label = null!;
+    // @property(Label)
+    // info: Label = null!;
 
-    @property(ProgressBar)
-    fileProgress: ProgressBar = null!;
+    // @property(ProgressBar)
+    // fileProgress: ProgressBar = null!;
 
-    @property(Label)
-    fileLabel: Label = null!;
-    @property(ProgressBar)
-    byteProgress: ProgressBar = null!;
+    // @property(Label)
+    // fileLabel: Label = null!;
+    // @property(ProgressBar)
+    // byteProgress: ProgressBar = null!;
 
-    @property(Label)
-    byteLabel: Label = null!;
+    // @property(Label)
+    // byteLabel: Label = null!;
 
-    @property(Node)
-    checkBtn: Node = null!;
+    // @property(Node)
+    // checkBtn: Node = null!;
 
-    @property(Node)
-    retryBtn: Node = null!;
+    // @property(Node)
+    // retryBtn: Node = null!;
 
-    @property(Node)
-    updateBtn: Node = null!;
+    // @property(Node)
+    // updateBtn: Node = null!;
 
     @property(Node)
     btnStart: Node = null
 
-    @property(HotUpdate)
-    hotUpdate: HotUpdate = null;
-    /** 是否需要重启 */
-    needRestart: any;
+    // @property(HotUpdate)
+    // hotUpdate: HotUpdate = null;
+    // /** 是否需要重启 */
+    // needRestart: any;
 
     protected onLoad(): void {
-        if (native) {
-            this.hotUpdate = new HotUpdate("project.manifest", ((native.fileUtils ? native.fileUtils.getWritablePath() : '/') + 'remote-asset'), this.AssetsEventCallback.bind(this))
-        }
+        this.btnStart.on(Button.EventType.CLICK, () => {
+            let promise = LoadBundle("Tank")
+            promise.then(function (bundleCache) {
+                let bundle:AssetManager.Bundle = bundleCache
+                bundle.loadScene("")
+
+            })
+        }, this)
     }
 
-    AssetsEventCallback(event: native.EventAssetsManager) {
-        switch (event.getEventCode()) {
-            case native.EventAssetsManager.ERROR_NO_LOCAL_MANIFEST:
-                console.error("No local manifest file found, hot update skipped.");
-                break;
-            case native.EventAssetsManager.ERROR_DOWNLOAD_MANIFEST:
-            case native.EventAssetsManager.ERROR_PARSE_MANIFEST:
-                console.error("Fail to download manifest file, hot update skipped.");
-                break;
-            case native.EventAssetsManager.ALREADY_UP_TO_DATE:
-                this.info.string = "Already up to date with the latest remote version.";
-                this.btnStart.active = true;
-                break;
-            case native.EventAssetsManager.NEW_VERSION_FOUND:
-                this.info.string = 'New version found, please try to update. (' + Math.ceil(event.getAssetsManagerEx().getTotalBytes() / 1024) + 'kb)';
-                this.checkBtn.active = false;
-                this.fileProgress.progress = 0;
-                this.byteProgress.progress = 0;
-                break;
-            case native.EventAssetsManager.UPDATE_PROGRESSION:
-                this.byteProgress.progress = event.getPercent();
-                this.fileProgress.progress = event.getPercentByFile();
+    // AssetsEventCallback(event: native.EventAssetsManager) {
+    //     switch (event.getEventCode()) {
+    //         case native.EventAssetsManager.ERROR_NO_LOCAL_MANIFEST:
+    //             console.error("No local manifest file found, hot update skipped.");
+    //             break;
+    //         case native.EventAssetsManager.ERROR_DOWNLOAD_MANIFEST:
+    //         case native.EventAssetsManager.ERROR_PARSE_MANIFEST:
+    //             console.error("Fail to download manifest file, hot update skipped.");
+    //             break;
+    //         case native.EventAssetsManager.ALREADY_UP_TO_DATE:
+    //             this.info.string = "Already up to date with the latest remote version.";
+    //             this.btnStart.active = true;
+    //             break;
+    //         case native.EventAssetsManager.NEW_VERSION_FOUND:
+    //             this.info.string = 'New version found, please try to update. (' + Math.ceil(event.getAssetsManagerEx().getTotalBytes() / 1024) + 'kb)';
+    //             this.checkBtn.active = false;
+    //             this.fileProgress.progress = 0;
+    //             this.byteProgress.progress = 0;
+    //             break;
+    //         case native.EventAssetsManager.UPDATE_PROGRESSION:
+    //             this.byteProgress.progress = event.getPercent();
+    //             this.fileProgress.progress = event.getPercentByFile();
 
-                this.fileLabel.string = event.getDownloadedFiles() + ' / ' + event.getTotalFiles();
-                this.byteLabel.string = event.getDownloadedBytes() + ' / ' + event.getTotalBytes();
-                console.log(this.fileLabel.string, this.byteLabel.string);
-                var msg = event.getMessage();
-                if (msg) {
-                    this.info.string = 'Updated file: ' + msg;
-                    // cc.log(event.getPercent()/100 + '% : ' + msg);
-                }
-                break;
-            case native.EventAssetsManager.UPDATE_FINISHED:
-                this.info.string = 'Update finished. ' + event.getMessage();
-                break;
-            case native.EventAssetsManager.UPDATE_FAILED:
-                this.info.string = 'Update failed. ' + event.getMessage();
-                this.retryBtn.active = true;
-                this.checkBtn.active = false;
-                break;
-            case native.EventAssetsManager.ERROR_UPDATING:
-                this.info.string = 'Asset update error: ' + event.getAssetId() + ', ' + event.getMessage();
-                break;
-            case native.EventAssetsManager.ERROR_DECOMPRESS:
-                this.info.string = event.getMessage();
-                break;
-        }
-    }
+    //             this.fileLabel.string = event.getDownloadedFiles() + ' / ' + event.getTotalFiles();
+    //             this.byteLabel.string = event.getDownloadedBytes() + ' / ' + event.getTotalBytes();
+    //             console.log(this.fileLabel.string, this.byteLabel.string);
+    //             var msg = event.getMessage();
+    //             if (msg) {
+    //                 this.info.string = 'Updated file: ' + msg;
+    //                 // cc.log(event.getPercent()/100 + '% : ' + msg);
+    //             }
+    //             break;
+    //         case native.EventAssetsManager.UPDATE_FINISHED:
+    //             this.info.string = 'Update finished. ' + event.getMessage();
+    //             break;
+    //         case native.EventAssetsManager.UPDATE_FAILED:
+    //             this.info.string = 'Update failed. ' + event.getMessage();
+    //             this.retryBtn.active = true;
+    //             this.checkBtn.active = false;
+    //             break;
+    //         case native.EventAssetsManager.ERROR_UPDATING:
+    //             this.info.string = 'Asset update error: ' + event.getAssetId() + ', ' + event.getMessage();
+    //             break;
+    //         case native.EventAssetsManager.ERROR_DECOMPRESS:
+    //             this.info.string = event.getMessage();
+    //             break;
+    //     }
+    // }
 
-    OnSuccess(status) {
-        if (status == 1) {
-            game.restart()
-            return
-        }
+    // OnSuccess(status) {
+    //     if (status == 1) {
+    //         game.restart()
+    //         return
+    //     }
 
-        if (status == 2) {
-            this.btnStart.active = true
-        }
-    }
+    //     if (status == 2) {
+    //         this.btnStart.active = true
+    //     }
+    // }
 };

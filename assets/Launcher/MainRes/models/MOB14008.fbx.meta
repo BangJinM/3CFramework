@@ -1,0 +1,434 @@
+{
+  "ver": "2.3.13",
+  "importer": "fbx",
+  "imported": true,
+  "uuid": "4c712865-bdb7-4e09-9325-c4f4c8edcd87",
+  "files": [
+    "__original-animation-0.cconb",
+    "__original-animation-1.cconb",
+    "__original-animation-2.cconb",
+    "__original-animation-3.cconb",
+    "__original-animation-4.cconb",
+    "__original-animation-5.cconb",
+    "__original-animation-6.cconb"
+  ],
+  "subMetas": {
+    "a62fe": {
+      "importer": "gltf-mesh",
+      "uuid": "4c712865-bdb7-4e09-9325-c4f4c8edcd87@a62fe",
+      "displayName": "",
+      "id": "a62fe",
+      "name": "Scene.mesh",
+      "userData": {
+        "gltfIndex": 0,
+        "triangleCount": 1212
+      },
+      "ver": "1.1.1",
+      "imported": true,
+      "files": [
+        ".bin",
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "07372": {
+      "importer": "gltf-animation",
+      "uuid": "4c712865-bdb7-4e09-9325-c4f4c8edcd87@07372",
+      "displayName": "",
+      "id": "07372",
+      "name": "MOB14008_Wait.animation",
+      "userData": {
+        "gltfIndex": 0,
+        "wrapMode": 2,
+        "sample": 30,
+        "span": {
+          "from": 0,
+          "to": 2
+        },
+        "events": []
+      },
+      "ver": "1.0.17",
+      "imported": true,
+      "files": [
+        ".cconb"
+      ],
+      "subMetas": {}
+    },
+    "f43fb": {
+      "importer": "gltf-animation",
+      "uuid": "4c712865-bdb7-4e09-9325-c4f4c8edcd87@f43fb",
+      "displayName": "",
+      "id": "f43fb",
+      "name": "MOB14008_Hurt.animation",
+      "userData": {
+        "gltfIndex": 1,
+        "wrapMode": 2,
+        "sample": 30,
+        "span": {
+          "from": 0,
+          "to": 1.100000023841858
+        },
+        "events": []
+      },
+      "ver": "1.0.17",
+      "imported": true,
+      "files": [
+        ".cconb"
+      ],
+      "subMetas": {}
+    },
+    "06680": {
+      "importer": "gltf-animation",
+      "uuid": "4c712865-bdb7-4e09-9325-c4f4c8edcd87@06680",
+      "displayName": "",
+      "id": "06680",
+      "name": "MOB14008_Attack1.animation",
+      "userData": {
+        "gltfIndex": 2,
+        "wrapMode": 2,
+        "sample": 30,
+        "span": {
+          "from": 0,
+          "to": 1.5
+        },
+        "events": []
+      },
+      "ver": "1.0.17",
+      "imported": true,
+      "files": [
+        ".cconb"
+      ],
+      "subMetas": {}
+    },
+    "5d896": {
+      "importer": "gltf-animation",
+      "uuid": "4c712865-bdb7-4e09-9325-c4f4c8edcd87@5d896",
+      "displayName": "",
+      "id": "5d896",
+      "name": "MOB14008_Die.animation",
+      "userData": {
+        "gltfIndex": 3,
+        "wrapMode": 2,
+        "sample": 30,
+        "span": {
+          "from": 0,
+          "to": 2.9000000953674316
+        },
+        "events": []
+      },
+      "ver": "1.0.17",
+      "imported": true,
+      "files": [
+        ".cconb"
+      ],
+      "subMetas": {}
+    },
+    "79e20": {
+      "importer": "gltf-animation",
+      "uuid": "4c712865-bdb7-4e09-9325-c4f4c8edcd87@79e20",
+      "displayName": "",
+      "id": "79e20",
+      "name": "MOB14008_Run.animation",
+      "userData": {
+        "gltfIndex": 4,
+        "wrapMode": 2,
+        "sample": 30,
+        "span": {
+          "from": 0,
+          "to": 0.699999988079071
+        },
+        "events": []
+      },
+      "ver": "1.0.17",
+      "imported": true,
+      "files": [
+        ".cconb"
+      ],
+      "subMetas": {}
+    },
+    "e2115": {
+      "importer": "gltf-animation",
+      "uuid": "4c712865-bdb7-4e09-9325-c4f4c8edcd87@e2115",
+      "displayName": "",
+      "id": "e2115",
+      "name": "MOB14008_Attack2.animation",
+      "userData": {
+        "gltfIndex": 5,
+        "wrapMode": 2,
+        "sample": 30,
+        "span": {
+          "from": 0,
+          "to": 1.7000000476837158
+        },
+        "events": []
+      },
+      "ver": "1.0.17",
+      "imported": true,
+      "files": [
+        ".cconb"
+      ],
+      "subMetas": {}
+    },
+    "6aa9d": {
+      "importer": "gltf-animation",
+      "uuid": "4c712865-bdb7-4e09-9325-c4f4c8edcd87@6aa9d",
+      "displayName": "",
+      "id": "6aa9d",
+      "name": "MOB14008_Walk.animation",
+      "userData": {
+        "gltfIndex": 6,
+        "wrapMode": 2,
+        "sample": 30,
+        "span": {
+          "from": 0,
+          "to": 0.9666666388511658
+        },
+        "events": []
+      },
+      "ver": "1.0.17",
+      "imported": true,
+      "files": [
+        ".cconb"
+      ],
+      "subMetas": {}
+    },
+    "438fe": {
+      "importer": "gltf-skeleton",
+      "uuid": "4c712865-bdb7-4e09-9325-c4f4c8edcd87@438fe",
+      "displayName": "",
+      "id": "438fe",
+      "name": "UnnamedSkeleton.skeleton",
+      "userData": {
+        "gltfIndex": 0,
+        "jointsLength": 33
+      },
+      "ver": "1.0.1",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "fd73d": {
+      "importer": "gltf-embeded-image",
+      "uuid": "4c712865-bdb7-4e09-9325-c4f4c8edcd87@fd73d",
+      "displayName": "",
+      "id": "fd73d",
+      "name": "DiffuseColor_Texture.image",
+      "userData": {
+        "gltfIndex": 0,
+        "fixAlphaTransparencyArtifacts": true,
+        "hasAlpha": true,
+        "type": "texture"
+      },
+      "ver": "1.0.3",
+      "imported": true,
+      "files": [
+        ".json",
+        ".png"
+      ],
+      "subMetas": {}
+    },
+    "4f17a": {
+      "importer": "texture",
+      "uuid": "4c712865-bdb7-4e09-9325-c4f4c8edcd87@4f17a",
+      "displayName": "",
+      "id": "4f17a",
+      "name": "DiffuseColor_Texture.texture",
+      "userData": {
+        "wrapModeS": "repeat",
+        "wrapModeT": "repeat",
+        "minfilter": "linear",
+        "magfilter": "linear",
+        "mipfilter": "none",
+        "anisotropy": 0,
+        "isUuid": true,
+        "imageUuidOrDatabaseUri": "4c712865-bdb7-4e09-9325-c4f4c8edcd87@fd73d"
+      },
+      "ver": "1.0.22",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "bc36e": {
+      "importer": "gltf-material",
+      "uuid": "4c712865-bdb7-4e09-9325-c4f4c8edcd87@bc36e",
+      "displayName": "",
+      "id": "bc36e",
+      "name": "MOB14008_mat.material",
+      "userData": {
+        "gltfIndex": 0
+      },
+      "ver": "1.0.14",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "4abcf": {
+      "importer": "gltf-scene",
+      "uuid": "4c712865-bdb7-4e09-9325-c4f4c8edcd87@4abcf",
+      "displayName": "",
+      "id": "4abcf",
+      "name": "MOB14008.prefab",
+      "userData": {
+        "gltfIndex": 0
+      },
+      "ver": "1.0.14",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    }
+  },
+  "userData": {
+    "imageMetas": [
+      {
+        "name": "DiffuseColor_Texture",
+        "uri": "4c712865-bdb7-4e09-9325-c4f4c8edcd87@fd73d"
+      }
+    ],
+    "fbx": {
+      "smartMaterialEnabled": true
+    },
+    "animationImportSettings": [
+      {
+        "name": "MOB14008_Wait",
+        "duration": 2,
+        "fps": 30,
+        "splits": [
+          {
+            "name": "MOB14008_Wait",
+            "from": 0,
+            "to": 2,
+            "wrapMode": 2,
+            "previousId": "07372"
+          }
+        ]
+      },
+      {
+        "name": "MOB14008_Hurt",
+        "duration": 1.100000023841858,
+        "fps": 30,
+        "splits": [
+          {
+            "name": "MOB14008_Hurt",
+            "from": 0,
+            "to": 1.100000023841858,
+            "wrapMode": 2,
+            "previousId": "f43fb"
+          }
+        ]
+      },
+      {
+        "name": "MOB14008_Attack1",
+        "duration": 1.5,
+        "fps": 30,
+        "splits": [
+          {
+            "name": "MOB14008_Attack1",
+            "from": 0,
+            "to": 1.5,
+            "wrapMode": 2,
+            "previousId": "06680"
+          }
+        ]
+      },
+      {
+        "name": "MOB14008_Die",
+        "duration": 2.9000000953674316,
+        "fps": 30,
+        "splits": [
+          {
+            "name": "MOB14008_Die",
+            "from": 0,
+            "to": 2.9000000953674316,
+            "wrapMode": 2,
+            "previousId": "5d896"
+          }
+        ]
+      },
+      {
+        "name": "MOB14008_Run",
+        "duration": 0.699999988079071,
+        "fps": 30,
+        "splits": [
+          {
+            "name": "MOB14008_Run",
+            "from": 0,
+            "to": 0.699999988079071,
+            "wrapMode": 2,
+            "previousId": "79e20"
+          }
+        ]
+      },
+      {
+        "name": "MOB14008_Attack2",
+        "duration": 1.7000000476837158,
+        "fps": 30,
+        "splits": [
+          {
+            "name": "MOB14008_Attack2",
+            "from": 0,
+            "to": 1.7000000476837158,
+            "wrapMode": 2,
+            "previousId": "e2115"
+          }
+        ]
+      },
+      {
+        "name": "MOB14008_Walk",
+        "duration": 0.9666666388511658,
+        "fps": 30,
+        "splits": [
+          {
+            "name": "MOB14008_Walk",
+            "from": 0,
+            "to": 0.9666666388511658,
+            "wrapMode": 2,
+            "previousId": "6aa9d"
+          }
+        ]
+      }
+    ],
+    "lods": {
+      "enable": false,
+      "hasBuiltinLOD": false,
+      "options": [
+        {
+          "screenRatio": 0.25,
+          "faceCount": 1
+        },
+        {
+          "screenRatio": 0.125,
+          "faceCount": 0.25
+        },
+        {
+          "screenRatio": 0.01,
+          "faceCount": 0.1
+        }
+      ]
+    },
+    "assetFinder": {
+      "meshes": [
+        "4c712865-bdb7-4e09-9325-c4f4c8edcd87@a62fe"
+      ],
+      "skeletons": [
+        "4c712865-bdb7-4e09-9325-c4f4c8edcd87@438fe"
+      ],
+      "textures": [
+        "4c712865-bdb7-4e09-9325-c4f4c8edcd87@4f17a"
+      ],
+      "materials": [
+        "4c712865-bdb7-4e09-9325-c4f4c8edcd87@bc36e"
+      ],
+      "scenes": [
+        "4c712865-bdb7-4e09-9325-c4f4c8edcd87@4abcf"
+      ]
+    }
+  }
+}

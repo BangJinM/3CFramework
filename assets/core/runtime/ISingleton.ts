@@ -1,5 +1,5 @@
 import * as cc from "cc";
-import { GetManagerPersistNode } from "./utils/CocosUtils";
+import { GetManagerPersistNode } from "./Utils/CocosUtils";
 
 /**
  * 单例类装饰
