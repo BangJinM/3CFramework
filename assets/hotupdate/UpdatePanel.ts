@@ -1,8 +1,8 @@
+import * as cc from "cc"
 
-import { _decorator, Component, Node, Label, ProgressBar, game, Button, director, Scene, AssetManager } from 'cc';
 import * as Core from "Core"
-import { LoadAssetByName, LoadBundle } from '../Launcher/MainScripts/common/ResourceUtils';
-const { ccclass, property } = _decorator;
+import { LoadAssetByName, LoadBundle, LoadScene } from '../Launcher/MainScripts/common/ResourceUtils';
+const { ccclass, property } = cc._decorator;
 
 @ccclass('UpdatePanel')
 export class UpdatePanel extends cc.Component {
@@ -33,7 +33,7 @@ export class UpdatePanel extends cc.Component {
     // updateBtn: Node = null!;
 
     @property(cc.Node)
-    updateUI: cc.Node = null!;
+    btnStart: cc.Node = null!;
 
     // @property(HotUpdate)
     // hotUpdate: HotUpdate = null;
@@ -41,12 +41,10 @@ export class UpdatePanel extends cc.Component {
     // needRestart: any;
 
     protected onLoad(): void {
-        this.btnStart.on(Button.EventType.CLICK, () => {
+        this.btnStart.on(cc.Button.EventType.CLICK, () => {
             let promise = LoadBundle("Tank")
             promise.then(function (bundleCache) {
-                let bundle:AssetManager.Bundle = bundleCache
-                bundle.loadScene("")
-
+                LoadAssetByName("TankRes/Scenes/TankMain", cc.Scene)
             })
         }, this)
     }

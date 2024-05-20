@@ -130,6 +130,6 @@ export function LoadBundle(fName: string) {
 
 }
 
-export function LoadScene(fName: String) {
-
+export function LoadScene(fName: String, bundleCache: BundleCache) {
+    let Scene: cc.Scene = new cc.Scene("")
 }

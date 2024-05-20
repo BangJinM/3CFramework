@@ -1,10 +1,14 @@
+import * as cc from "cc"
 import { ISingleton, set_manager_instance } from "../ISingleton";
 import { GameStatus } from "./GameStatus";
 
 @set_manager_instance()
+@cc._decorator.ccclass("GameStatusManager")
 export class GameStatusManager extends ISingleton {
     gameStatuses: Map<string, GameStatus> = new Map()
+    @cc._decorator.property({ type: GameStatus })
     curStatus: GameStatus = null
+    @cc._decorator.property({ type: GameStatus })
     lastStatus: GameStatus = null
 
     Init() {
