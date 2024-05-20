@@ -1,25 +1,18 @@
 import { IReceiver } from "./IReceiver";
-import { ISocket, SocketOptions } from "./ISocket";
-import { MessageManager } from "./MessageManager";
+import { ISocket } from "./ISocket";
 import { WebSocketImpl } from "./WebSocketImpl";
 
 export class WebSocketClient {
     private socket: ISocket = null
     private messageReceiver: IReceiver = null
-    private socketOptions: SocketOptions = null
 
     constructor(messageReceiver) {
         this.messageReceiver = messageReceiver
-        this.socketOptions = new SocketOptions()
-        this.socketOptions.openCb = this.OpenCb.bind(this)
-        this.socketOptions.closeCb = this.CloseCb.bind(this)
-        this.socketOptions.messageCb = this.MessageCb.bind(this)
-        this.socketOptions.errorCb = this.ErrorCb.bind(this)
     }
 
     public Connect(url) {
         if (!this.socket) {
-            this.socket = new WebSocketImpl(this.socketOptions)
+            this.socket = new WebSocketImpl()
         }
 
         if (this.socket.Connecting()) {
@@ -27,11 +20,12 @@ export class WebSocketClient {
             return;
         }
 
-        if (this.socket.Connected()) {
+        if (this.socket.IsConnect()) {
             console.log("websocket Connected!")
             return;
         }
 
+        this.socket.AddListener(this.OnOpen.bind(this), this.OnClose.bind(this), this.OnMessage.bind(this), this.OnError.bind(this))
         this.socket.Connect(url);
     }
 
@@ -42,7 +36,7 @@ export class WebSocketClient {
     }
 
     public Connected(): Boolean {
-        return (this.socket && this.socket.Connected());
+        return (this.socket && this.socket.IsConnect());
     }
 
     public Connecting(): Boolean {
@@ -53,17 +47,17 @@ export class WebSocketClient {
         throw new Error("Method not implemented.");
     }
 
-    OpenCb = (e: Event) => {
+    OnOpen(e: Event) {
         console.log('连接成功的默认回调::::', e)
-    };
-    CloseCb = (e: CloseEvent) => {
+    }
+    OnClose(e: CloseEvent) {
         console.log('关闭的默认回调::::', e)
     }
-    MessageCb = (e: MessageEvent) => {
+    OnMessage(e: MessageEvent) {
         console.log('连接成功的默认回调::::', e)
         this.messageReceiver.Received(1, [])
     }
-    ErrorCb = (e: Event) => {
+    OnError(e: Event) {
         console.log('错误的默认回调::::', e)
     }
 }

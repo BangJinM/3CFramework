@@ -1,20 +1,13 @@
-import { ISingleton } from "../ISingleton";
 import { IReceiver } from "./IReceiver";
+import { ISocket } from "./ISocket";
 export type MessageReceiveHandler = (cmd: number, bytes: Uint8Array[]) => any;
-export class MessageManager implements IReceiver, ISingleton {
-    Init() {
-    }
-    Update(deltaTime: number) {
-    }
-    Clean() {
-        for (const key of this.messageHandlerMap.keys()) {
-            this.UnregisterHandler(key)
-        }
-    }
-    Destroy() {
-        this.Clean()
-    }
+export class NetClient implements IReceiver {
+    private socket: ISocket = null
     private messageHandlerMap: Map<number, MessageReceiveHandler> = new Map()
+
+    constructor(socket: ISocket) {
+        this.socket = socket
+    }
 
     public Received(cmd: number, bytes: Uint8Array[]): void {
         if (!this.messageHandlerMap.has(cmd))
