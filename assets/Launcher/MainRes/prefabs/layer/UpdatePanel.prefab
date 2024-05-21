@@ -458,7 +458,7 @@
     "_string": "开始游戏",
     "_horizontalAlign": 1,
     "_verticalAlign": 1,
-    "_actualFontSize": 39.9375,
+    "_actualFontSize": 20,
     "_fontSize": 20,
     "_fontFamily": "Arial",
     "_lineHeight": 40,
@@ -831,6 +831,9 @@
     "_enabled": true,
     "__prefab": {
       "__id__": 35
+    },
+    "btnStart": {
+      "__id__": 11
     },
     "_id": ""
   },

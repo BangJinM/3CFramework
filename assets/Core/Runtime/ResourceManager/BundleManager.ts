@@ -32,4 +32,15 @@ export class BundleManager extends ISingleton {
 
         this.AddBundleCache(fName, bundleCache)
     }
+
+    RemoveBundle(fName: string) {
+        if (!this.bundleMap.has(fName)) {
+            return
+        }
+
+        let bundleCache = this.bundleMap.get(fName)
+        bundleCache.bundle.releaseAll()
+        this.bundleMap.delete(fName)
+        cc.assetManager.removeBundle(bundleCache.bundle)
+    }
 }

@@ -6,8 +6,8 @@ const { ccclass, property } = cc._decorator;
 
 @ccclass('UpdatePanel')
 export class UpdatePanel extends cc.Component {
-    @property(cc.Label)
-    info: cc.Label = null!;
+    // @property(cc.Label)
+    // info: cc.Label = null!;
 
     // @property(Label)
     // info: Label = null!;
@@ -44,7 +44,8 @@ export class UpdatePanel extends cc.Component {
         this.btnStart.on(cc.Button.EventType.CLICK, () => {
             let promise = LoadBundle("Tank")
             promise.then(function (bundleCache) {
-                LoadAssetByName("TankRes/Scenes/TankMain", cc.Scene)
+                Core.GameStatusManager.GetInstance().ChangeStatus("GameStatusTank")
+
             })
         }, this)
     }
