@@ -14,8 +14,16 @@ export class GameStatusTank extends Core.GameStatus {
         await LoadBundle("Tank")
         let mainResBundle: Core.BundleCache = Core.BundleManager.GetInstance().GetBundle("Tank")
 
-        mainResBundle.bundle.loadScene("TankMain", function (error, scene) {
-            cc.director.runScene(scene)
+        mainResBundle.bundle.loadScene("TankMain", function (error, scene: cc.Scene) {
+            let promise = LoadAssetByName("TankRes/Prefabs/TankMain", cc.Prefab, mainResBundle)
+            promise.then(function (asset: cc.Prefab) {
+                asset.addRef()
+
+                cc.director.runScene(scene, null, function () {
+                    cc.director.getScene().addChild(Core.CloneNP(asset))
+                    asset.decRef()
+                })
+            })
         })
     }
 

@@ -12,7 +12,7 @@ export class LauncherMain extends cc.Component {
     protected onLoad(): void {
         Core.Logger.GetInstance().Init()
 
-        Core.Logger.info("GameStatusInit OnEnter")
+        Core.Logger.info("LauncherMain")
         Global.Init()
 
         let gameStatusManager: Core.GameStatusManager = Core.GameStatusManager.GetInstance();

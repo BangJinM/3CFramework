@@ -171,12 +171,15 @@ export function forEach<T = any>(array: T[], process: ForEachFunction, onComplet
     }
 }
 
+@cc._decorator.ccclass("BundleCache")
 export class BundleCache {
     /** 路径或者名字 */
-    url: string | null = null
+    @cc._decorator.property(String)
+    url: string = ""
     /** bundle */
+    @cc._decorator.property(cc.AssetManager.Bundle)
     bundle: cc.AssetManager.Bundle | null = null
-
+    @cc._decorator.property(Number)
     refCount = 0
 
     AddRef() { this.refCount++ }
