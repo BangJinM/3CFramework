@@ -11,14 +11,4 @@ export class Global {
         Global.uiGraphManager = UIGraphManager.GetInstance()
         await Global.uiGraphManager.Init()
     }
-
-    static Clean() {
-        Global.uiGraphManager.Clean()
-        Global.uiGraphManager.node.destroy()
-        Global.uiGraphManager = null
-    }
-
-    static LoginInit() { }
-    static LoginClean() { }
-
 }

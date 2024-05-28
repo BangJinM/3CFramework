@@ -16,3 +16,4 @@ export * from "./Runtime/UIManager/UIEnum"
 export * from "./Runtime/UIManager/UIGraphManager"
 
 export * from "./Runtime/Logger"
+export * from "./Runtime/ISingleton"

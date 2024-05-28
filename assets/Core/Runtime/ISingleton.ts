@@ -4,11 +4,11 @@ import { GetManagerPersistNode } from "./Utils/CocosUtils";
 /**
  * 单例类装饰
  */
-export function set_manager_instance() {
+export function set_manager_instance(pName?) {
     return (target) => {
         target.GetInstance = function () {
             if (!target.instance) {
-                let node = GetManagerPersistNode(`__${target.name}__`)
+                let node = GetManagerPersistNode(`__${target.name}__`, pName)
                 target.instance = node.addComponent(target)
             }
             return target.instance

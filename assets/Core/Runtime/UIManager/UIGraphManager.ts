@@ -4,14 +4,12 @@ import { ISingleton, set_manager_instance } from "../ISingleton";
 import { LayerProperty } from "./LayerProperty";
 
 /** UI 根节点 管理 */
-@cc._decorator.ccclass("UIGraphManager")
+@cc._decorator.ccclass()
 @set_manager_instance()
 export class UIGraphManager extends ISingleton {
     /** ui相机 */
-    @cc._decorator.property({ type: Node, tooltip: "ui 相机" })
     uiCameraNode: cc.Node = null
     /** UICanvas */
-    @cc._decorator.property({ type: Node, tooltip: "ui Canvas" })
     uiCanvasNode: cc.Node = null
     /** 节点属性列表 */
     uiNodes: Map<number, LayerProperty[]> = new Map()

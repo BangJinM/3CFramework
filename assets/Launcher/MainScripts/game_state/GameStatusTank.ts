@@ -2,6 +2,7 @@ import * as cc from "cc"
 import { Global } from "../common/Global";
 import * as Core from "Core";
 import { LoadAssetByName, LoadBundle } from "../common/ResourceUtils";
+import { TankMain } from "../../../Tank/TankScripts/TankMain";
 
 @cc._decorator.ccclass("GameStatusTank")
 export class GameStatusTank extends Core.GameStatus {
@@ -15,14 +16,8 @@ export class GameStatusTank extends Core.GameStatus {
         let mainResBundle: Core.BundleCache = Core.BundleManager.GetInstance().GetBundle("Tank")
 
         mainResBundle.bundle.loadScene("TankMain", function (error, scene: cc.Scene) {
-            let promise = LoadAssetByName("TankRes/Prefabs/TankMain", cc.Prefab, mainResBundle)
-            promise.then(function (asset: cc.Prefab) {
-                asset.addRef()
-
-                cc.director.runScene(scene, null, function () {
-                    cc.director.getScene().addChild(Core.CloneNP(asset))
-                    asset.decRef()
-                })
+            cc.director.runScene(scene, null, function () {
+                TankMain.GetInstance().Init()
             })
         })
     }

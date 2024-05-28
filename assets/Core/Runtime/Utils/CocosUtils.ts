@@ -21,7 +21,7 @@ export function GetPersistRootNode() {
 }
 
 /** 获取管理类下的持久化节点 */
-export function GetManagerPersistNode(name: string) {
+export function GetManagerPersistNode(name: string, pName?: string) {
     let scene = cc.director.getScene()
     if (!scene)
         return
@@ -31,10 +31,19 @@ export function GetManagerPersistNode(name: string) {
         persistRootNode = GetPersistRootNode()
     }
 
-    let managerNode = persistRootNode.getChildByName("__ManagerNode__")
+    let pNode: cc.Node = persistRootNode
+    if (pName) {
+        pNode = persistRootNode.getChildByName(pName)
+        if (!pNode) {
+            pNode = new cc.Node(pName)
+            persistRootNode.addChild(pNode)
+        }
+    }
+
+    let managerNode = pNode.getChildByName("__ManagerNode__")
     if (!managerNode) {
         managerNode = new cc.Node(name)
-        persistRootNode.addChild(managerNode)
+        pNode.addChild(managerNode)
     }
     return managerNode
 }
