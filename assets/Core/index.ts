@@ -17,3 +17,6 @@ export * from "./Runtime/UIManager/UIGraphManager"
 
 export * from "./Runtime/Logger"
 export * from "./Runtime/ISingleton"
+
+export * from "./Runtime/ECS/System/AppearanceSystem"
+export * from "./Runtime/ECS/Base/ECSWorld"

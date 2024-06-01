@@ -15,6 +15,10 @@ export class TankMain extends Core.ISingleton {
         })
 
         LevelManager.GetInstance().Init()
+        let world: Core.ECSWorld = new Core.ECSWorld()
+        let entity: number = world.CreateEntity()
+        world.AddSystem(new Core.AppearanceSystem())
+        world.AddComponent(entity, Core.app)
     }
 }
 
