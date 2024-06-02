@@ -1,7 +1,7 @@
 import * as cc from "cc"
 
 import * as Core from "Core"
-import { LoadAssetByName, LoadBundle, LoadScene } from '../Launcher/MainScripts/common/ResourceUtils';
+import { LoadAssetByName, LoadBundle, LoadScene } from '../Core/Runtime/ResourceManager/ResourceUtils';
 const { ccclass, property } = cc._decorator;
 
 @ccclass('UpdatePanel')

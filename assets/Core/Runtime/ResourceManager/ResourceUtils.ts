@@ -1,7 +1,7 @@
 import * as cc from "cc";
-import { AssetType, BundleCache, GetPipeline, asyncify, bundlePipeLine } from "Core";
-import { Global } from "./Global";
-import { BundleManager } from "../../../Core/Runtime/ResourceManager/BundleManager";
+import { BundleManager } from "./BundleManager";
+import { AssetType, BundleCache, GetPipeline, asyncify, bundlePipeLine } from "./ResourcesDefines";
+import { CacheManager } from "./CacheManager";
 
 function GetTask(fName: string, type: AssetType, options): cc.AssetManager.Task {
     return cc.AssetManager.Task.create({
@@ -20,7 +20,7 @@ function LoadCacheAsset(task: cc.AssetManager.Task): [boolean, Promise<any>] {
 
     if (!needCache) return [false, null]
 
-    let asset = Global.CacheManager.GetAssetData(type, url);
+    let asset = CacheManager.GetInstance().GetAssetData(type, url);
     if (!asset) return [false, null]
     let promise = new Promise(function (success) {
         success(asset)

@@ -1,7 +1,7 @@
 import * as cc from "cc"
 import { Global } from "../common/Global";
 import * as Core from "Core";
-import { LoadAssetByName, LoadBundle } from "../common/ResourceUtils";
+import { LoadAssetByName, LoadBundle } from "../../../Core/Runtime/ResourceManager/ResourceUtils";
 import { TankMain } from "../../../Tank/TankScripts/TankMain";
 
 @cc._decorator.ccclass("GameStatusTank")

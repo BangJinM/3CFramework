@@ -1,6 +1,6 @@
 import * as cc from 'cc';
 import * as Core from 'Core';
-import { LoadAssetByName } from '../../Launcher/MainScripts/common/ResourceUtils';
+import { LoadAssetByName } from '../../Core/Runtime/ResourceManager/ResourceUtils';
 import { LevelManager } from './LevelManager';
 
 @cc._decorator.ccclass('UserComp.TankMain')
