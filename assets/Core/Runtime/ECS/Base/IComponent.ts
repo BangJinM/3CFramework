@@ -1,27 +1,29 @@
 
-export interface IComponent {
-    /**
-     * 当对象被添加时调用。
-     */
-    OnAdd();
+export function set_property_dirty(target: any, propertyKey: string) {
+    let originalValue: any;
 
-    /**
-     * 当对象移除时调用。
-     */
-    OnRemove();
+    // 获取原始的getter和setter
+    const descriptor = Object.getOwnPropertyDescriptor(target.prototype, propertyKey)!;
+    const originalGetter = descriptor.get;
+    const originalSetter = descriptor.set;
 
-    /**
-     * 当对象进入时触发。
-     */
-    OnEnter();
+    // 创建新的getter和setter
+    descriptor.get = originalGetter
+    descriptor.set = function (newValue) {
+        if (originalValue !== newValue) {
+            target?.MarkDirty()
+            originalValue = newValue;
+            originalSetter?.call(this, newValue)
+        }
+    };
 
-    /**
-     * 当对象离开时触发。
-     */
-    OnExit();
+    // 更新对象的属性描述符
+    Object.defineProperty(target, propertyKey, descriptor);
+}
 
-    /**
-     * 每帧更新时调用，用于处理随时间变化的逻辑。
-     */
-    OnUpdate(deltaTime: number);
+export class IComponent {
+    dirty = false;
+
+    MarkDirty(): void { this.dirty = true }
+    IsDirty(): boolean { return this.dirty }
 }
