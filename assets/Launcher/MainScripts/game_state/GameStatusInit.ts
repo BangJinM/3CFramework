@@ -18,7 +18,7 @@ export class GameStatusInit extends Core.GameStatus {
         let promise = LoadAssetByName("prefabs/layer/UpdatePanel", cc.Prefab, mainResBundle)
         promise.then(function (asset: cc.Prefab) {
             if (!asset) return
-            let updateL = Core.CloneNP(asset)
+            let updateL = Core.Clone(asset)
             this.layerProperty = { layerNode: updateL, layerName: "UpdatePanel", uiType: Core.UIEnum.UI_NORMAL }
             Global.uiGraphManager.AddNode(this.layerProperty)
         }.bind(this))

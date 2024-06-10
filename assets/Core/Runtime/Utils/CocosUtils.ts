@@ -49,7 +49,7 @@ export function GetManagerPersistNode(name: string, pName?: string) {
 }
 
 /** 克隆节点/prefab */
-export function CloneNP(prefab: cc.Prefab | cc.Node) {
+export function Clone(prefab: cc.Prefab | cc.Node) {
     let newP: cc.Node = cc.instantiate(prefab) as cc.Node
     AssetRefComponent.AfterClone(prefab, newP)
     return newP
