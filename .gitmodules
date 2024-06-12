@@ -1,0 +1,3 @@
+[submodule "extensions/creator_common_lib"]
+	path = extensions/creator_common_lib
+	url = git@github.com:BangJinM/creator_common_lib.git

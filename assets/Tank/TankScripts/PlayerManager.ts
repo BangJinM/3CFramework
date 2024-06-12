@@ -1,7 +1,7 @@
 import * as cc from 'cc';
-import * as Core from 'Core';
+import * as ccl from 'ccl';
 
-export class PlayerManager extends Core.ISingleton {
+export class PlayerManager extends ccl.ISingleton {
     player: number = 0;
 
     SetPlayer(id: number) {

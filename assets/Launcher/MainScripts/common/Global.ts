@@ -1,4 +1,4 @@
-import { CacheManager, UIGraphManager } from "Core"
+import { CacheManager, UIGraphManager } from "ccl"
 
 /** 
  * 全局变量 根据不同的游戏周期，初始化对应的变量

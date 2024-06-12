@@ -1,11 +1,9 @@
 import * as cc from "cc"
-import * as Core from "Core";
-import { ISceneGridManager } from "../../Core/Runtime/AStar/ISceneGridManager";
-import { LoadAssetByName } from "../../Core/Runtime/ResourceManager/ResourceUtils";
+import * as ccl from "ccl";
 
 @cc._decorator.ccclass()
-@Core.set_manager_instance("Tank")
-export class LevelManager extends Core.ISingleton implements ISceneGridManager {
+@ccl.set_manager_instance("Tank")
+export class LevelManager extends ccl.ISingleton implements ccl.ISceneGridManager {
     scene: cc.Node = null
     level: number = 1
 
@@ -32,7 +30,7 @@ export class LevelManager extends Core.ISingleton implements ISceneGridManager {
     LoadScene(level: number) {
         this.level = level
 
-        let promise = LoadAssetByName("level", cc.TiledMapAsset, Core.BundleManager.GetInstance().GetBundle("Tank"))
+        let promise = LoadAssetByName("level", cc.TiledMapAsset, ccl.BundleManager.GetInstance().GetBundle("Tank"))
         promise.then((asset: cc.TiledMapAsset) => {
 
         })
@@ -43,6 +41,6 @@ export class LevelManager extends Core.ISingleton implements ISceneGridManager {
             return
 
         this.scene.removeAllChildren()
-        
+
     }
 }

@@ -1,7 +1,6 @@
 import * as cc from "cc"
+import * as ccl from "ccl"
 
-import * as Core from "Core"
-import { LoadAssetByName, LoadBundle, LoadScene } from '../Core/Runtime/ResourceManager/ResourceUtils';
 const { ccclass, property } = cc._decorator;
 
 @ccclass('UpdatePanel')
@@ -42,9 +41,9 @@ export class UpdatePanel extends cc.Component {
 
     protected onLoad(): void {
         this.btnStart.on(cc.Button.EventType.CLICK, () => {
-            let promise = LoadBundle("Tank")
+            let promise = ccl.LoadBundle("Tank")
             promise.then(function (bundleCache) {
-                Core.GameStatusManager.GetInstance().ChangeStatus("GameStatusTank")
+                ccl.GameStatusManager.GetInstance().ChangeStatus("GameStatusTank")
 
             })
         }, this)

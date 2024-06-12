@@ -1,19 +1,18 @@
 import * as cc from "cc"
 import { Global } from "../common/Global";
-import * as Core from "Core";
-import { LoadAssetByName, LoadBundle } from "../../../Core/Runtime/ResourceManager/ResourceUtils";
+import * as ccl from "ccl";
 import { TankMain } from "../../../Tank/TankScripts/TankMain";
 
 @cc._decorator.ccclass("GameStatusTank")
-export class GameStatusTank extends Core.GameStatus {
+export class GameStatusTank extends ccl.GameStatus {
     constructor() {
         super("GameStatusTank")
-        Core.Logger.info("GameStatusTank constructor");
+        ccl.Logger.info("GameStatusTank constructor");
     }
 
     async OnEnter() {
         await LoadBundle("Tank")
-        let mainResBundle: Core.BundleCache = Core.BundleManager.GetInstance().GetBundle("Tank")
+        let mainResBundle: ccl.BundleCache = ccl.BundleManager.GetInstance().GetBundle("Tank")
 
         mainResBundle.bundle.loadScene("TankMain", function (error, scene: cc.Scene) {
             cc.director.runScene(scene, null, function () {
@@ -23,7 +22,7 @@ export class GameStatusTank extends Core.GameStatus {
     }
 
     async OnExit(): Promise<void> {
-        let bundleManager: Core.BundleManager = Core.BundleManager.GetInstance()
+        let bundleManager: ccl.BundleManager = ccl.BundleManager.GetInstance()
         bundleManager.RemoveBundle("Tank")
     }
 }

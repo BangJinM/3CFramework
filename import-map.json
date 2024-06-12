@@ -1,5 +1,5 @@
 {
     "imports": {
-        "Core": "./assets/Core/index.ts"
+        "ccl": "./extensions/creator_common_lib/assets/index.ts"
     }
 }
