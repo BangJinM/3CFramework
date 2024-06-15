@@ -1,7 +1,7 @@
 import * as cc from 'cc';
-import * as Core from 'Core';
+import * as ccl from "ccl"
 
-export class MonsterManager extends Core.ISingleton {
+export class MonsterManager extends ccl.ISingleton {
     /** 怪物实体 */
     monsterEntity: number[] = []
     /** 怪物死亡实体 */

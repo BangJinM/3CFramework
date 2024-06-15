@@ -1,7 +1,7 @@
 import * as cc from "cc"
-import * as Core from "Core";
+import * as ccl from "ccl";
 
-export class TiledMapManager extends Core.ISingleton {
+export class TiledMapManager extends ccl.ISingleton {
     tiledMap: cc.TiledMap;
 
     LoadTiledMap(mapName: string) {

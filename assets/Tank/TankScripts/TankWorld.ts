@@ -1,5 +1,5 @@
-import { ECSWorld } from "../../Core/Runtime/ECS/Base/ECSWorld";
+import { ECSWorld } from "ccl";
 
-export class  TankWorld extends ECSWorld{
-    
+export class TankWorld extends ECSWorld {
+
 }

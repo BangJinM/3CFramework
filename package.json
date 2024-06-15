@@ -3,5 +3,8 @@
   "uuid": "23bd2041-1e60-4c43-914e-f004c3fce7c2",
   "creator": {
     "version": "3.8.3"
+  },
+  "dependencies": {
+    "ccl": "git+https://github.com/BangJinM/creator_common_lib.git"
   }
 }
