@@ -11,7 +11,7 @@ export class GameStatusTank extends ccl.GameStatus {
     }
 
     async OnEnter() {
-        await LoadBundle("Tank")
+        await ccl.LoadBundle("Tank")
         let mainResBundle: ccl.BundleCache = ccl.BundleManager.GetInstance().GetBundle("Tank")
 
         mainResBundle.bundle.loadScene("TankMain", function (error, scene: cc.Scene) {

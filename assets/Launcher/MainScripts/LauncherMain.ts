@@ -20,8 +20,5 @@ export class LauncherMain extends cc.Component {
         gameStatusManager.AddGameStatus(new GameStatusInit())
         gameStatusManager.AddGameStatus(new GameStatusTank())
         ccl.GameStatusManager.GetInstance().ChangeStatus("GameStatusInit")
-
-        let apprComp = new ccl.SpriteApprComp()
-        apprComp.spriteName = "1111"
     }
 }

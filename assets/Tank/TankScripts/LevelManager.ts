@@ -30,7 +30,7 @@ export class LevelManager extends ccl.ISingleton implements ccl.ISceneGridManage
     LoadScene(level: number) {
         this.level = level
 
-        let promise = LoadAssetByName("level", cc.TiledMapAsset, ccl.BundleManager.GetInstance().GetBundle("Tank"))
+        let promise = ccl.LoadAssetByName("level", cc.TiledMapAsset, ccl.BundleManager.GetInstance().GetBundle("Tank"))
         promise.then((asset: cc.TiledMapAsset) => {
 
         })

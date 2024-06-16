@@ -1,6 +1,7 @@
 import * as cc from 'cc';
 import * as ccl from "ccl"
 
+@ccl.set_manager_instance()
 export class MonsterManager extends ccl.ISingleton {
     /** 怪物实体 */
     monsterEntity: number[] = []
