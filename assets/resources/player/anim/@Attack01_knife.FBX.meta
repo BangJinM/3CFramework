@@ -1,0 +1,99 @@
+{
+  "ver": "2.3.13",
+  "importer": "fbx",
+  "imported": true,
+  "uuid": "af2bca96-d9e9-4f89-935e-d9bdf1d5038a",
+  "files": [
+    "__original-animation-0.cconb"
+  ],
+  "subMetas": {
+    "8499e": {
+      "importer": "gltf-animation",
+      "uuid": "af2bca96-d9e9-4f89-935e-d9bdf1d5038a@8499e",
+      "displayName": "",
+      "id": "8499e",
+      "name": "Attack01_knife.animation",
+      "userData": {
+        "gltfIndex": 0,
+        "wrapMode": 2,
+        "sample": 30,
+        "span": {
+          "from": 0,
+          "to": 0.8999999761581421
+        },
+        "events": []
+      },
+      "ver": "1.0.17",
+      "imported": true,
+      "files": [
+        ".cconb"
+      ],
+      "subMetas": {}
+    },
+    "0ce38": {
+      "importer": "gltf-scene",
+      "uuid": "af2bca96-d9e9-4f89-935e-d9bdf1d5038a@0ce38",
+      "displayName": "",
+      "id": "0ce38",
+      "name": "@Attack01_knife.FBX.prefab",
+      "userData": {
+        "gltfIndex": 0
+      },
+      "ver": "1.0.14",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    }
+  },
+  "userData": {
+    "imageMetas": [],
+    "fbx": {
+      "smartMaterialEnabled": true
+    },
+    "animationImportSettings": [
+      {
+        "name": "Take 001",
+        "duration": 0.8999999761581421,
+        "fps": 30,
+        "splits": [
+          {
+            "name": "Attack01_knife",
+            "from": 0,
+            "to": 0.8999999761581421,
+            "wrapMode": 2,
+            "previousId": "8499e"
+          }
+        ]
+      }
+    ],
+    "lods": {
+      "enable": false,
+      "hasBuiltinLOD": false,
+      "options": [
+        {
+          "screenRatio": 0.25,
+          "faceCount": 1
+        },
+        {
+          "screenRatio": 0.125,
+          "faceCount": 0.25
+        },
+        {
+          "screenRatio": 0.01,
+          "faceCount": 0.1
+        }
+      ]
+    },
+    "assetFinder": {
+      "meshes": [],
+      "skeletons": [],
+      "textures": [],
+      "materials": [],
+      "scenes": [
+        "af2bca96-d9e9-4f89-935e-d9bdf1d5038a@0ce38"
+      ]
+    }
+  }
+}

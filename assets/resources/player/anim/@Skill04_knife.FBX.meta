@@ -1,0 +1,99 @@
+{
+  "ver": "2.3.13",
+  "importer": "fbx",
+  "imported": true,
+  "uuid": "5acfb80b-a90d-4cac-9869-02ba1cff7bfe",
+  "files": [
+    "__original-animation-0.cconb"
+  ],
+  "subMetas": {
+    "420e7": {
+      "importer": "gltf-animation",
+      "uuid": "5acfb80b-a90d-4cac-9869-02ba1cff7bfe@420e7",
+      "displayName": "",
+      "id": "420e7",
+      "name": "Skill04_knife.animation",
+      "userData": {
+        "gltfIndex": 0,
+        "wrapMode": 2,
+        "sample": 30,
+        "span": {
+          "from": 0,
+          "to": 2
+        },
+        "events": []
+      },
+      "ver": "1.0.17",
+      "imported": true,
+      "files": [
+        ".cconb"
+      ],
+      "subMetas": {}
+    },
+    "02bd7": {
+      "importer": "gltf-scene",
+      "uuid": "5acfb80b-a90d-4cac-9869-02ba1cff7bfe@02bd7",
+      "displayName": "",
+      "id": "02bd7",
+      "name": "@Skill04_knife.FBX.prefab",
+      "userData": {
+        "gltfIndex": 0
+      },
+      "ver": "1.0.14",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    }
+  },
+  "userData": {
+    "imageMetas": [],
+    "fbx": {
+      "smartMaterialEnabled": true
+    },
+    "animationImportSettings": [
+      {
+        "name": "Take 001",
+        "duration": 2,
+        "fps": 30,
+        "splits": [
+          {
+            "name": "Skill04_knife",
+            "from": 0,
+            "to": 2,
+            "wrapMode": 2,
+            "previousId": "420e7"
+          }
+        ]
+      }
+    ],
+    "lods": {
+      "enable": false,
+      "hasBuiltinLOD": false,
+      "options": [
+        {
+          "screenRatio": 0.25,
+          "faceCount": 1
+        },
+        {
+          "screenRatio": 0.125,
+          "faceCount": 0.25
+        },
+        {
+          "screenRatio": 0.01,
+          "faceCount": 0.1
+        }
+      ]
+    },
+    "assetFinder": {
+      "meshes": [],
+      "skeletons": [],
+      "textures": [],
+      "materials": [],
+      "scenes": [
+        "5acfb80b-a90d-4cac-9869-02ba1cff7bfe@02bd7"
+      ]
+    }
+  }
+}

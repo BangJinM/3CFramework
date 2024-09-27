@@ -1,17 +1,15 @@
 import * as cc from "cc";
 
 import * as ccl from "ccl";
+import { Global } from "./common/Global";
 import { GameStatusInit } from "./game_state/GameStatusInit";
 import { GameStatusTank } from "./game_state/GameStatusTank";
-import { Global } from "./common/Global";
 
 const { ccclass, property } = cc._decorator;
 
 @ccclass("LauncherMain")
 export class LauncherMain extends cc.Component {
     protected onLoad(): void {
-        ccl.Logger.GetInstance().Init()
-
         ccl.Logger.info("LauncherMain")
         Global.Init()
 

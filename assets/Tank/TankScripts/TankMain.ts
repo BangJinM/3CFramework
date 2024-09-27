@@ -1,9 +1,9 @@
 import * as cc from 'cc';
 import * as ccl from 'ccl';
 import { LevelManager } from './LevelManager';
-import { TankWorld } from './TankWorld';
-import { PlayerManager } from './PlayerManager';
 import { MonsterManager } from './MonsterManager';
+import { PlayerManager } from './PlayerManager';
+import { TankWorld } from './TankWorld';
 
 @cc._decorator.ccclass('UserComp.TankMain')
 @ccl.set_manager_instance("Tank")
@@ -12,17 +12,11 @@ export class TankMain extends ccl.ISingleton {
     sceneNode: cc.Node = null
 
     public Init(): void {
-
-
         let mainResBundle: ccl.BundleCache = ccl.BundleManager.GetInstance().GetBundle("Tank")
-        let promise = ccl.LoadAssetByName("TankRes/Prefabs/TankMain", cc.Prefab, mainResBundle)
-        promise.then(function (asset: cc.Prefab) {
-            this.sceneNode = ccl.Clone(asset)
+        ccl.Resources.Loader.LoadAsset("TankRes/Prefabs/TankMain", cc.Prefab, mainResBundle, (iResource: ccl.IResource) => {
+            this.sceneNode = ccl.Resources.UIUtils.Clone(iResource.oriAsset as cc.Prefab)
             cc.director.getScene().addChild(this.sceneNode)
-
-        }.bind(this))
-
-
+        })
     }
 
     public InitSuccess() {

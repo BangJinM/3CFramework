@@ -1,4 +1,4 @@
-import * as cc from "cc"
+import * as cc from "cc";
 import * as ccl from "ccl";
 
 export class TiledMapManager extends ccl.ISingleton {

@@ -1,9 +1,10 @@
-import * as cc from "cc"
-import { Global } from "../common/Global";
+import * as cc from "cc";
 import * as ccl from "ccl";
+import { Global } from "../common/Global";
+import { UpdatePanel } from "../hotupdate/UpdatePanel";
 
 export class GameStatusInit extends ccl.GameStatus {
-    layerProperty = null
+    layerProperty: ccl.BaseUIContainer = null
 
     constructor() {
         super("GameStatusInit")
@@ -11,14 +12,12 @@ export class GameStatusInit extends ccl.GameStatus {
     }
 
     async OnEnter() {
-        await ccl.LoadBundle("MainRes")
-
         let node = new cc.Node()
         this.layerProperty = node.addComponent(ccl.BaseUIContainer)
-        this.layerProperty.bundleName = "MainRes"
         this.layerProperty.uiType = ccl.UIEnum.UI_NORMAL
-        this.layerProperty.prefabURL = "prefabs/layer/UpdatePanel"
         this.layerProperty.layerName = "prefabs/layer/UpdatePanel"
+        this.layerProperty.ScriptAsset = UpdatePanel
+        this.layerProperty.mainPrefabPropty = { bundleName: "resources", prefabName: "prefabs/layer/UpdatePanel" }
 
         Global.uiGraphManager.AddNode(this.layerProperty)
     }

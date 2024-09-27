@@ -12,5 +12,4 @@ export class PlayerManager extends ccl.ISingleton {
         return this.player
     }
 
-
 }

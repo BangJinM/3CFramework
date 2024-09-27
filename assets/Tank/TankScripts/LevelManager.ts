@@ -1,4 +1,4 @@
-import * as cc from "cc"
+import * as cc from "cc";
 import * as ccl from "ccl";
 
 @cc._decorator.ccclass()
@@ -29,9 +29,7 @@ export class LevelManager extends ccl.ISingleton implements ccl.ISceneGridManage
 
     LoadScene(level: number) {
         this.level = level
-
-        let promise = ccl.LoadAssetByName("level", cc.TiledMapAsset, ccl.BundleManager.GetInstance().GetBundle("Tank"))
-        promise.then((asset: cc.TiledMapAsset) => {
+        ccl.Resources.Loader.LoadAsset("level", cc.TiledMapAsset, ccl.BundleManager.GetInstance().GetBundle("Tank"), (iResource: ccl.IResource) => {
 
         })
     }
