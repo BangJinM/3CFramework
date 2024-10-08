@@ -1,5 +1,5 @@
-import * as ccl from "ccl"
-import * as cc from "cc"
+import * as cc from "cc";
+import * as ccl from "ccl";
 import { NotifyID } from "../TankGlobalConfig";
 import { TankMain } from "../TankMain";
 
@@ -25,11 +25,10 @@ export class TankGameLogic extends ccl.ISingleton {
             let index = 0
             for (let x = 0; x < 26; x++) {
                 for (let y = 0; y < 26; y++) {
-                    let node = new cc.Node()
-                    let sprite = node.addComponent(cc.Sprite)
+
                     let spriteName = ""
                     if (text[index] == "3") {
-                        spriteName = "blank"
+                        spriteName = "walls"
                     } else if (text[index] == "5") {
                         spriteName == "steels"
                         // } else if (text[index] == "") {
@@ -40,13 +39,15 @@ export class TankGameLogic extends ccl.ISingleton {
                         spriteName == "water"
                     }
                     if (spriteName) {
+                        let node = new cc.Node()
+                        let sprite = node.addComponent(cc.Sprite)
                         ccl.Resources.UIUtils.LoadSpriteFrame(sprite, `TankRes/maps/landform/${spriteName}`, ccl.BundleManager.GetInstance().GetBundle("Tank"))
                         let tankMain: TankMain = TankMain.GetInstance()
                         tankMain.mapNode.addChild(node)
 
-                        node.setPosition(y * 32, (25 - x) * 32)
-                    } else {
-                        node.destroy()
+                        node.layer = cc.Layers.Enum.ALL
+
+                        node.setPosition((y - 16) * 32, (16 - x) * 32)
                     }
                     index++
                 }

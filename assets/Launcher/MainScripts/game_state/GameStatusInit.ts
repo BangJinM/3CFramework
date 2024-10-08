@@ -11,18 +11,17 @@ export class GameStatusInit extends ccl.GameStatus {
         ccl.Logger.info("GameStatusInit constructor");
     }
 
-    async OnEnter() {
+    OnEnter() {
         let node = new cc.Node()
         this.layerProperty = node.addComponent(ccl.BaseUIContainer)
         this.layerProperty.uiType = ccl.UIEnum.UI_NORMAL
         this.layerProperty.layerName = "prefabs/layer/UpdatePanel"
         this.layerProperty.ScriptAsset = UpdatePanel
         this.layerProperty.mainPrefabPropty = { bundleName: "resources", prefabName: "prefabs/layer/UpdatePanel" }
-
         Global.uiGraphManager.AddNode(this.layerProperty)
     }
 
-    async OnExit(): Promise<void> {
+    OnExit() {
         Global.uiGraphManager.RemoveNode(this.layerProperty)
     }
 }

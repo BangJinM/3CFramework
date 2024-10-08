@@ -1,11 +1,13 @@
 import * as cc from 'cc';
 import * as ccl from 'ccl';
+import { ECSActorApprComp } from './ECS/Comp/ECSActorApprComp';
+import { ECSActorApprSystem } from './ECS/ECSActorApprSystem';
 import { LevelManager } from './LevelManager';
-import { TankWorld } from './TankWorld';
-import { PlayerSystem } from './System/PlayerSystem';
-import { MonsterSystem } from './System/MonsterSystem';
 import { TankGameLogic } from './Logic/TankGameLogic';
+import { MonsterSystem } from './System/MonsterSystem';
+import { PlayerSystem } from './System/PlayerSystem';
 import { TankBegin } from './TankBegin';
+import { TankWorld } from './TankWorld';
 
 @cc._decorator.ccclass('UserComp.TankMain')
 @ccl.set_manager_instance("Tank")
@@ -45,12 +47,22 @@ export class TankMain extends ccl.ISingleton {
         ccl.UIGraphManager.GetInstance().AddNode(layerProperty)
 
         ccl.SubjectManager.GetInstance()
+
+        this.escWorld.AddSystem(ECSActorApprSystem)
+        let apprSys = this.escWorld.GetSystem<ECSActorApprSystem>(ECSActorApprSystem)
+        let player: number = this.escWorld.CreateEntity()
+        let comp = this.escWorld.AddComponent(player, ECSActorApprComp)
+        comp.SetAppr("Textures/UI/button_orange")
     }
 
     public Update(deltaTime: number): void {
         this.escWorld?.Update(deltaTime)
     }
 
+
+    GetNode(name:string){
+        return cc.find(name, this.sceneNode)
+    }
 }
 
 
