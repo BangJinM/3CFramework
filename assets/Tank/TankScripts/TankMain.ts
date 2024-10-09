@@ -20,7 +20,6 @@ export class TankMain extends ccl.ISingleton {
         let mainResBundle: ccl.BundleCache = ccl.BundleManager.GetInstance().GetBundle("Tank")
         ccl.Resources.Loader.LoadAsset("TankRes/Prefabs/SceneNode", cc.Prefab, mainResBundle, (iResource: ccl.IResource) => {
             this.sceneNode = ccl.Resources.UIUtils.Clone(iResource.oriAsset as cc.Prefab)
-            this.mapNode = this.sceneNode.getChildByName("TankCanvas").getChildByName("NODE_GAME").getChildByName("NODE_MAP")
             cc.director.getScene().addChild(this.sceneNode)
             this.InitSuccess()
         })

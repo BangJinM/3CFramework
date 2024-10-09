@@ -1,5 +1,4 @@
-import { Enum } from "cc";
 
-export enum NotifyID {
+export enum Notify {
     TankGameStart
 }
