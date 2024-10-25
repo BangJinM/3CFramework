@@ -43,7 +43,7 @@ export class TankGameLogic extends ccl.ISingleton {
                     }
                     if (spriteName) {
                         let node = new cc.Node()
-                        let sprite = node.addComponent(cc.Sprite) 
+                        let sprite = node.addComponent(cc.Sprite)
                         ccl.Resources.UIUtils.LoadSpriteFrame(sprite, `TankRes/maps/landform/${spriteName}`, ccl.BundleManager.GetInstance().GetBundle("Tank"))
                         mapNode.addChild(node)
 

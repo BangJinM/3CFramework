@@ -1,4 +1,5 @@
 
 export enum Notify {
-    TankGameStart
+    TankGameStart,
+    TankGameEnd,
 }

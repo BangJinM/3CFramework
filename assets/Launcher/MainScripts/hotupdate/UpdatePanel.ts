@@ -4,12 +4,12 @@ import * as ccl from "ccl";
 const { ccclass, property } = cc._decorator;
 
 @ccclass('UpdatePanel')
-export class UpdatePanel extends ccl.BaseUIComp {
+export class UpdatePanel extends ccl.BaseUIContainer {
     @property(cc.Node)
     btnStart: cc.Node = null!;
 
-    protected onLoad(): void {
-        this.btnStart = this.node.getChildByName("update_panel").getChildByName("btnStart")
+    OnUILoad(): void {
+        this.btnStart = this.childNode.getChildByName("update_panel").getChildByName("btnStart")
         this.btnStart.on(cc.Button.EventType.CLICK, () => {
             ccl.GameStatusManager.GetInstance().ChangeStatus("GameStatusTank")
         }, this)

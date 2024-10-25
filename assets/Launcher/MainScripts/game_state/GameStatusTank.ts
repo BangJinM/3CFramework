@@ -13,8 +13,9 @@ export class GameStatusTank extends ccl.GameStatus {
         let bundleManager: ccl.BundleManager = ccl.BundleManager.GetInstance() as ccl.BundleManager
         bundleManager.LoadBundle("Tank", (bundleCache: ccl.BundleCache) => {
             ccl.Resources.Loader.LoadSceneAsset("TankMain", bundleCache, (scene) => {
+                scene.oriAsset.addRef()
                 cc.director.runScene(scene.oriAsset as cc.SceneAsset, null, () => {
-                    scene.GetUName()
+                    scene.oriAsset.decRef()
                     TankMain.GetInstance().Init()
                 })
             })

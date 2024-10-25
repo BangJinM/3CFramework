@@ -37,10 +37,9 @@ export class TankMain extends ccl.ISingleton {
         LevelManager.GetInstance().Init()
 
         let node = new cc.Node()
-        let layerProperty = node.addComponent(ccl.BaseUIContainer)
+        let layerProperty = node.addComponent(TankBegin)
         layerProperty.uiType = ccl.UIEnum.UI_NORMAL
         layerProperty.layerName = "TankRes/Prefabs/TankBegin"
-        layerProperty.ScriptAsset = TankBegin
         layerProperty.mainPrefabPropty = { bundleName: "Tank", prefabName: "TankRes/Prefabs/TankBegin" }
 
         ccl.UIGraphManager.GetInstance().AddNode(layerProperty)
@@ -59,7 +58,7 @@ export class TankMain extends ccl.ISingleton {
     }
 
 
-    GetNode(name:string){
+    GetNode(name: string) {
         return cc.find(name, this.sceneNode)
     }
 }
