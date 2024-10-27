@@ -2,7 +2,6 @@ import * as cc from 'cc';
 import * as ccl from 'ccl';
 import { ECSActorApprComp } from './ECS/Comp/ECSActorApprComp';
 import { ECSActorApprSystem } from './ECS/ECSActorApprSystem';
-import { LevelManager } from './LevelManager';
 import { TankGameLogic } from './Logic/TankGameLogic';
 import { MonsterSystem } from './System/MonsterSystem';
 import { PlayerSystem } from './System/PlayerSystem';
@@ -33,8 +32,7 @@ export class TankMain extends ccl.ISingleton {
         ccl.SubjectManager.GetInstance().Init()
         let tankGameLogic: TankGameLogic = TankGameLogic.GetInstance()
         tankGameLogic.Init()
-
-        LevelManager.GetInstance().Init()
+        tankGameLogic.InitProtector(this.escWorld)
 
         let node = new cc.Node()
         let layerProperty = node.addComponent(TankBegin)

@@ -2,14 +2,27 @@ import * as cc from "cc";
 import * as ccl from "ccl";
 import { Notify } from "../TankGlobalConfig";
 import { TankMain } from "../TankMain";
+import { TankWorld } from "../TankWorld";
+import { ECSActorApprComp } from "../ECS/Comp/ECSActorApprComp";
+import { ECSHPComp } from "../ECS/Comp/ECSHPComp";
 
 @ccl.set_manager_instance("Tank")
 export class TankGameLogic extends ccl.ISingleton {
     level = 0
+    protectorId: number = 0
 
     Init(): void {
         let subjectManager: ccl.SubjectManager = ccl.SubjectManager.GetInstance()
         subjectManager.AddObserver(Notify.TankGameStart, this.RecBegin.bind(this))
+    }
+
+    InitProtector(ecsWorld: TankWorld) {
+        this.protectorId = ecsWorld.CreateEntity()
+        let apprComp: ECSActorApprComp = ecsWorld.AddComponent(this.protectorId, ECSActorApprComp)
+        apprComp.SetAppr("maps/landform/symbol")
+        
+        ecsWorld.AddComponent(this.protectorId, ECSHPComp)
+        ecsWorld
     }
 
     RecBegin(data: ccl.INoticeData): void {
@@ -48,7 +61,7 @@ export class TankGameLogic extends ccl.ISingleton {
                         mapNode.addChild(node)
 
                         node.layer = cc.Layers.Enum.ALL
-
+                        node.name = ((y - 1) * 26 + x).toString()
                         node.setPosition((x - 13) * 32 + 16, (13 - y) * 32 - 16)
                     }
                     index++
