@@ -2,7 +2,19 @@ import * as cc from "cc";
 import * as ccl from "ccl";
 import { TankGameLogic } from "../TankGameLogic";
 
+@cc._decorator.ccclass("ColliderEventComp")
+@cc._decorator.requireComponent(cc.RigidBody2D)
+@cc._decorator.requireComponent(cc.BoxCollider2D)
 export class ColliderEventComp extends cc.Component {
+    boxSize: cc.Size = new cc.Size(32, 32)
+
+    protected onLoad(): void {
+        let boxCollider = ccl.GetOrAddComponent(this.node, cc.BoxCollider2D)
+        boxCollider.size = this.boxSize
+
+        let rigidComp = ccl.GetOrAddComponent(this.node, cc.RigidBody2D)
+        rigidComp.enabledContactListener = true
+    }
 
     start() {
         // 注册单个碰撞体的回调函数
@@ -11,12 +23,6 @@ export class ColliderEventComp extends cc.Component {
             collider.on(cc.Contact2DType.BEGIN_CONTACT, this.onBeginContact, this);
             collider.on(cc.Contact2DType.END_CONTACT, this.onEndContact, this);
         }
-
-        // 注册全局碰撞回调函数
-        // if (cc.PhysicsSystem2D.instance) {
-        //     cc.PhysicsSystem2D.instance.on(cc.Contact2DType.BEGIN_CONTACT, this.onBeginContact, this);
-        //     cc.PhysicsSystem2D.instance.on(cc.Contact2DType.END_CONTACT, this.onEndContact, this);
-        // }
     }
     onBeginContact(selfCollider: cc.Collider2D, otherCollider: cc.Collider2D, contact: cc.IPhysics2DContact | null) {
         // 只在两个碰撞体开始接触时被调用一次
