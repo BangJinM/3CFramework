@@ -7,7 +7,7 @@ import { AutoMoveComponent } from "./Component/AutoMoveComponent";
 import { ColliderEventComp } from "./Component/ColliderEventComp";
 import { MoveComponent } from "./Component/MoveComponent";
 
-@ccl.set_manager_instance("Tank")
+@cc._decorator.ccclass("TankGameLogic")
 export class TankGameLogic extends ccl.ISingleton implements ccl.ISceneGridManager {
     level = 0
     players: cc.Node[] = []
@@ -165,7 +165,7 @@ export class TankGameLogic extends ccl.ISingleton implements ccl.ISceneGridManag
 
         {
             let sprite = ccl.GetOrAddComponent(protectorNode, cc.Sprite)
-            ccl.Resources.UIUtils.LoadSpriteFrame(sprite, `TankRes/maps/landform/symbol`, ccl.BundleManager.GetInstance().GetBundle("Tank"))
+            ccl.Resources.UIUtils.LoadSpriteFrame(sprite, `TankRes/maps/landform/symbol`, ccl.BundleManager.GetInstance<ccl.BundleManager>().GetBundle("Tank"))
         }
         {
             let rigidComp = ccl.GetOrAddComponent(protectorNode, cc.RigidBody2D)
@@ -223,7 +223,7 @@ export class TankGameLogic extends ccl.ISingleton implements ccl.ISceneGridManag
         mapNode.destroyAllChildren()
         mapNode.removeAllChildren()
 
-        ccl.Resources.Loader.LoadAsset(`TankRes/maps/${this.level.toString()}`, cc.TextAsset, ccl.BundleManager.GetInstance().GetBundle("Tank"), (iResource: ccl.IResource) => {
+        ccl.Resources.Loader.LoadAsset(`TankRes/maps/${this.level.toString()}`, cc.TextAsset, ccl.BundleManager.GetInstance<ccl.BundleManager>().GetBundle("Tank"), (iResource: ccl.IResource) => {
             if (!iResource.oriAsset) return
             let text = (iResource.oriAsset as cc.TextAsset).text
             let index = 0

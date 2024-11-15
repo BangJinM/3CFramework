@@ -4,7 +4,6 @@ import { MoveComponent } from "./MoveComponent";
 
 @cc._decorator.ccclass("AutoMoveComponent")
 export class AutoMoveComponent extends cc.Component {
-    target: any[] = []
     time: number = 0
     protected onLoad(): void {
         let rigidComp = ccl.GetOrAddComponent(this.node, cc.RigidBody2D)

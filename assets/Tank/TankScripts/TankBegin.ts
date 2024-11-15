@@ -2,7 +2,7 @@ import * as cc from "cc";
 import * as ccl from "ccl";
 import { Notify } from "./TankGlobalConfig";
 
-@cc._decorator.ccclass('UserComp.TankBegin')
+@cc._decorator.ccclass('TankBegin')
 export class TankBegin extends ccl.BaseUIContainer {
 
     OnUILoad(): void {
