@@ -174,45 +174,48 @@ export class TankGameLogic extends ccl.ISingleton implements ccl.ISceneGridManag
         this.actorNode.addChild(protectorNode)
     }
 
-    CreateWall(type: number, x, y) {
+    CreateWall(type: number, posX, poxY) {
         let spriteName = ""
 
         switch (type) {
             case 1:
-                spriteName == "grass"
+                spriteName == "forest"
                 break
             // case 2:
             //     break
             case 3:
-                spriteName = "walls"
+                spriteName = "wall"
                 break
             case 4:
-                spriteName = "water"
+                spriteName = "river-1"
                 break
             case 5:
-                spriteName == "steels"
+                spriteName == "stone"
                 break
         }
 
         if (!spriteName || spriteName.length <= 0) return
 
-        let wallNode = new cc.Node(`${y}_${x}`)
+        let position = new cc.Vec3((posX - 13) * 32, (13 - poxY) * 32, 0)
+        for (let i = 0; i < 4; i++) {
+            let wallNode = new cc.Node(`${posX}_${poxY}_${i}`)
 
-        let rigidComp = ccl.GetOrAddComponent(wallNode, cc.RigidBody2D)
-        rigidComp.type = cc.ERigidBody2DType.Static
+            let rigidComp = ccl.GetOrAddComponent(wallNode, cc.RigidBody2D)
+            rigidComp.type = cc.ERigidBody2DType.Static
 
-        let boxCollider = ccl.GetOrAddComponent(wallNode, cc.BoxCollider2D)
-        boxCollider.size = new cc.Size(32, 32)
+            let boxCollider = ccl.GetOrAddComponent(wallNode, cc.BoxCollider2D)
+            boxCollider.size = new cc.Size(32, 32)
 
-        let apprComp = ccl.GetOrAddComponent(wallNode, ActorApprComponent)
-        apprComp.appr = `TankRes/maps/landform/${spriteName}`
-        apprComp.bundleName = `Tank`
-        apprComp.type = 2
+            let apprComp = ccl.GetOrAddComponent(wallNode, ActorApprComponent)
+            apprComp.appr = `TankRes/Textures/Block/${spriteName}`
+            apprComp.bundleName = `Tank`
+            apprComp.type = 2
 
-        wallNode.setPosition(new cc.Vec3((x - 13) * 32 + 16, (13 - y) * 32 - 16, 0))
-        wallNode.layer = this.mapNode.layer
+            wallNode.setPosition(new cc.Vec3(position.x - ((i % 2) == 0 ? 16 : -16), position.y - ((i % 2) == 0 ? 16 : -16), 0))
+            wallNode.layer = this.mapNode.layer
 
-        this.mapNode.addChild(wallNode)
+            this.mapNode.addChild(wallNode)
+        }
     }
 
     LevelUp() {

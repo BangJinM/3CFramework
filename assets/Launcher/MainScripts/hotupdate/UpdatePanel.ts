@@ -8,11 +8,11 @@ export class UpdatePanel extends ccl.BaseUIContainer {
     @property(cc.Node)
     btnStart: cc.Node = null!;
 
-    OnUILoad(): void {
+    OnChildUILoad(): void {
         this.btnStart = this.childNode.getChildByName("update_panel").getChildByName("btnStart")
         this.btnStart.on(cc.Button.EventType.CLICK, () => {
             ccl.Logger.info("GameStatusTank")
-            ccl.GameStatusManager.GetInstance().ChangeStatus("GameStatusTank")
+            ccl.GameStatusManager.GetInstance<ccl.GameStatusManager>().ChangeStatus("GameStatusTank")
         }, this)
     }
 };
