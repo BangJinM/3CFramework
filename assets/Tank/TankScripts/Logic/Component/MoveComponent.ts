@@ -1,50 +1,63 @@
 import * as cc from "cc";
-import * as ccl from "ccl";
+import { ColliderEventComp } from "./ColliderEventComp";
 
-@cc._decorator.requireComponent(cc.RigidBody2D)
+
+@cc._decorator.ccclass("ColliderEventComp")
 export class MoveComponent extends cc.Component {
+    @cc._decorator.property(cc.CCFloat)
     public speed: number = 1
-    public direction: cc.Vec2 = new cc.Vec2(0, 0)
-    public isMoving: boolean = false
+    @cc._decorator.property(cc.CCBoolean)
+    public moving: boolean = false
+    @cc._decorator.property(cc.CCBoolean)
+    public autoMoving: boolean = false
+    @cc._decorator.property(cc.Vec3)
+    public direction: cc.Vec3 = new cc.Vec3(0, 0, 0)
+    @cc._decorator.property(cc.CCFloat)
+    public curTime: number = 0
+    @cc._decorator.property(cc.CCFloat)
+    public cTime: number = 0
 
-    SetMoveDirection(direction: cc.Vec2) {
-        this.direction = direction
-        this.OnUpdateMoveing()
+    SetMoveDirection(direction: cc.Vec3) { this.direction = direction }
+    GetMoveDirection() { return this.direction }
+    SetSpeed(speed: number) { this.speed = speed }
+    SetMoving(isMoving: boolean) { this.moving = isMoving }
+    GetMoving() { return this.moving }
+
+    protected update(dt: number): void {
+        this.OnUpdateMoveing(dt)
     }
 
-    SetMoveSpeed(speed: number) {
-        this.speed = speed
-        this.OnUpdateMoveing()
-    }
+    OnUpdateMoveing(dt: number) {
+        if (!(this._objFlags & cc.CCObject.Flags.IsOnLoadCalled)) return
 
-    SetMoving(isMoving: boolean) {
-        this.isMoving = isMoving
-        this.OnUpdateMoveing()
-    }
+        let isCollide: boolean = false
+        /** 移动 */
+        if (this.moving) {
+            let position = this.node.position.clone()
+            position.x += this.direction.x * this.speed
+            position.y += this.direction.y * this.speed
 
-    GetMoving() {
-        return this.isMoving
-    }
-
-    protected onLoad(): void {
-        let rigidComp = ccl.GetOrAddComponent(this.node, cc.RigidBody2D)
-        rigidComp.type = cc.ERigidBody2DType.Kinematic
-    }
-
-    protected start(): void {
-        this.OnUpdateMoveing()
-    }
-
-    OnUpdateMoveing() {
-        if (!(this._objFlags & cc.CCObject.Flags.IsOnLoadCalled))
-            return
-
-        let rigidComp = ccl.GetOrAddComponent(this.node, cc.RigidBody2D)
-        if (!this.isMoving) {
-            rigidComp.linearVelocity = cc.Vec2.ZERO
+            let collisionComp: ColliderEventComp = this.node.getComponent(ColliderEventComp)
+            if (!collisionComp || !collisionComp.IsCollision()) {
+                this.node.setPosition(position)
+            }
         }
-        else {
-            rigidComp.linearVelocity = this.direction.clone().multiplyScalar(this.speed)
+        /** 自动移动 */
+        if (this.autoMoving) {
+            this.curTime += dt
+            if (isCollide || this.curTime >= this.cTime) {
+                this.curTime = 0
+                this.cTime = cc.math.random() * 4 + 2
+
+                let Direction = [
+                    new cc.Vec3(1, 0, 0),
+                    new cc.Vec3(-1, 0, 0),
+                    new cc.Vec3(0, 1, 0),
+                    new cc.Vec3(0, -1, 0)
+                ]
+                let dir = Math.ceil(cc.math.random() * 4)
+                this.SetMoveDirection(Direction[dir - 1])
+            }
         }
     }
 }

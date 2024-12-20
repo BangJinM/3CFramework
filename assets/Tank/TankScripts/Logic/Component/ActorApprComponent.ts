@@ -22,7 +22,10 @@ export class ActorApprComponent extends cc.Component {
             return
 
         let sprite = GetOrAddComponent(this.node, cc.Sprite)
+        sprite.type = cc.Sprite.Type.SLICED
         let bundleManager: ccl.BundleManager = ccl.BundleManager.GetInstance()
         ccl.Resources.UIUtils.LoadSpriteFrame(sprite, this.appr, bundleManager.GetBundle(this.bundleName))
+
+        GetOrAddComponent(sprite, cc.UITransform).setContentSize(32, 32)
     }
 }

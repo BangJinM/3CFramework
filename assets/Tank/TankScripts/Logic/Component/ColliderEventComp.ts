@@ -3,42 +3,60 @@ import * as ccl from "ccl";
 import { TankGameLogic } from "../TankGameLogic";
 
 @cc._decorator.ccclass("ColliderEventComp")
-@cc._decorator.requireComponent(cc.RigidBody2D)
-@cc._decorator.requireComponent(cc.BoxCollider2D)
-export class ColliderEventComp extends cc.Component {
-    boxSize: cc.Size = new cc.Size(32, 32)
+export class ColliderEventComp extends cc.Component implements ccl.QuadBoundary {
+    x: number;
+    y: number;
+    @cc._decorator.property(cc.CCFloat)
+    width: number;
+    @cc._decorator.property(cc.CCFloat)
+    height: number;
 
     protected onLoad(): void {
-        let boxCollider = ccl.GetOrAddComponent(this.node, cc.BoxCollider2D)
-        boxCollider.size = this.boxSize
-
-        let rigidComp = ccl.GetOrAddComponent(this.node, cc.RigidBody2D)
-        rigidComp.enabledContactListener = true
+        TankGameLogic.GetInstance<TankGameLogic>().quadTree.Add(this)
     }
 
-    start() {
-        // 注册单个碰撞体的回调函数
-        let collider = this.node.getComponent(cc.Collider2D);
-        if (collider) {
-            collider.on(cc.Contact2DType.BEGIN_CONTACT, this.onBeginContact, this);
-            collider.on(cc.Contact2DType.END_CONTACT, this.onEndContact, this);
+    UpdateXY(x: number, y: number) {
+        this.x = x
+        this.y = y
+
+        this.UpdateQuadTree()
+    }
+
+    UpdateSize(width: number, height: number) {
+        this.width = width
+        this.height = height
+
+        this.UpdateQuadTree()
+    }
+
+    UpdateQuadTree() {
+        if (!(this._objFlags & cc.CCObject.Flags.IsOnLoadCalled)) return
+        TankGameLogic.GetInstance<TankGameLogic>().quadTree.UpdateObject(this)
+    }
+
+    protected onDestroy(): void {
+        TankGameLogic.GetInstance<TankGameLogic>().quadTree.Remove(this)
+    }
+
+    CheckCollision(object: ccl.QuadBoundary) {
+        var a_min_x = this.x - this.width / 2;
+        var a_min_y = this.y - this.height / 2;
+        var a_max_x = this.x + this.width / 2;
+        var a_max_y = this.y + this.height / 2;
+        var b_min_x = object.x - object.width / 2;
+        var b_min_y = object.y - object.height / 2;
+        var b_max_x = object.x + object.width / 2;
+        var b_max_y = object.y + object.height / 2;
+        return a_min_x <= b_max_x && a_max_x >= b_min_x && a_min_y <= b_max_y && a_max_y >= b_min_y;
+    }
+
+    IsCollision() {
+        let quadTrees: ccl.QuadTree[] = TankGameLogic.GetInstance<TankGameLogic>().quadTree.FindTree(this)
+        for (const element of quadTrees) {
+            for (const object of element.objects) {
+                if (this != object && this.CheckCollision(object)) return true
+            }
         }
-    }
-    onBeginContact(selfCollider: cc.Collider2D, otherCollider: cc.Collider2D, contact: cc.IPhysics2DContact | null) {
-        // 只在两个碰撞体开始接触时被调用一次
-        ccl.Logger.info('onBeginContact');
-        (TankGameLogic.GetInstance() as TankGameLogic).OnBeginContact(selfCollider, otherCollider, contact)
-    }
-    onEndContact(selfCollider: cc.Collider2D, otherCollider: cc.Collider2D, contact: cc.IPhysics2DContact | null) {
-        // 只在两个碰撞体结束接触时被调用一次
-        ccl.Logger.info('onEndContact');
-    }
-    onPreSolve(selfCollider: cc.Collider2D, otherCollider: cc.Collider2D, contact: cc.IPhysics2DContact | null) {
-        // 每次将要处理碰撞体接触逻辑时被调用
-        ccl.Logger.info('onPreSolve');
-    }
-    onPostSolve(selfCollider: cc.Collider2D, otherCollider: cc.Collider2D, contact: cc.IPhysics2DContact | null) {
-        // 每次处理完碰撞体接触逻辑时被调用
-        ccl.Logger.info('onPostSolve');
+        return false
     }
 }

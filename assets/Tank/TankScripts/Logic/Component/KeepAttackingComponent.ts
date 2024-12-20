@@ -14,6 +14,6 @@ export class KeepAttackingBuff extends cc.Component {
 
         this.curTime %= this.interval
         let tankGameLogic = (TankGameLogic.GetInstance() as TankGameLogic)
-        tankGameLogic.OnFire(this.bulletType, this.node.getPosition().clone(), cc.v2(0, 1))
+        tankGameLogic.OnFire(this.bulletType, this.node.getPosition().clone(), new cc.Vec3(0, 1, 0))
     }
 }

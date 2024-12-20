@@ -1,6 +1,6 @@
 import * as cc from "cc";
-
 import * as ccl from "ccl";
+
 import { Global } from "./common/Global";
 import { GameStatusInit } from "./game_state/GameStatusInit";
 import { GameStatusTank } from "./game_state/GameStatusTank";
@@ -13,10 +13,10 @@ export class LauncherMain extends cc.Component {
         ccl.Logger.info("LauncherMain")
         Global.Init()
 
-        let gameStatusManager: ccl.GameStatusManager = ccl.GameStatusManager.GetInstance();
+        let gameStatusManager: ccl.GameStatusManager = ccl.GameStatusManager.GetInstance<ccl.GameStatusManager>();
         gameStatusManager.Init()
         gameStatusManager.AddGameStatus(new GameStatusInit())
         gameStatusManager.AddGameStatus(new GameStatusTank())
-        ccl.GameStatusManager.GetInstance().ChangeStatus("GameStatusInit")
+        gameStatusManager.ChangeStatus("GameStatusInit")
     }
 }
