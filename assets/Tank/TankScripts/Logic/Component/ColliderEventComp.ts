@@ -4,7 +4,9 @@ import { TankGameLogic } from "../TankGameLogic";
 
 @cc._decorator.ccclass("ColliderEventComp")
 export class ColliderEventComp extends cc.Component implements ccl.QuadBoundary {
+    @cc._decorator.property(cc.CCFloat)
     x: number;
+    @cc._decorator.property(cc.CCFloat)
     y: number;
     @cc._decorator.property(cc.CCFloat)
     width: number;
@@ -12,26 +14,49 @@ export class ColliderEventComp extends cc.Component implements ccl.QuadBoundary 
     height: number;
 
     protected onLoad(): void {
+    }
+
+    protected start(): void {
+        TankGameLogic.GetInstance<TankGameLogic>().quadTree.Add(this)
+        this.UpdateXY(this.node.position.x, this.node.position.y)
+    }
+
+    protected onEnable(): void {
+        TankGameLogic.GetInstance<TankGameLogic>().quadTree.Remove(this)
         TankGameLogic.GetInstance<TankGameLogic>().quadTree.Add(this)
     }
 
-    UpdateXY(x: number, y: number) {
-        this.x = x
-        this.y = y
+    protected onDisable(): void {
+        TankGameLogic.GetInstance<TankGameLogic>().quadTree.Remove(this)
+    }
 
-        this.UpdateQuadTree()
+    UpdateXY(x: number, y: number) {
+        this.UpdateQuadTree(x, y, this.width, this.height)
     }
 
     UpdateSize(width: number, height: number) {
-        this.width = width
-        this.height = height
-
-        this.UpdateQuadTree()
+        this.UpdateQuadTree(this.x, this.y, width, height)
     }
 
-    UpdateQuadTree() {
+    UpdateQuadTree(x: number, y: number, width: number, height: number) {
         if (!(this._objFlags & cc.CCObject.Flags.IsOnLoadCalled)) return
-        TankGameLogic.GetInstance<TankGameLogic>().quadTree.UpdateObject(this)
+        TankGameLogic.GetInstance<TankGameLogic>().quadTree.Remove(this)
+
+        this.width = width
+        this.height = height
+        this.x = x - this.width / 2
+        this.y = y - this.height / 2
+
+        TankGameLogic.GetInstance<TankGameLogic>().quadTree.Add(this)
+    }
+
+    protected update(dt: number): void {
+        let sprite: cc.Sprite = this.node.getComponent(cc.Sprite)
+        if (this.IsCollision().length > 0) {
+            sprite.color = cc.Color.RED
+        } else {
+            sprite.color = cc.Color.WHITE
+        }
     }
 
     protected onDestroy(): void {
@@ -39,24 +64,21 @@ export class ColliderEventComp extends cc.Component implements ccl.QuadBoundary 
     }
 
     CheckCollision(object: ccl.QuadBoundary) {
-        var a_min_x = this.x - this.width / 2;
-        var a_min_y = this.y - this.height / 2;
-        var a_max_x = this.x + this.width / 2;
-        var a_max_y = this.y + this.height / 2;
-        var b_min_x = object.x - object.width / 2;
-        var b_min_y = object.y - object.height / 2;
-        var b_max_x = object.x + object.width / 2;
-        var b_max_y = object.y + object.height / 2;
-        return a_min_x <= b_max_x && a_max_x >= b_min_x && a_min_y <= b_max_y && a_max_y >= b_min_y;
+        var a_max_x = this.x + this.width;
+        var a_max_y = this.y + this.height;
+        var b_max_x = object.x + object.width;
+        var b_max_y = object.y + object.height;
+        return this.x < b_max_x && a_max_x > object.x && this.y < b_max_y && a_max_y > object.y;
     }
 
     IsCollision() {
         let quadTrees: ccl.QuadTree[] = TankGameLogic.GetInstance<TankGameLogic>().quadTree.FindTree(this)
+        let objects: ColliderEventComp[] = []
         for (const element of quadTrees) {
             for (const object of element.objects) {
-                if (this != object && this.CheckCollision(object)) return true
+                if (this != object && this.CheckCollision(object)) objects.push(object as ColliderEventComp)
             }
         }
-        return false
+        return objects
     }
 }
