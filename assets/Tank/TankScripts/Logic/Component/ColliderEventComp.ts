@@ -2,7 +2,17 @@ import * as cc from "cc";
 import * as ccl from "ccl";
 import { TankGameLogic } from "../TankGameLogic";
 
-@cc._decorator.ccclass("ColliderEventComp")
+export enum ColliderType {
+    PLAYER,
+    ENEMY,
+    ENEMY_BULLET,
+    PLAYER_BULLET,
+    PROTECTOR,
+    BOUNDARY,
+    WALL,
+}
+
+@cc._decorator.ccclass("Tank.ColliderEventComp")
 export class ColliderEventComp extends cc.Component implements ccl.QuadBoundary {
     @cc._decorator.property(cc.CCFloat)
     x: number;
@@ -12,21 +22,14 @@ export class ColliderEventComp extends cc.Component implements ccl.QuadBoundary 
     width: number;
     @cc._decorator.property(cc.CCFloat)
     height: number;
+    @cc._decorator.property({ type: cc.Enum(ColliderType) })
+    type: ColliderType = 0
 
     protected onLoad(): void {
-    }
-
-    protected start(): void {
         TankGameLogic.GetInstance<TankGameLogic>().quadTree.Add(this)
         this.UpdateXY(this.node.position.x, this.node.position.y)
     }
-
-    protected onEnable(): void {
-        TankGameLogic.GetInstance<TankGameLogic>().quadTree.Remove(this)
-        TankGameLogic.GetInstance<TankGameLogic>().quadTree.Add(this)
-    }
-
-    protected onDisable(): void {
+    protected onDestroy(): void {
         TankGameLogic.GetInstance<TankGameLogic>().quadTree.Remove(this)
     }
 
@@ -39,7 +42,6 @@ export class ColliderEventComp extends cc.Component implements ccl.QuadBoundary 
     }
 
     UpdateQuadTree(x: number, y: number, width: number, height: number) {
-        if (!(this._objFlags & cc.CCObject.Flags.IsOnLoadCalled)) return
         TankGameLogic.GetInstance<TankGameLogic>().quadTree.Remove(this)
 
         this.width = width
@@ -52,15 +54,13 @@ export class ColliderEventComp extends cc.Component implements ccl.QuadBoundary 
 
     protected update(dt: number): void {
         let sprite: cc.Sprite = this.node.getComponent(cc.Sprite)
-        if (this.IsCollision().length > 0) {
-            sprite.color = cc.Color.RED
-        } else {
-            sprite.color = cc.Color.WHITE
+        if (sprite) {
+            if (this.IsCollision().length > 0) {
+                sprite.color = cc.Color.RED
+            } else {
+                sprite.color = cc.Color.WHITE
+            }
         }
-    }
-
-    protected onDestroy(): void {
-        TankGameLogic.GetInstance<TankGameLogic>().quadTree.Remove(this)
     }
 
     CheckCollision(object: ccl.QuadBoundary) {

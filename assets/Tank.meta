@@ -6,7 +6,7 @@
   "files": [],
   "subMetas": {},
   "userData": {
-    "isBundle": true,
-    "bundleName": "Tank"
+    "bundleName": "Tank",
+    "isBundle": true
   }
 }

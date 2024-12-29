@@ -3,7 +3,7 @@ import * as ccl from "ccl";
 import { Notify } from "../TankGlobalConfig";
 import { TankMain } from "../TankMain";
 import { ActorApprComponent } from "./Component/ActorApprComponent";
-import { ColliderEventComp } from "./Component/ColliderEventComp";
+import { ColliderEventComp, ColliderType } from "./Component/ColliderEventComp";
 import { MoveComponent } from "./Component/MoveComponent";
 
 @cc._decorator.ccclass("TankGameLogic")
@@ -13,7 +13,7 @@ export class TankGameLogic extends ccl.ISingleton implements ccl.ISceneGridManag
     protectorId: number = 0
     terrainIds: number[] = []
     quadTree: ccl.QuadTree = null
-
+    protectorNode: cc.Node = null
     actorNode: cc.Node = null
     mapNode: cc.Node;
 
@@ -25,47 +25,73 @@ export class TankGameLogic extends ccl.ISingleton implements ccl.ISceneGridManag
         let tankMain: TankMain = TankMain.GetInstance()
         this.mapNode = tankMain.GetNode("TankCanvas/NODE_GAME/NODE_MAP")
         this.actorNode = tankMain.GetNode("TankCanvas/NODE_GAME/NODE_ACTER")
+        this.protectorNode = tankMain.GetNode("TankCanvas/NODE_GAME/NODE_MAIN")
+
+        ccl.Resources.Loader.LoadPrefabAsset("TankRes/Prefabs/NodeMapBoundery", ccl.BundleManager.GetInstance<ccl.BundleManager>().GetBundle("Tank"), (iResource: ccl.IResource) => {
+            if (!iResource.oriAsset) return
+
+            let bulletNode = ccl.Resources.UIUtils.Clone(iResource.oriAsset as cc.Prefab)
+            tankMain.GetNode("TankCanvas/NODE_GAME/NODE_MAP_BOUNDARY").addChild(bulletNode)
+        })
 
         cc.input.on(cc.Input.EventType.KEY_DOWN, (event: cc.EventKeyboard) => {
             if (event.keyCode == cc.KeyCode.KEY_W) {
                 let player = this.players[0]
                 let moveComp = ccl.GetOrAddComponent(player, MoveComponent)
-                moveComp.SetMoveDirection(new cc.Vec3(0, 1, 0))
+                moveComp.SetDirection(new cc.Vec3(0, 1, 0))
+                moveComp.pushKey++;
+                ccl.Logger.info(`down pushKey: ${moveComp.pushKey}`)
+
             } else if (event.keyCode == cc.KeyCode.KEY_S) {
                 let player = this.players[0]
                 let moveComp = ccl.GetOrAddComponent(player, MoveComponent)
-                moveComp.SetMoveDirection(new cc.Vec3(0, -1, 0))
+                moveComp.SetDirection(new cc.Vec3(0, -1, 0))
+                moveComp.pushKey++;
+                ccl.Logger.info(`down pushKey: ${moveComp.pushKey}`)
+
             } else if (event.keyCode == cc.KeyCode.KEY_A) {
                 let player = this.players[0]
                 let moveComp = ccl.GetOrAddComponent(player, MoveComponent)
-                moveComp.SetMoveDirection(new cc.Vec3(-1, 0, 0))
+                moveComp.SetDirection(new cc.Vec3(-1, 0, 0))
+                moveComp.pushKey++;
+                ccl.Logger.info(`down pushKey: ${moveComp.pushKey}`)
+
             } else if (event.keyCode == cc.KeyCode.KEY_D) {
                 let player = this.players[0]
                 let moveComp = ccl.GetOrAddComponent(player, MoveComponent)
-                moveComp.SetMoveDirection(new cc.Vec3(1, 0, 0))
-            } else if (event.keyCode == cc.KeyCode.SPACE) {
-                let player = this.players[0]
+                moveComp.SetDirection(new cc.Vec3(1, 0, 0))
+                moveComp.pushKey++;
+                ccl.Logger.info(`down pushKey: ${moveComp.pushKey}`)
 
-                this.OnFire(0, player.getPosition(), new cc.Vec3(1, 0))
+            } else if (event.keyCode == cc.KeyCode.SPACE) {
+                this.OnFire(this.players[0])
             }
         })
         cc.input.on(cc.Input.EventType.KEY_UP, (event: cc.EventKeyboard) => {
             if (event.keyCode == cc.KeyCode.KEY_W) {
                 let player = this.players[0]
                 let moveComp = ccl.GetOrAddComponent(player, MoveComponent)
-                moveComp.SetMoveDirection(cc.Vec3.ZERO)
+                moveComp.pushKey--;
+                ccl.Logger.info(`up pushKey: ${moveComp.pushKey}`)
+
             } else if (event.keyCode == cc.KeyCode.KEY_S) {
                 let player = this.players[0]
                 let moveComp = ccl.GetOrAddComponent(player, MoveComponent)
-                moveComp.SetMoveDirection(cc.Vec3.ZERO)
+                moveComp.pushKey--;
+                ccl.Logger.info(`up pushKey: ${moveComp.pushKey}`)
+
             } else if (event.keyCode == cc.KeyCode.KEY_A) {
                 let player = this.players[0]
                 let moveComp = ccl.GetOrAddComponent(player, MoveComponent)
-                moveComp.SetMoveDirection(cc.Vec3.ZERO)
+                moveComp.pushKey--;
+                ccl.Logger.info(`up pushKey: ${moveComp.pushKey}`)
+
             } else if (event.keyCode == cc.KeyCode.KEY_D) {
                 let player = this.players[0]
                 let moveComp = ccl.GetOrAddComponent(player, MoveComponent)
-                moveComp.SetMoveDirection(cc.Vec3.ZERO)
+                moveComp.pushKey--;
+                ccl.Logger.info(`up pushKey: ${moveComp.pushKey}`)
+
             }
         })
     }
@@ -77,7 +103,9 @@ export class TankGameLogic extends ccl.ISingleton implements ccl.ISceneGridManag
         this.LevelUp()
     }
 
-    OnFire(buffType: number, position: cc.Vec3, direction: cc.Vec3) {
+    OnFire(node: cc.Node) {
+        let moveComp = ccl.GetOrAddComponent(node, MoveComponent)
+
         ccl.Resources.Loader.LoadPrefabAsset("TankRes/Prefabs/Bullet1", ccl.BundleManager.GetInstance<ccl.BundleManager>().GetBundle("Tank"), (iResource: ccl.IResource) => {
             if (!iResource.oriAsset) return
 
@@ -86,19 +114,21 @@ export class TankGameLogic extends ccl.ISingleton implements ccl.ISceneGridManag
             this.actorNode.addChild(bulletNode)
 
             moveComp.type = 0
-            moveComp.direction = direction
-            moveComp.node.position = position
+            moveComp.direction = moveComp.direction
+            moveComp.node.position = node.position.clone().add(moveComp.direction)
         })
     }
 
     OnContact(selfCollider: ColliderEventComp, otherColliders: ColliderEventComp[]) {
-        ccl.Logger.info(`OnBeginContact, ${selfCollider.node.name}`)
+        // ccl.Logger.info(`OnBeginContact, ${selfCollider.node.name}`)
 
         for (const element of otherColliders) {
-            if (selfCollider.node.name == "Bullet1") {
-                if (element.node.name == "Wall") {
+            if (selfCollider.type == ColliderType.ENEMY_BULLET) {
+                if (element.type == ColliderType.BOUNDARY) {
                     selfCollider.node.destroy()
+                } else if (element.type == ColliderType.WALL) {
                     element.node.destroy()
+                    selfCollider.node.destroy()
                 }
             }
         }
@@ -110,7 +140,8 @@ export class TankGameLogic extends ccl.ISingleton implements ccl.ISceneGridManag
             if (!iResource.oriAsset) return
 
             let playerNode = ccl.Resources.UIUtils.Clone(iResource.oriAsset as cc.Prefab)
-            ccl.GetOrAddComponent(playerNode, MoveComponent)
+            let moveComp = ccl.GetOrAddComponent(playerNode, MoveComponent)
+            moveComp.type = 2
             this.actorNode.addChild(playerNode)
 
             this.players[0] = playerNode
@@ -118,36 +149,27 @@ export class TankGameLogic extends ccl.ISingleton implements ccl.ISceneGridManag
     }
 
     CreateEnemy() {
-        let enemyNode = new cc.Node("enemy")
-        ccl.GetOrAddComponent(enemyNode, MoveComponent)
+        ccl.Resources.Loader.LoadPrefabAsset("TankRes/Prefabs/Actor", ccl.BundleManager.GetInstance<ccl.BundleManager>().GetBundle("Tank"), (iResource: ccl.IResource) => {
+            if (!iResource.oriAsset) return
 
-        let apprComp = ccl.GetOrAddComponent(enemyNode, ActorApprComponent)
-        apprComp.bundleName = "Tank"
-        apprComp.appr = `TankRes/maps/landform/water`
-        apprComp.type = 4
+            let playerNode = ccl.Resources.UIUtils.Clone(iResource.oriAsset as cc.Prefab)
+            ccl.GetOrAddComponent(playerNode, MoveComponent)
+            this.actorNode.addChild(playerNode)
 
-        enemyNode.layer = this.actorNode.layer
-        enemyNode.setPosition(new cc.Vec3(0, 100, 0))
-        this.actorNode.addChild(enemyNode)
+            // this.players[0] = playerNode
+        })
     }
 
     InitProtector() {
-        let protectorNode = new cc.Node("protector")
+        ccl.Resources.Loader.LoadPrefabAsset("TankRes/Prefabs/Actor", ccl.BundleManager.GetInstance<ccl.BundleManager>().GetBundle("Tank"), (iResource: ccl.IResource) => {
+            if (!iResource.oriAsset) return
 
-        ccl.GetOrAddComponent(protectorNode, cc.UITransform)
+            let playerNode = ccl.Resources.UIUtils.Clone(iResource.oriAsset as cc.Prefab)
+            this.protectorNode.addChild(playerNode)
 
-        protectorNode.setPosition(new cc.Vec3(0, -390, 0))
-        protectorNode.layer = this.actorNode.layer
-
-        {
-            let sprite = ccl.GetOrAddComponent(protectorNode, cc.Sprite)
-            ccl.Resources.UIUtils.LoadSpriteFrame(sprite, `TankRes/maps/landform/symbol`, ccl.BundleManager.GetInstance<ccl.BundleManager>().GetBundle("Tank"))
-        }
-        {
-            let rigidComp = ccl.GetOrAddComponent(protectorNode, cc.RigidBody2D)
-            rigidComp.type = cc.ERigidBody2DType.Kinematic
-        }
-        this.actorNode.addChild(protectorNode)
+            let colliderEventComp: ColliderEventComp = playerNode.getComponent(ColliderEventComp)
+            colliderEventComp.UpdateXY(this.protectorNode.position.x, this.protectorNode.position.y)
+        })
     }
 
     CreateWall(type: number, posX, posY, iResource: ccl.IResource) {
@@ -162,7 +184,7 @@ export class TankGameLogic extends ccl.ISingleton implements ccl.ISceneGridManag
     }
 
     LevelUp() {
-        this.level++
+        this.level = 3
 
         let tankMain: TankMain = TankMain.GetInstance()
         let mapNode = tankMain.GetNode("TankCanvas/NODE_GAME/NODE_MAP")

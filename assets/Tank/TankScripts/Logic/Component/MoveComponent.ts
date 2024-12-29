@@ -9,6 +9,7 @@ export class MoveComponent extends cc.Component {
     public type: number = 0
     @cc._decorator.property(cc.CCFloat)
     public speed: number = 1
+    public pushKey: number = 0
     @cc._decorator.property(cc.Vec3)
     public direction: cc.Vec3 = new cc.Vec3(0, 0, 0)
     @cc._decorator.property(cc.CCFloat)
@@ -16,7 +17,7 @@ export class MoveComponent extends cc.Component {
     @cc._decorator.property(cc.CCFloat)
     public cTime: number = 0
 
-    SetMoveDirection(direction: cc.Vec3) { this.direction = direction }
+    SetDirection(direction: cc.Vec3) { this.direction = direction }
     GetMoveDirection() { return this.direction }
     SetSpeed(speed: number) { this.speed = speed }
     protected update(dt: number): void {
@@ -41,6 +42,8 @@ export class MoveComponent extends cc.Component {
     }
 
     OnPlayerMoveing(dt: number) {
+        if (this.pushKey == 0) return
+
         let position = this.node.position.clone()
         position.x += this.direction.x * this.speed
         position.y += this.direction.y * this.speed
@@ -50,7 +53,7 @@ export class MoveComponent extends cc.Component {
             collisionComp.UpdateXY(position.x, position.y)
         }
 
-        if (collisionComp.IsCollision().length > 0) {
+        if (collisionComp.IsCollision().length <= 0) {
             this.node.setPosition(position)
         } else {
             collisionComp.UpdateXY(this.node.position.x, this.node.position.y)
@@ -86,7 +89,7 @@ export class MoveComponent extends cc.Component {
                 new cc.Vec3(0, -1, 0)
             ]
             let dir = Math.ceil(cc.math.random() * 4)
-            this.SetMoveDirection(Direction[dir - 1])
+            this.SetDirection(Direction[dir - 1])
         }
     }
 }
