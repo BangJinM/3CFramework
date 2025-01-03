@@ -1,7 +1,7 @@
 [
   {
     "__type__": "cc.Prefab",
-    "_name": "Wall",
+    "_name": "Bullet",
     "_objFlags": 0,
     "__editorExtras__": {},
     "_native": "",
@@ -13,7 +13,7 @@
   },
   {
     "__type__": "cc.Node",
-    "_name": "Wall",
+    "_name": "Bullet",
     "_objFlags": 0,
     "__editorExtras__": {},
     "_parent": null,
@@ -73,8 +73,8 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 32,
-      "height": 32
+      "width": 8,
+      "height": 8
     },
     "_anchorPoint": {
       "__type__": "cc.Vec2",
@@ -85,7 +85,7 @@
   },
   {
     "__type__": "cc.CompPrefabInfo",
-    "fileId": "0d+tOSiFlNP4HJVxnBg+U3"
+    "fileId": "c7/Ltl1tlJe5q9Jjc38h/h"
   },
   {
     "__type__": "cc.Sprite",
@@ -110,12 +110,12 @@
       "a": 255
     },
     "_spriteFrame": {
-      "__uuid__": "b730527c-3233-41c2-aaf7-7cdab58f9749@f9941",
+      "__uuid__": "455fff97-a022-462c-b791-25aaa780e565@f9941",
       "__expectedType__": "cc.SpriteFrame"
     },
     "_type": 0,
     "_fillType": 0,
-    "_sizeMode": 0,
+    "_sizeMode": 1,
     "_fillCenter": {
       "__type__": "cc.Vec2",
       "x": 0,
@@ -130,7 +130,7 @@
   },
   {
     "__type__": "cc.CompPrefabInfo",
-    "fileId": "fe41b1rgxG5q5O9Ur0DgQs"
+    "fileId": "82N64i275EhIjTrlqzN4a4"
   },
   {
     "__type__": "cc.PrefabInfo",

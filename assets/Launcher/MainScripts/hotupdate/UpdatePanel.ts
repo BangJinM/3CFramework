@@ -5,6 +5,9 @@ const { ccclass, property } = cc._decorator;
 
 @ccclass('UpdatePanel')
 export class UpdatePanel extends ccl.BaseUIContainer {
+    uiType = ccl.UIEnum.UI_NORMAL;
+    layerName = "prefabs/layer/UpdatePanel"
+    mainPrefabPropty: ccl.UiRefPrefabProperty = { bundleName: "resources", prefabName: "prefabs/layer/UpdatePanel" }
     @property(cc.Node)
     btnStart: cc.Node = null!;
 

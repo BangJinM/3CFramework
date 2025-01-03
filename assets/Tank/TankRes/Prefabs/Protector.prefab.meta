@@ -2,12 +2,12 @@
   "ver": "1.1.50",
   "importer": "prefab",
   "imported": true,
-  "uuid": "7cb4cc50-6306-4262-9f9b-7659452b8c94",
+  "uuid": "0ad0886e-6ef3-4bd5-9cc2-f75c4822a157",
   "files": [
     ".json"
   ],
   "subMetas": {},
   "userData": {
-    "syncNodeName": "Bullet1"
+    "syncNodeName": "Protector"
   }
 }
