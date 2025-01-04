@@ -54,7 +54,7 @@ export class MoveableSystem extends ccl.ECSSystem {
                     colliderTypes.push(...[ColliderType.PLAYER, ColliderType.PLAYER_BULLET])
                 }
                 let objects = tankQuadTreeManager.GetCollisionObjects(colliderTypes, quadBoundary)
-                if (objects.length > 0) {
+                if (objects.size > 0) {
                     TankGameLogic.GetInstance<TankGameLogic>().OnContact(collisionComp.boundary, objects)
                 } else {
                     tankQuadTreeManager.RemoveColliderEventComp(collisionComp)

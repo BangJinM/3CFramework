@@ -109,12 +109,11 @@ export class TankQuadTreeManager extends ccl.ISingleton {
         let quadTree = this.quadTrees.get(type)
         if (!quadTree) return []
 
-        let objects: TankQuadBoundary[] = [];
-
+        let objects: Set<TankQuadBoundary> = new Set()
         let quadTrees = quadTree.FindTree(obj);
         for (const element of quadTrees) {
             for (const check of element.objects) {
-                if (this.CheckCollision(obj, check as TankQuadBoundary)) objects.push(check as TankQuadBoundary);
+                if (this.CheckCollision(obj, check as TankQuadBoundary)) objects.add(check as TankQuadBoundary);
             }
         }
 
@@ -129,10 +128,10 @@ export class TankQuadTreeManager extends ccl.ISingleton {
      * @returns 一个数组，包含所有检测到的碰撞对象。
      */
     GetCollisionObjects(types: ColliderType[], obj: TankQuadBoundary) {
-        let objects = []
+        let objects: Set<TankQuadBoundary> = new Set()
         for (const element of types) {
             for (const value of this.GetCollisionObject(element, obj)) {
-                objects.push(value)
+                objects.add(value)
             }
         }
         return objects

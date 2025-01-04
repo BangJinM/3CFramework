@@ -165,7 +165,7 @@ export class TankGameLogic extends ccl.ISingleton {
         })
     }
 
-    OnContact(selfQuadBoundary: TankQuadBoundary, otherQuadBoundarys: TankQuadBoundary[]) {
+    OnContact(selfQuadBoundary: TankQuadBoundary, otherQuadBoundarys: Set<TankQuadBoundary>) {
         // ccl.Logger.info(`OnBeginContact, ${selfQuadBoundary.entity}`)
         let selfCollider = this.tankWorld.GetComponent(selfQuadBoundary.entity, ColliderableComponent)
         let selfObj = this.tankWorld.GetEntity<IBaseActor>(selfQuadBoundary.entity)
