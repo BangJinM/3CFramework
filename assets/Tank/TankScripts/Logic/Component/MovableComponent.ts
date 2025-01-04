@@ -63,7 +63,7 @@ export class MoveableSystem extends ccl.ECSSystem {
                     tankQuadTreeManager.AddColliderEventComp(collisionComp)
                 }
             } else if (moveComp.moveType == MoveType.CONTROLLER1 || moveComp.moveType == MoveType.CONTROLLER2) {
-                if (tankQuadTreeManager.GetCollisionObjects([ColliderType.NORMAL, ColliderType.PLAYER, ColliderType.ENEMY, ColliderType.BOUNDARY], quadBoundary).length > 0) {
+                if (tankQuadTreeManager.GetCollisionObjects([ColliderType.NORMAL, ColliderType.PLAYER, ColliderType.ENEMY, ColliderType.BOUNDARY], quadBoundary).size > 0) {
                     entityObj.node.setPosition(position)
                     tankQuadTreeManager.RemoveColliderEventComp(collisionComp)
                     collisionComp.boundary.x = quadBoundary.x
