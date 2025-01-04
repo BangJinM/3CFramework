@@ -4,7 +4,6 @@ import { Notify } from "../TankGlobalConfig";
 import { TankMain } from "../TankMain";
 import { ApprSystem } from "./Component/ApprComponent";
 import { ColliderableComponent, ColliderableSystem, ColliderType, TankQuadBoundary } from "./Component/ColliderableComponent";
-import { ColliderEventComp } from "./Component/ColliderEventComp";
 import { IBaseActor } from "./Component/IBaseActor";
 import { MoveableComponent, MoveableSystem, MoveType } from "./Component/MovableComponent";
 import { TankQuadTreeManager } from "./Component/TankQuadTreeManager";
