@@ -3,6 +3,7 @@ import * as ccl from "ccl";
 import { ColliderableComponent, ColliderType, TankQuadBoundary } from "./ColliderableComponent";
 import { IBaseActor } from "./IBaseActor";
 import { TankQuadTreeManager } from "./TankQuadTreeManager";
+import { TankGameLogic } from "../TankGameLogic";
 
 export enum MoveType {
     /** 直走 */
@@ -33,56 +34,51 @@ export class MoveableSystem extends ccl.ECSSystem {
             let moveComp = this.ecsWorld.GetComponent(element, MoveableComponent)
             let entityObj = this.ecsWorld.GetEntity<IBaseActor>(element)
             quadBoundary.entity = element
+
+            let position = entityObj.node.position.clone()
+            position.x += moveComp.direction.x * moveComp.speed
+            position.y += moveComp.direction.y * moveComp.speed
+
+            let collisionComp: ColliderableComponent = this.ecsWorld.GetComponent(element, ColliderableComponent)
+            quadBoundary.x = entityObj.node.position.x + moveComp.direction.x * moveComp.speed - collisionComp.boundary.width / 2
+            quadBoundary.y = entityObj.node.position.y + moveComp.direction.y * moveComp.speed - collisionComp.boundary.height / 2
+            quadBoundary.width = collisionComp.boundary.width
+            quadBoundary.height = collisionComp.boundary.height
             if (moveComp.moveType == MoveType.FORWARD) {
-                let position = entityObj.node.position.clone()
-                position.x += moveComp.direction.x * moveComp.speed
-                position.y += moveComp.direction.y * moveComp.speed
                 entityObj.node.setPosition(position)
 
-                let collisionComp: ColliderableComponent = this.ecsWorld.GetComponent(element, ColliderableComponent)
-                if (collisionComp) {
-      
-                    quadBoundary.width = collisionComp.boundary.width
-                    quadBoundary.height = collisionComp.boundary.height
-                    quadBoundary.x = position.x - collisionComp.boundary.width / 2
-                    quadBoundary.y = position.y - collisionComp.boundary.height / 2
-
-                    let objects = tankQuadTreeManager.GetCollisionObjects([ColliderType.NORMAL, ColliderType.ENEMY, ColliderType.BOUNDARY, ColliderType.PLAYER, ColliderType.PLAYER_BULLET], quadBoundary)
-                    // if (objects.length > 0) {
-                    //     TankGameLogic.GetInstance<TankGameLogic>().OnContact(element, objects)
-                    // }
+                let colliderTypes = [ColliderType.NORMAL, ColliderType.BOUNDARY]
+                if (collisionComp.type == ColliderType.PLAYER_BULLET) {
+                    colliderTypes.push(...[ColliderType.ENEMY, ColliderType.ENEMY_BULLET])
+                } else {
+                    colliderTypes.push(...[ColliderType.PLAYER, ColliderType.PLAYER_BULLET])
+                }
+                let objects = tankQuadTreeManager.GetCollisionObjects(colliderTypes, quadBoundary)
+                if (objects.length > 0) {
+                    TankGameLogic.GetInstance<TankGameLogic>().OnContact(collisionComp.boundary, objects)
+                } else {
+                    tankQuadTreeManager.RemoveColliderEventComp(collisionComp)
+                    collisionComp.boundary.x = quadBoundary.x
+                    collisionComp.boundary.y = quadBoundary.y
+                    tankQuadTreeManager.AddColliderEventComp(collisionComp)
                 }
             } else if (moveComp.moveType == MoveType.CONTROLLER1 || moveComp.moveType == MoveType.CONTROLLER2) {
-                let collisionComp: ColliderableComponent = this.ecsWorld.GetComponent(element, ColliderableComponent)
-                quadBoundary.x = entityObj.node.position.x + moveComp.direction.x * moveComp.speed
-                quadBoundary.y = entityObj.node.position.y + moveComp.direction.y * moveComp.speed
-                quadBoundary.width = collisionComp.boundary.width
-                quadBoundary.height = collisionComp.boundary.height
-
-                if (!tankQuadTreeManager.IsCollisions([ColliderType.NORMAL, ColliderType.PLAYER, ColliderType.ENEMY, ColliderType.BOUNDARY], quadBoundary)) {
-                    entityObj.node.setPosition(new cc.Vec3(quadBoundary.x, quadBoundary.y, 0))
-                    tankQuadTreeManager.RemoveColliderEventComp(collisionComp.type, collisionComp.boundary)
-                    collisionComp.boundary.x = quadBoundary.x - collisionComp.boundary.width / 2
-                    collisionComp.boundary.y = quadBoundary.y - collisionComp.boundary.height / 2
-                    tankQuadTreeManager.AddColliderEventComp(collisionComp.type, collisionComp.boundary)
-
+                if (tankQuadTreeManager.GetCollisionObjects([ColliderType.NORMAL, ColliderType.PLAYER, ColliderType.ENEMY, ColliderType.BOUNDARY], quadBoundary).length > 0) {
+                    entityObj.node.setPosition(position)
+                    tankQuadTreeManager.RemoveColliderEventComp(collisionComp)
+                    collisionComp.boundary.x = quadBoundary.x
+                    collisionComp.boundary.y = quadBoundary.y
+                    tankQuadTreeManager.AddColliderEventComp(collisionComp)
                 }
             } else {
-                let collisionComp: ColliderableComponent = this.ecsWorld.GetComponent(element, ColliderableComponent)
-                quadBoundary.x = entityObj.node.position.x + moveComp.direction.x * moveComp.speed
-                quadBoundary.y = entityObj.node.position.y + moveComp.direction.y * moveComp.speed
-                quadBoundary.width = collisionComp.boundary.width
-                quadBoundary.height = collisionComp.boundary.height
-
                 let isCollide: boolean = TankQuadTreeManager.GetInstance<TankQuadTreeManager>().IsCollisions([ColliderType.NORMAL, ColliderType.BOUNDARY], quadBoundary)
                 if (!isCollide) {
-                    entityObj.node.setPosition(new cc.Vec3(quadBoundary.x, quadBoundary.y, 0))
-                    tankQuadTreeManager.RemoveColliderEventComp(collisionComp.type, collisionComp.boundary)
-                    collisionComp.boundary.x = quadBoundary.x - collisionComp.boundary.width / 2
-                    collisionComp.boundary.y = quadBoundary.y - collisionComp.boundary.height / 2
-                    tankQuadTreeManager.AddColliderEventComp(collisionComp.type, collisionComp.boundary)
+                    entityObj.node.setPosition(position)
+                    tankQuadTreeManager.RemoveColliderEventComp(collisionComp)
+                    collisionComp.boundary.x = quadBoundary.x
+                    collisionComp.boundary.y = quadBoundary.y
+                    tankQuadTreeManager.AddColliderEventComp(collisionComp)
                 }
-
                 moveComp.cTime += deltaTime
                 if (isCollide || moveComp.cTime >= moveComp.time) {
                     moveComp.cTime = 0

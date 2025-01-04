@@ -3,11 +3,12 @@ import * as ccl from "ccl";
 import { Notify } from "../TankGlobalConfig";
 import { TankMain } from "../TankMain";
 import { ApprSystem } from "./Component/ApprComponent";
-import { ColliderableComponent, ColliderableSystem, ColliderType } from "./Component/ColliderableComponent";
+import { ColliderableComponent, ColliderableSystem, ColliderType, TankQuadBoundary } from "./Component/ColliderableComponent";
 import { ColliderEventComp } from "./Component/ColliderEventComp";
 import { IBaseActor } from "./Component/IBaseActor";
 import { MoveableComponent, MoveableSystem, MoveType } from "./Component/MovableComponent";
 import { TankQuadTreeManager } from "./Component/TankQuadTreeManager";
+import { FirableComponent, FirableSystem } from "./Component/FirableComponent";
 
 @cc._decorator.ccclass("TankGameLogic")
 export class TankGameLogic extends ccl.ISingleton {
@@ -40,6 +41,7 @@ export class TankGameLogic extends ccl.ISingleton {
         this.tankWorld.AddSystem(ApprSystem)
         this.tankWorld.AddSystem(MoveableSystem)
         this.tankWorld.AddSystem(ColliderableSystem)
+        this.tankWorld.AddSystem(FirableSystem)
 
         ccl.Resources.Loader.LoadPrefabAsset("TankRes/Prefabs/NodeMapBoundery", ccl.BundleManager.GetInstance<ccl.BundleManager>().GetBundle("Tank"), (iResource: ccl.IResource) => {
             if (!iResource.oriAsset) return
@@ -50,7 +52,7 @@ export class TankGameLogic extends ccl.ISingleton {
             for (const element of bulletNode.children) {
                 let actorId = this.tankWorld.CreateEntity(IBaseActor)
                 let actorObj = this.tankWorld.GetEntity<IBaseActor>(actorId)
-                actorObj.id = actorId.toString()
+                actorObj.id = actorId
                 actorObj.node = element
 
                 let uiT: cc.UITransform = ccl.GetOrAddComponent(element, cc.UITransform)
@@ -137,36 +139,54 @@ export class TankGameLogic extends ccl.ISingleton {
         this.CreateWalls(this.level)
     }
 
-    OnFire(node: cc.Node) {
+    OnFire(position: cc.Vec3, direction: cc.Vec3, level: number, type: ColliderType) {
         ccl.Resources.Loader.LoadPrefabAsset("TankRes/Prefabs/Bullet", ccl.BundleManager.GetInstance<ccl.BundleManager>().GetBundle("Tank"), (iResource: ccl.IResource) => {
-            if (!iResource.oriAsset || !node || !cc.isValid(node)) return
+            if (!iResource.oriAsset) return
 
             let bulletNode = ccl.Resources.UIUtils.Clone(iResource.oriAsset as cc.Prefab)
             this.actorNode.addChild(bulletNode)
+            bulletNode.position = position.clone()
 
-            // let colliderEventComp = ccl.GetOrAddComponent(bulletNode, ColliderEventComp)
-            // colliderEventComp.type = ColliderType.PLAYER_BULLET
+            let actorId = this.tankWorld.CreateEntity(IBaseActor)
+            let actorObj = this.tankWorld.GetEntity<IBaseActor>(actorId)
+            actorObj.id = actorId
+            actorObj.node = bulletNode
 
-            // let fireMoveComp = ccl.GetOrAddComponent(node, MoveComponent)
-            // let moveComp = ccl.GetOrAddComponent(bulletNode, MoveComponent)
-            // moveComp.type = 0
-            // moveComp.direction = fireMoveComp.direction
-            // moveComp.node.position = node.position.clone().add(moveComp.direction)
+            let colliderableComponent = this.tankWorld.AddComponent(actorId, ColliderableComponent)
+            colliderableComponent.type = type
+            colliderableComponent.boundary.width = colliderableComponent.boundary.height = 8
+            colliderableComponent.boundary.x = bulletNode.position.x - colliderableComponent.boundary.width / 2
+            colliderableComponent.boundary.y = bulletNode.position.y - colliderableComponent.boundary.height / 2
+            colliderableComponent.SetDirty(true)
+
+            let moveableComp = this.tankWorld.AddComponent(actorId, MoveableComponent)
+            moveableComp.direction = direction
+            moveableComp.speed = 1.5
         })
     }
 
-    OnContact(selfCollider: ColliderEventComp, otherColliders: ColliderEventComp[]) {
-        // ccl.Logger.info(`OnBeginContact, ${selfCollider.node.name}`)
-        // for (const element of otherColliders) {
-        //     if (selfCollider.type == ColliderType.ENEMY_BULLET || selfCollider.type == ColliderType.PLAYER_BULLET) {
-        //         if (element.type == ColliderType.BOUNDARY) {
-        //             selfCollider.node.destroy()
-        //         } else if (element.type == ColliderType.NORMAL) {
-        //             element.node.destroy()
-        //             selfCollider.node.destroy()
-        //         }
-        //     }
-        // }
+    OnContact(selfQuadBoundary: TankQuadBoundary, otherQuadBoundarys: TankQuadBoundary[]) {
+        // ccl.Logger.info(`OnBeginContact, ${selfQuadBoundary.entity}`)
+        let selfCollider = this.tankWorld.GetComponent(selfQuadBoundary.entity, ColliderableComponent)
+        let selfObj = this.tankWorld.GetEntity<IBaseActor>(selfQuadBoundary.entity)
+
+        for (const element of otherQuadBoundarys) {
+            let otherCollider = this.tankWorld.GetComponent(element.entity, ColliderableComponent)
+            let otherObj = this.tankWorld.GetEntity<IBaseActor>(element.entity)
+            if (selfCollider.type == ColliderType.ENEMY_BULLET || selfCollider.type == ColliderType.PLAYER_BULLET) {
+                if (otherCollider.type == ColliderType.BOUNDARY) {
+                    selfObj.node.destroy()
+                    this.tankWorld.RemoveEntity(selfObj.id)
+                }
+                else if (otherCollider.type == ColliderType.NORMAL) {
+                    selfObj.node.destroy()
+                    this.tankWorld.RemoveEntity(selfObj.id)
+
+                    otherObj.node.destroy()
+                    this.tankWorld.RemoveEntity(otherObj.id)
+                }
+            }
+        }
     }
 
 
@@ -179,7 +199,7 @@ export class TankGameLogic extends ccl.ISingleton {
 
             let actorId = this.tankWorld.CreateEntity(IBaseActor)
             let actorObj = this.tankWorld.GetEntity<IBaseActor>(actorId)
-            actorObj.id = actorId.toString()
+            actorObj.id = actorId
             actorObj.node = playerNode
 
             let colliderableComponent = this.tankWorld.AddComponent(actorId, ColliderableComponent)
@@ -209,7 +229,7 @@ export class TankGameLogic extends ccl.ISingleton {
 
             let actorId = this.tankWorld.CreateEntity(IBaseActor)
             let actorObj = this.tankWorld.GetEntity<IBaseActor>(actorId)
-            actorObj.id = actorId.toString()
+            actorObj.id = actorId
             actorObj.node = enemyNode
 
             let posXIndex = Math.ceil(cc.math.random() * 3)
@@ -225,6 +245,8 @@ export class TankGameLogic extends ccl.ISingleton {
             let moveableComp = this.tankWorld.AddComponent(actorId, MoveableComponent)
             moveableComp.moveType = MoveType.RANDOM
             moveableComp.speed = 1
+
+            let firableComp = this.tankWorld.AddComponent(actorId, FirableComponent)
         })
     }
 
@@ -237,7 +259,7 @@ export class TankGameLogic extends ccl.ISingleton {
 
             let actorId = this.tankWorld.CreateEntity(IBaseActor)
             let actorObj = this.tankWorld.GetEntity<IBaseActor>(actorId)
-            actorObj.id = actorId.toString()
+            actorObj.id = actorId
             actorObj.node = protectorNode
 
             let colliderableComponent = this.tankWorld.AddComponent(actorId, ColliderableComponent)
@@ -261,7 +283,7 @@ export class TankGameLogic extends ccl.ISingleton {
 
         let actorId = this.tankWorld.CreateEntity(IBaseActor)
         let actorObj = this.tankWorld.GetEntity<IBaseActor>(actorId)
-        actorObj.id = actorId.toString()
+        actorObj.id = actorId
         actorObj.node = wallNode
 
         let colliderableComponent = this.tankWorld.AddComponent(actorId, ColliderableComponent)

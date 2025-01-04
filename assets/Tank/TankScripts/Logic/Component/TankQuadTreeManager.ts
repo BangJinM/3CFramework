@@ -1,11 +1,11 @@
 import * as cc from "cc";
 import * as ccl from "ccl";
-import { ColliderType, TankQuadBoundary } from "./ColliderableComponent";
+import { ColliderableComponent, ColliderType, TankQuadBoundary } from "./ColliderableComponent";
 
 
 @cc._decorator.ccclass("TankQuadTreeManager")
 export class TankQuadTreeManager extends ccl.ISingleton {
-    objects: Set<number> = new Set()
+    objects: Map<number, number> = new Map()
     quadBoundary: ccl.QuadBoundary = new ccl.QuadBoundary(0, 0, 0, 0);
     quadTrees: Map<number, ccl.QuadTree> = new Map();
     /**
@@ -33,11 +33,12 @@ export class TankQuadTreeManager extends ccl.ISingleton {
      * 
      * @param comp - 需要添加的碰撞事件组件。
      */
-    AddColliderEventComp(type: ColliderType, comp: TankQuadBoundary) {
-        if (this.objects.has(comp.entity)) return
-        let quadTree = this.quadTrees.get(type)
+    AddColliderEventComp(comp: ColliderableComponent) {
+        if (this.objects.get(comp.boundary.entity)) return
+        let quadTree = this.quadTrees.get(comp.type)
         if (!quadTree) return
-        quadTree.Add(comp);
+        quadTree.Add(comp.boundary);
+        this.objects.set(comp.boundary.entity, comp.type)
     }
 
     /**
@@ -45,11 +46,13 @@ export class TankQuadTreeManager extends ccl.ISingleton {
      * 
      * @param comp - 需要移除的碰撞事件组件。
      */
-    RemoveColliderEventComp(type: ColliderType, comp: TankQuadBoundary) {
-        if (!this.objects.has(comp.entity)) return
+    RemoveColliderEventComp(comp: ColliderableComponent) {
+        if (!this.objects.has(comp.boundary.entity)) return
+        let type = this.objects.get(comp.boundary.entity)
         let quadTree = this.quadTrees.get(type)
         if (!quadTree) return
-        quadTree.Remove(comp);
+        quadTree.Remove(comp.boundary);
+        this.objects.delete(comp.boundary.entity)
     }
     /**
      * 检查两个四叉树边界是否发生碰撞。

@@ -56,7 +56,7 @@ import * as ccl from "ccl";
 // }
 
 export class IBaseActor extends ccl.ECSEntity {
-    public id: string = "";
+    public id: number = 0;
     node: cc.Node = null
 
 }

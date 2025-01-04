@@ -49,6 +49,12 @@ export class ColliderableSystem extends ccl.ECSSystem {
         this.tankQuadTreeManager = null
     }
 
+    OnEntityExit(entity: number): void {
+        super.OnEntityExit(entity)
+        let colliderableComp = this.ecsWorld.GetComponent(entity, ColliderableComponent)
+        this.tankQuadTreeManager.RemoveColliderEventComp(colliderableComp)
+    }
+
     OnUpdate(deltaTime: number): void {
         let entities = this.GetEntities()
         for (const element of entities) {
@@ -56,8 +62,8 @@ export class ColliderableSystem extends ccl.ECSSystem {
             if (colliderableComp.GetDirty()) {
                 colliderableComp.SetDirty(false)
                 colliderableComp.boundary.entity = element
-                this.tankQuadTreeManager.RemoveColliderEventComp(colliderableComp.type, colliderableComp.boundary)
-                this.tankQuadTreeManager.AddColliderEventComp(colliderableComp.type, colliderableComp.boundary)
+                this.tankQuadTreeManager.RemoveColliderEventComp(colliderableComp)
+                this.tankQuadTreeManager.AddColliderEventComp(colliderableComp)
             }
 
             let isCollide = this.tankQuadTreeManager.IsCollisions([ColliderType.NORMAL, ColliderType.ENEMY, ColliderType.BOUNDARY, ColliderType.PLAYER, ColliderType.PLAYER_BULLET], colliderableComp.boundary)
@@ -87,6 +93,4 @@ export class TankQuadBoundary extends ccl.QuadBoundary {
 export class ColliderableComponent extends ccl.ECSComponent {
     boundary: TankQuadBoundary = new TankQuadBoundary(0);
     type: ColliderType = ColliderType.NORMAL;
-    preColliders: number[] = [];
-    colliders: number[] = [];
 }
