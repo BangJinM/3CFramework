@@ -4,10 +4,11 @@ import { Notify } from "../TankGlobalConfig";
 import { TankMain } from "../TankMain";
 import { ApprSystem } from "./Component/ApprComponent";
 import { ColliderableComponent, ColliderableSystem, ColliderType, TankQuadBoundary } from "./Component/ColliderableComponent";
+import { FirableComponent, FirableSystem } from "./Component/FirableComponent";
 import { IBaseActor } from "./Component/IBaseActor";
 import { MoveableComponent, MoveableSystem, MoveType } from "./Component/MovableComponent";
+import { PlayableComponent, PlayableSystem } from "./Component/PlayableComponent";
 import { TankQuadTreeManager } from "./Component/TankQuadTreeManager";
-import { FirableComponent, FirableSystem } from "./Component/FirableComponent";
 
 @cc._decorator.ccclass("TankGameLogic")
 export class TankGameLogic extends ccl.ISingleton {
@@ -15,7 +16,7 @@ export class TankGameLogic extends ccl.ISingleton {
     tankWorld: ccl.ECSWorld = new ccl.ECSWorld()
 
     level = 0
-    players: cc.Node[] = []
+    players: IBaseActor[] = []
     enemies: cc.Node[] = []
     protectorId: number = 0
     terrainIds: number[] = []
@@ -41,6 +42,7 @@ export class TankGameLogic extends ccl.ISingleton {
         this.tankWorld.AddSystem(MoveableSystem)
         this.tankWorld.AddSystem(ColliderableSystem)
         this.tankWorld.AddSystem(FirableSystem)
+        this.tankWorld.AddSystem(PlayableSystem)
 
         ccl.Resources.Loader.LoadPrefabAsset("TankRes/Prefabs/NodeMapBoundery", ccl.BundleManager.GetInstance<ccl.BundleManager>().GetBundle("Tank"), (iResource: ccl.IResource) => {
             if (!iResource.oriAsset) return
@@ -66,67 +68,6 @@ export class TankGameLogic extends ccl.ISingleton {
                 colliderComp.SetDirty(true)
             }
         })
-
-        // cc.input.on(cc.Input.EventType.KEY_DOWN, (event: cc.EventKeyboard) => {
-        //     if (event.keyCode == cc.KeyCode.KEY_W) {
-        //         let player = this.players[0]
-        //         let moveComp = ccl.GetOrAddComponent(player, MoveComponent)
-        //         moveComp.SetDirection(new cc.Vec3(0, 1, 0))
-        //         moveComp.pushKey++;
-        //         ccl.Logger.info(`down pushKey: ${moveComp.pushKey}`)
-
-        //     } else if (event.keyCode == cc.KeyCode.KEY_S) {
-        //         let player = this.players[0]
-        //         let moveComp = ccl.GetOrAddComponent(player, MoveComponent)
-        //         moveComp.SetDirection(new cc.Vec3(0, -1, 0))
-        //         moveComp.pushKey++;
-        //         ccl.Logger.info(`down pushKey: ${moveComp.pushKey}`)
-
-        //     } else if (event.keyCode == cc.KeyCode.KEY_A) {
-        //         let player = this.players[0]
-        //         let moveComp = ccl.GetOrAddComponent(player, MoveComponent)
-        //         moveComp.SetDirection(new cc.Vec3(-1, 0, 0))
-        //         moveComp.pushKey++;
-        //         ccl.Logger.info(`down pushKey: ${moveComp.pushKey}`)
-
-        //     } else if (event.keyCode == cc.KeyCode.KEY_D) {
-        //         let player = this.players[0]
-        //         let moveComp = ccl.GetOrAddComponent(player, MoveComponent)
-        //         moveComp.SetDirection(new cc.Vec3(1, 0, 0))
-        //         moveComp.pushKey++;
-        //         ccl.Logger.info(`down pushKey: ${moveComp.pushKey}`)
-
-        //     } else if (event.keyCode == cc.KeyCode.SPACE) {
-        //         this.OnFire(this.players[0])
-        //     }
-        // })
-        // cc.input.on(cc.Input.EventType.KEY_UP, (event: cc.EventKeyboard) => {
-        //     if (event.keyCode == cc.KeyCode.KEY_W) {
-        //         let player = this.players[0]
-        //         let moveComp = ccl.GetOrAddComponent(player, MoveComponent)
-        //         moveComp.pushKey--;
-        //         ccl.Logger.info(`up pushKey: ${moveComp.pushKey}`)
-
-        //     } else if (event.keyCode == cc.KeyCode.KEY_S) {
-        //         let player = this.players[0]
-        //         let moveComp = ccl.GetOrAddComponent(player, MoveComponent)
-        //         moveComp.pushKey--;
-        //         ccl.Logger.info(`up pushKey: ${moveComp.pushKey}`)
-
-        //     } else if (event.keyCode == cc.KeyCode.KEY_A) {
-        //         let player = this.players[0]
-        //         let moveComp = ccl.GetOrAddComponent(player, MoveComponent)
-        //         moveComp.pushKey--;
-        //         ccl.Logger.info(`up pushKey: ${moveComp.pushKey}`)
-
-        //     } else if (event.keyCode == cc.KeyCode.KEY_D) {
-        //         let player = this.players[0]
-        //         let moveComp = ccl.GetOrAddComponent(player, MoveComponent)
-        //         moveComp.pushKey--;
-        //         ccl.Logger.info(`up pushKey: ${moveComp.pushKey}`)
-
-        //     }
-        // })
     }
 
 
@@ -212,8 +153,38 @@ export class TankGameLogic extends ccl.ISingleton {
             moveableComp.moveType = MoveType.CONTROLLER1
             moveableComp.speed = 1
 
+            this.tankWorld.AddComponent(actorId, PlayableComponent, [[cc.KeyCode.KEY_W, cc.KeyCode.KEY_S, cc.KeyCode.KEY_D, cc.KeyCode.KEY_A], cc.KeyCode.SPACE])
 
-            this.players[0] = playerNode
+            this.players[0] = actorObj
+        })
+
+        ccl.Resources.Loader.LoadPrefabAsset("TankRes/Prefabs/Player", ccl.BundleManager.GetInstance<ccl.BundleManager>().GetBundle("Tank"), (iResource: ccl.IResource) => {
+            if (!iResource.oriAsset) return
+
+            let playerNode = ccl.Resources.UIUtils.Clone(iResource.oriAsset as cc.Prefab)
+            this.actorNode.addChild(playerNode)
+
+            let actorId = this.tankWorld.CreateEntity(IBaseActor)
+            let actorObj = this.tankWorld.GetEntity<IBaseActor>(actorId)
+            actorObj.id = actorId
+            actorObj.node = playerNode
+
+            playerNode.setPosition(new cc.Vec3(-300, -13 * 32 + 32, 0))
+
+            let colliderableComponent = this.tankWorld.AddComponent(actorId, ColliderableComponent)
+            colliderableComponent.type = ColliderType.PLAYER
+            colliderableComponent.boundary.width = colliderableComponent.boundary.height = 64
+            colliderableComponent.boundary.x = playerNode.position.x - colliderableComponent.boundary.width / 2
+            colliderableComponent.boundary.y = playerNode.position.y - colliderableComponent.boundary.height / 2
+            colliderableComponent.SetDirty(true)
+
+            let moveableComp = this.tankWorld.AddComponent(actorId, MoveableComponent)
+            moveableComp.moveType = MoveType.CONTROLLER1
+            moveableComp.speed = 1
+
+            this.tankWorld.AddComponent(actorId, PlayableComponent, [[cc.KeyCode.KEY_I, cc.KeyCode.KEY_K, cc.KeyCode.KEY_J, cc.KeyCode.KEY_L], cc.KeyCode.SPACE])
+
+            this.players[1] = actorObj
         })
     }
 

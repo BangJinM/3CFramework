@@ -1,10 +1,9 @@
 import * as cc from "cc";
 import * as ccl from "ccl";
-import { ColliderableComponent, ColliderType, TankQuadBoundary } from "./ColliderableComponent";
-import { IBaseActor } from "./IBaseActor";
-import { TankQuadTreeManager } from "./TankQuadTreeManager";
-import { MoveableComponent } from "./MovableComponent";
 import { TankGameLogic } from "../TankGameLogic";
+import { ColliderType } from "./ColliderableComponent";
+import { IBaseActor } from "./IBaseActor";
+import { MoveableComponent } from "./MovableComponent";
 
 export class FirableSystem extends ccl.ECSSystem {
     Direction = [
@@ -22,11 +21,12 @@ export class FirableSystem extends ccl.ECSSystem {
             let entityObj = this.ecsWorld.GetEntity<IBaseActor>(element)
 
             firableComp.cTime += deltaTime
-            if (firableComp && firableComp.cTime >= firableComp.duration) {
-                let moveableComp = this.ecsWorld.GetComponent(element, MoveableComponent)
-                TankGameLogic.GetInstance<TankGameLogic>().OnFire(entityObj.node.position, moveableComp.direction, 1, ColliderType.ENEMY_BULLET)
-
-                firableComp.cTime = 0
+            if (firableComp.auto == 1) {
+                if (firableComp && firableComp.cTime >= firableComp.duration) {
+                    let moveableComp = this.ecsWorld.GetComponent(element, MoveableComponent)
+                    TankGameLogic.GetInstance<TankGameLogic>().OnFire(entityObj.node.position, moveableComp.direction, 1, ColliderType.ENEMY_BULLET)
+                    firableComp.cTime = 0
+                }
             }
         }
     }
@@ -37,5 +37,7 @@ export class FirableComponent extends ccl.ECSComponent {
     /** 间隔 */
     duration: number = 2;
     /** 当前时间 */
-    cTime: number = 0
+    cTime: number = 0;
+    /** 自动开火 */
+    auto: number = 0;
 }
