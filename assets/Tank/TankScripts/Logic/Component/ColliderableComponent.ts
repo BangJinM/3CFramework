@@ -49,6 +49,13 @@ export class ColliderableSystem extends ccl.ECSSystem {
         this.tankQuadTreeManager = null
     }
 
+    OnEntityEnter(entity: number): void {
+        super.OnEntityEnter(entity)
+
+        let colliderableComp = this.ecsWorld.GetComponent(entity, ColliderableComponent)
+        this.tankQuadTreeManager.AddColliderEventComp(colliderableComp)
+    }
+
     OnEntityExit(entity: number): void {
         super.OnEntityExit(entity)
         let colliderableComp = this.ecsWorld.GetComponent(entity, ColliderableComponent)
@@ -93,4 +100,10 @@ export class TankQuadBoundary extends ccl.QuadBoundary {
 export class ColliderableComponent extends ccl.ECSComponent {
     boundary: TankQuadBoundary = new TankQuadBoundary(0);
     type: ColliderType = ColliderType.NORMAL;
+
+    constructor(args: any[] = []) {
+        super()
+        this.type = args[0] || ColliderType.NORMAL
+        this.boundary = args[1] || new TankQuadBoundary(0)
+    }
 }

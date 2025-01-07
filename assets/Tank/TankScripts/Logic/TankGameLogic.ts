@@ -57,15 +57,12 @@ export class TankGameLogic extends ccl.ISingleton {
                 actorObj.node = element
 
                 let uiT: cc.UITransform = ccl.GetOrAddComponent(element, cc.UITransform)
-
-                let colliderComp = this.tankWorld.AddComponent(actorId, ColliderableComponent)
-                colliderComp.boundary.width = uiT.contentSize.width
-                colliderComp.boundary.height = uiT.contentSize.height
-                colliderComp.boundary.x = element.position.x - uiT.contentSize.width / 2
-                colliderComp.boundary.y = element.position.y - uiT.contentSize.height / 2
-                colliderComp.type = ColliderType.BOUNDARY
-
-                colliderComp.SetDirty(true)
+                let boundary = new TankQuadBoundary(actorId)
+                boundary.width = uiT.contentSize.width
+                boundary.height = uiT.contentSize.height
+                boundary.x = element.position.x - uiT.contentSize.width / 2
+                boundary.y = element.position.y - uiT.contentSize.height / 2
+                this.tankWorld.AddComponent(actorId, ColliderableComponent, [ColliderType.BOUNDARY, boundary])
             }
         })
     }
@@ -92,12 +89,11 @@ export class TankGameLogic extends ccl.ISingleton {
             actorObj.id = actorId
             actorObj.node = bulletNode
 
-            let colliderableComponent = this.tankWorld.AddComponent(actorId, ColliderableComponent)
-            colliderableComponent.type = type
-            colliderableComponent.boundary.width = colliderableComponent.boundary.height = 8
-            colliderableComponent.boundary.x = bulletNode.position.x - colliderableComponent.boundary.width / 2
-            colliderableComponent.boundary.y = bulletNode.position.y - colliderableComponent.boundary.height / 2
-            colliderableComponent.SetDirty(true)
+            let boundary = new TankQuadBoundary(actorId)
+            boundary.width = boundary.height = 8
+            boundary.x = bulletNode.position.x - boundary.width / 2
+            boundary.y = bulletNode.position.y - boundary.height / 2
+            this.tankWorld.AddComponent(actorId, ColliderableComponent, [type, boundary])
 
             let moveableComp = this.tankWorld.AddComponent(actorId, MoveableComponent)
             moveableComp.direction = direction
@@ -142,12 +138,11 @@ export class TankGameLogic extends ccl.ISingleton {
             actorObj.id = actorId
             actorObj.node = playerNode
 
-            let colliderableComponent = this.tankWorld.AddComponent(actorId, ColliderableComponent)
-            colliderableComponent.type = ColliderType.PLAYER
-            colliderableComponent.boundary.width = colliderableComponent.boundary.height = 64
-            colliderableComponent.boundary.x = playerNode.position.x - colliderableComponent.boundary.width / 2
-            colliderableComponent.boundary.y = playerNode.position.y - colliderableComponent.boundary.height / 2
-            colliderableComponent.SetDirty(true)
+            let boundary = new TankQuadBoundary(actorId)
+            boundary.width = boundary.height = 64
+            boundary.x = playerNode.position.x - boundary.width / 2
+            boundary.y = playerNode.position.y - boundary.height / 2
+            this.tankWorld.AddComponent(actorId, ColliderableComponent, [ColliderType.PLAYER, boundary])
 
             let moveableComp = this.tankWorld.AddComponent(actorId, MoveableComponent)
             moveableComp.moveType = MoveType.CONTROLLER1
@@ -172,12 +167,11 @@ export class TankGameLogic extends ccl.ISingleton {
 
             playerNode.setPosition(new cc.Vec3(-300, -13 * 32 + 32, 0))
 
-            let colliderableComponent = this.tankWorld.AddComponent(actorId, ColliderableComponent)
-            colliderableComponent.type = ColliderType.PLAYER
-            colliderableComponent.boundary.width = colliderableComponent.boundary.height = 64
-            colliderableComponent.boundary.x = playerNode.position.x - colliderableComponent.boundary.width / 2
-            colliderableComponent.boundary.y = playerNode.position.y - colliderableComponent.boundary.height / 2
-            colliderableComponent.SetDirty(true)
+            let boundary = new TankQuadBoundary(actorId)
+            boundary.width = boundary.height = 64
+            boundary.x = playerNode.position.x - boundary.width / 2
+            boundary.y = playerNode.position.y - boundary.height / 2
+            this.tankWorld.AddComponent(actorId, ColliderableComponent, [ColliderType.PLAYER, boundary])
 
             let moveableComp = this.tankWorld.AddComponent(actorId, MoveableComponent)
             moveableComp.moveType = MoveType.CONTROLLER1
@@ -207,12 +201,11 @@ export class TankGameLogic extends ccl.ISingleton {
             let posXIndex = Math.ceil(cc.math.random() * 3)
             enemyNode.setPosition(new cc.Vec3(posX[posXIndex], 13 * 32 - 32, 0))
 
-            let colliderableComponent = this.tankWorld.AddComponent(actorId, ColliderableComponent)
-            colliderableComponent.type = ColliderType.ENEMY
-            colliderableComponent.boundary.width = colliderableComponent.boundary.height = 64
-            colliderableComponent.boundary.x = enemyNode.position.x - colliderableComponent.boundary.width / 2
-            colliderableComponent.boundary.y = enemyNode.position.y - colliderableComponent.boundary.height / 2
-            colliderableComponent.SetDirty(true)
+            let boundary = new TankQuadBoundary(actorId)
+            boundary.width = boundary.height = 64
+            boundary.x = enemyNode.position.x - boundary.width / 2
+            boundary.y = enemyNode.position.y - boundary.height / 2
+            this.tankWorld.AddComponent(actorId, ColliderableComponent, [ColliderType.ENEMY, boundary])
 
             let moveableComp = this.tankWorld.AddComponent(actorId, MoveableComponent)
             moveableComp.moveType = MoveType.RANDOM
@@ -234,12 +227,11 @@ export class TankGameLogic extends ccl.ISingleton {
             actorObj.id = actorId
             actorObj.node = protectorNode
 
-            let colliderableComponent = this.tankWorld.AddComponent(actorId, ColliderableComponent)
-            colliderableComponent.boundary.width = colliderableComponent.boundary.height = 64
-            colliderableComponent.boundary.x = this.protectorNode.position.x - colliderableComponent.boundary.width / 2
-            colliderableComponent.boundary.y = this.protectorNode.position.y - colliderableComponent.boundary.height / 2
-            colliderableComponent.type = ColliderType.NORMAL
-            colliderableComponent.SetDirty(true)
+            let boundary = new TankQuadBoundary(actorId)
+            boundary.width = boundary.height = 64
+            boundary.x = this.protectorNode.position.x - boundary.width / 2
+            boundary.y = this.protectorNode.position.y - boundary.height / 2
+            this.tankWorld.AddComponent(actorId, ColliderableComponent, [ColliderType.NORMAL, boundary])
         })
     }
 
@@ -258,11 +250,11 @@ export class TankGameLogic extends ccl.ISingleton {
         actorObj.id = actorId
         actorObj.node = wallNode
 
-        let colliderableComponent = this.tankWorld.AddComponent(actorId, ColliderableComponent)
-        colliderableComponent.boundary.width = colliderableComponent.boundary.height = 32
-        colliderableComponent.boundary.x = position.x - colliderableComponent.boundary.width / 2
-        colliderableComponent.boundary.y = position.y - colliderableComponent.boundary.height / 2
-        colliderableComponent.SetDirty(true)
+        let boundary = new TankQuadBoundary(actorId)
+        boundary.width = boundary.height = 32
+        boundary.x = wallNode.position.x - boundary.width / 2
+        boundary.y = wallNode.position.y - boundary.height / 2
+        this.tankWorld.AddComponent(actorId, ColliderableComponent, [ColliderType.NORMAL, boundary])
     }
 
     CreateWalls(level: number) {
