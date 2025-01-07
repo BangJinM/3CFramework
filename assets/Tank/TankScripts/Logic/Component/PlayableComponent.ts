@@ -32,8 +32,8 @@ export class PlayableSystem extends ccl.ECSSystem {
             }
 
             if (event.keyCode == playableComp.fireKey) {
-                let firableComp: FirableComponent = this.ecsWorld.AddComponent(entity, FirableComponent)
-                if (firableComp.cTime >= firableComp.duration) {
+                let firableComp: FirableComponent = this.ecsWorld.GetComponent(entity, FirableComponent)
+                if (firableComp && firableComp.cTime >= firableComp.duration) {
                     let actorObj = this.ecsWorld.GetEntity<IBaseActor>(entity)
                     TankGameLogic.GetInstance<TankGameLogic>().OnFire(actorObj.node.position, playableComp.lastDirection, 1, ColliderType.PLAYER_BULLET)
                 }

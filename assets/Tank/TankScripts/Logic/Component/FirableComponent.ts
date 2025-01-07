@@ -21,7 +21,7 @@ export class FirableSystem extends ccl.ECSSystem {
             let entityObj = this.ecsWorld.GetEntity<IBaseActor>(element)
 
             firableComp.cTime += deltaTime
-            if (firableComp.auto == 1) {
+            if (firableComp.auto) {
                 if (firableComp && firableComp.cTime >= firableComp.duration) {
                     let moveableComp = this.ecsWorld.GetComponent(element, MoveableComponent)
                     TankGameLogic.GetInstance<TankGameLogic>().OnFire(entityObj.node.position, moveableComp.direction, 1, ColliderType.ENEMY_BULLET)
@@ -39,5 +39,10 @@ export class FirableComponent extends ccl.ECSComponent {
     /** 当前时间 */
     cTime: number = 0;
     /** 自动开火 */
-    auto: number = 0;
+    auto: boolean = false;
+
+    constructor(args: any[] = []) {
+        super()
+        this.auto = args[0] || false
+    }
 }

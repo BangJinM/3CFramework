@@ -153,6 +153,7 @@ export class TankGameLogic extends ccl.ISingleton {
             moveableComp.moveType = MoveType.CONTROLLER1
             moveableComp.speed = 1
 
+            this.tankWorld.AddComponent(actorId, FirableComponent)
             this.tankWorld.AddComponent(actorId, PlayableComponent, [[cc.KeyCode.KEY_W, cc.KeyCode.KEY_S, cc.KeyCode.KEY_D, cc.KeyCode.KEY_A], cc.KeyCode.SPACE])
 
             this.players[0] = actorObj
@@ -182,6 +183,7 @@ export class TankGameLogic extends ccl.ISingleton {
             moveableComp.moveType = MoveType.CONTROLLER1
             moveableComp.speed = 1
 
+            this.tankWorld.AddComponent(actorId, FirableComponent)
             this.tankWorld.AddComponent(actorId, PlayableComponent, [[cc.KeyCode.KEY_I, cc.KeyCode.KEY_K, cc.KeyCode.KEY_J, cc.KeyCode.KEY_L], cc.KeyCode.SPACE])
 
             this.players[1] = actorObj
@@ -216,7 +218,7 @@ export class TankGameLogic extends ccl.ISingleton {
             moveableComp.moveType = MoveType.RANDOM
             moveableComp.speed = 1
 
-            let firableComp = this.tankWorld.AddComponent(actorId, FirableComponent)
+            this.tankWorld.AddComponent(actorId, FirableComponent, [true])
         })
     }
 
