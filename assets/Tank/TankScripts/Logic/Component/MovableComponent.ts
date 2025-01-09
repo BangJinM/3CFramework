@@ -99,4 +99,12 @@ export class MoveableComponent extends ccl.ECSComponent {
     direction: cc.Vec3 = cc.Vec3.ZERO;
     time: number = 0
     cTime: number = 0
+
+    constructor(direction: cc.Vec3 = cc.Vec3.ZERO, moveType: MoveType = MoveType.FORWARD, speed: number = 1) {
+        super();
+
+        this.direction = direction;
+        this.moveType = moveType;
+        this.speed = speed;
+    }
 }

@@ -94,10 +94,7 @@ export class TankGameLogic extends ccl.ISingleton {
             boundary.x = bulletNode.position.x - boundary.width / 2
             boundary.y = bulletNode.position.y - boundary.height / 2
             this.tankWorld.AddComponent(actorId, ColliderableComponent, type, boundary)
-
-            let moveableComp = this.tankWorld.AddComponent(actorId, MoveableComponent)
-            moveableComp.direction = direction
-            moveableComp.speed = 1.5
+            this.tankWorld.AddComponent(actorId, MoveableComponent, direction, MoveType.FORWARD, 1.5)
         })
     }
 
@@ -144,10 +141,7 @@ export class TankGameLogic extends ccl.ISingleton {
             boundary.y = playerNode.position.y - boundary.height / 2
             this.tankWorld.AddComponent(actorId, ColliderableComponent, ColliderType.PLAYER, boundary)
 
-            let moveableComp = this.tankWorld.AddComponent(actorId, MoveableComponent)
-            moveableComp.moveType = MoveType.CONTROLLER1
-            moveableComp.speed = 1
-
+            this.tankWorld.AddComponent(actorId, MoveableComponent, cc.Vec3.ZERO, MoveType.CONTROLLER1, 1)
             this.tankWorld.AddComponent(actorId, FirableComponent)
             this.tankWorld.AddComponent(actorId, PlayableComponent, [cc.KeyCode.KEY_W, cc.KeyCode.KEY_S, cc.KeyCode.KEY_D, cc.KeyCode.KEY_A], cc.KeyCode.SPACE)
 
@@ -172,11 +166,7 @@ export class TankGameLogic extends ccl.ISingleton {
             boundary.x = playerNode.position.x - boundary.width / 2
             boundary.y = playerNode.position.y - boundary.height / 2
             this.tankWorld.AddComponent(actorId, ColliderableComponent, ColliderType.PLAYER, boundary)
-
-            let moveableComp = this.tankWorld.AddComponent(actorId, MoveableComponent)
-            moveableComp.moveType = MoveType.CONTROLLER1
-            moveableComp.speed = 1
-
+            this.tankWorld.AddComponent(actorId, MoveableComponent, cc.Vec3.ZERO, MoveType.CONTROLLER1)
             this.tankWorld.AddComponent(actorId, FirableComponent)
             this.tankWorld.AddComponent(actorId, PlayableComponent, [cc.KeyCode.KEY_I, cc.KeyCode.KEY_K, cc.KeyCode.KEY_J, cc.KeyCode.KEY_L], cc.KeyCode.SPACE)
 
@@ -206,11 +196,7 @@ export class TankGameLogic extends ccl.ISingleton {
             boundary.x = enemyNode.position.x - boundary.width / 2
             boundary.y = enemyNode.position.y - boundary.height / 2
             this.tankWorld.AddComponent(actorId, ColliderableComponent, ColliderType.ENEMY, boundary)
-
-            let moveableComp = this.tankWorld.AddComponent(actorId, MoveableComponent)
-            moveableComp.moveType = MoveType.RANDOM
-            moveableComp.speed = 1
-
+            this.tankWorld.AddComponent(actorId, MoveableComponent, cc.Vec3.ZERO, MoveType.RANDOM)
             this.tankWorld.AddComponent(actorId, FirableComponent, true)
         })
     }
