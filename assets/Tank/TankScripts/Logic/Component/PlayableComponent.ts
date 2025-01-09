@@ -78,14 +78,13 @@ export class PlayableComponent extends ccl.ECSComponent {
     keyDowns: Set<number> = new Set<number>();
     fireKey: number = cc.KeyCode.SPACE;
 
-    constructor(args: any[]) {
+    constructor(keyBoards: number[], fireKey: number = cc.KeyCode.SPACE) {
         super();
 
-        let keyBoards: number[] = args[0];
         for (const key in keyBoards) {
             this.keyBoardMap.set(keyBoards[key], Number(key));
         }
-        this.fireKey = args[1];
+        this.fireKey = fireKey;
     }
     isKeyBoard(keyCode: number) {
         return this.keyBoardMap.has(keyCode);

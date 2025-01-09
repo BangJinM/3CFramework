@@ -101,9 +101,9 @@ export class ColliderableComponent extends ccl.ECSComponent {
     boundary: TankQuadBoundary = new TankQuadBoundary(0);
     type: ColliderType = ColliderType.NORMAL;
 
-    constructor(args: any[] = []) {
+    constructor(type: ColliderType, bondary: TankQuadBoundary) {
         super()
-        this.type = args[0] || ColliderType.NORMAL
-        this.boundary = args[1] || new TankQuadBoundary(0)
+        this.type = type
+        this.boundary = bondary
     }
 }
