@@ -78,8 +78,8 @@ export class PlayableComponent extends ccl.ECSComponent {
     keyDowns: Set<number> = new Set<number>();
     fireKey: number = cc.KeyCode.SPACE;
 
-    constructor(keyBoards: number[], fireKey: number = cc.KeyCode.SPACE) {
-        super();
+    constructor(id: number, keyBoards: number[], fireKey: number = cc.KeyCode.SPACE) {
+        super(id);
 
         for (const key in keyBoards) {
             this.keyBoardMap.set(keyBoards[key], Number(key));

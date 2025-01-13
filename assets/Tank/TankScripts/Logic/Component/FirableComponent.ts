@@ -41,8 +41,8 @@ export class FirableComponent extends ccl.ECSComponent {
     /** 自动开火 */
     auto: boolean = false;
 
-    constructor(auto: boolean = false) {
-        super()
+    constructor(id: number, auto: boolean = false) {
+        super(id)
         this.auto = auto
     }
 }
