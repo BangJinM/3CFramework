@@ -51,7 +51,7 @@ export class TankGameLogic extends ccl.ISingleton {
             tankMain.GetNode("TankCanvas/NODE_GAME/NODE_MAP_BOUNDARY").addChild(bulletNode)
 
             for (const element of bulletNode.children) {
-                let actorId = this.tankWorld.CreateEntity(IBaseActor)
+                let actorId = this.tankWorld.CreateEntity(IBaseActor, bulletNode)
 
                 let uiT: cc.UITransform = ccl.GetOrAddComponent(element, cc.UITransform)
                 let boundary = new TankQuadBoundary(actorId)
@@ -81,7 +81,7 @@ export class TankGameLogic extends ccl.ISingleton {
             this.actorNode.addChild(bulletNode)
             bulletNode.position = position.clone()
 
-            let actorId = this.tankWorld.CreateEntity(IBaseActor)
+            let actorId = this.tankWorld.CreateEntity(IBaseActor, bulletNode)
 
             let boundary = new TankQuadBoundary(actorId)
             boundary.width = boundary.height = 8
@@ -124,7 +124,7 @@ export class TankGameLogic extends ccl.ISingleton {
             let playerNode = ccl.Resources.UIUtils.Clone(iResource.oriAsset as cc.Prefab)
             this.actorNode.addChild(playerNode)
 
-            let actorId = this.tankWorld.CreateEntity(IBaseActor)
+            let actorId = this.tankWorld.CreateEntity(IBaseActor, playerNode)
             let actorObj = this.tankWorld.GetEntity<IBaseActor>(actorId)
 
             let boundary = new TankQuadBoundary(actorId)
@@ -146,7 +146,7 @@ export class TankGameLogic extends ccl.ISingleton {
             let playerNode = ccl.Resources.UIUtils.Clone(iResource.oriAsset as cc.Prefab)
             this.actorNode.addChild(playerNode)
 
-            let actorId = this.tankWorld.CreateEntity(IBaseActor)
+            let actorId = this.tankWorld.CreateEntity(IBaseActor, playerNode)
             let actorObj = this.tankWorld.GetEntity<IBaseActor>(actorId)
 
             playerNode.setPosition(new cc.Vec3(-300, -13 * 32 + 32, 0))
@@ -173,7 +173,7 @@ export class TankGameLogic extends ccl.ISingleton {
             let enemyNode = ccl.Resources.UIUtils.Clone(iResource.oriAsset as cc.Prefab)
             this.actorNode.addChild(enemyNode)
 
-            let actorId = this.tankWorld.CreateEntity(IBaseActor)
+            let actorId = this.tankWorld.CreateEntity(IBaseActor, enemyNode)
 
             let posXIndex = Math.ceil(cc.math.random() * 3)
             enemyNode.setPosition(new cc.Vec3(posX[posXIndex], 13 * 32 - 32, 0))
@@ -195,7 +195,7 @@ export class TankGameLogic extends ccl.ISingleton {
             let protectorNode = ccl.Resources.UIUtils.Clone(iResource.oriAsset as cc.Prefab)
             this.protectorNode.addChild(protectorNode)
 
-            let actorId = this.tankWorld.CreateEntity(IBaseActor)
+            let actorId = this.tankWorld.CreateEntity(IBaseActor, protectorNode)
 
             let boundary = new TankQuadBoundary(actorId)
             boundary.width = boundary.height = 64
@@ -215,7 +215,7 @@ export class TankGameLogic extends ccl.ISingleton {
 
         this.mapNode.addChild(wallNode)
 
-        let actorId = this.tankWorld.CreateEntity(IBaseActor)
+        let actorId = this.tankWorld.CreateEntity(IBaseActor, wallNode)
 
         let boundary = new TankQuadBoundary(actorId)
         boundary.width = boundary.height = 32
