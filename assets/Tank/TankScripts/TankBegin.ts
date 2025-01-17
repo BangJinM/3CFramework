@@ -1,27 +1,19 @@
 import * as cc from "cc";
 import * as ccl from "ccl";
-import { Notify } from "./TankGlobalConfig";
-
+import { NoticeTable } from "./Config/NoticeTable";
+import { TankGameLogic } from "./Logic/TankGameLogic";
 @cc._decorator.ccclass('TankBegin')
 export class TankBegin extends ccl.BaseUIContainer {
-    OnUILoad(): void {
-        let subjectManager: ccl.SubjectManager = ccl.SubjectManager.GetInstance() as ccl.SubjectManager
-        subjectManager.AddObserver(Notify.TankGameEnd, this.RemoveSelf.bind(this))
-    }
+    uiType = ccl.UIEnum.UI_NORMAL
+    layerName = "TankRes/Prefabs/TankBegin"
+    mainPrefabPropty = { bundleName: "Tank", prefabName: "TankRes/Prefabs/TankBegin" }
 
     OnChildUILoad(): void {
         this.childNode.getChildByName("button_orange").on(cc.Button.EventType.CLICK, () => {
-            ccl.SubjectManager.GetInstance<ccl.SubjectManager>().NotifyObserver(Notify.TankGameStart, {})
+            TankGameLogic.GetInstance().Init()
+            ccl.SubjectManager.GetInstance<ccl.SubjectManager>().NotifyObserver(NoticeTable.Tank_UI_GameBegin_End, {})
+            ccl.SubjectManager.GetInstance<ccl.SubjectManager>().NotifyObserver(NoticeTable.TankGameStart, null)
             ccl.Logger.info("Error")
-            ccl.SubjectManager.GetInstance<ccl.SubjectManager>().NotifyObserver(Notify.TankGameEnd, {})
         })
-    }
-
-    OnUIDestroy(): void {
-        ccl.SubjectManager.GetInstance<ccl.SubjectManager>().RemoveObserver(Notify.TankGameEnd, this.RemoveSelf.bind(this))
-    }
-
-    RemoveSelf() {
-        ccl.UIGraphManager.GetInstance<ccl.UIGraphManager>().RemoveNode(this)
     }
 }   

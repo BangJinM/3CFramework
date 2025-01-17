@@ -1,7 +1,8 @@
 import * as cc from 'cc';
 import * as ccl from 'ccl';
+import { NoticeTable } from './Config/NoticeTable';
 import { TankGameLogic } from './Logic/TankGameLogic';
-import { TankBegin } from './TankBegin';
+import { TankUIManager } from './UI/TankUIManager';
 
 @cc._decorator.ccclass('TankMain')
 export class TankMain extends ccl.ISingleton {
@@ -17,16 +18,9 @@ export class TankMain extends ccl.ISingleton {
     }
 
     public InitSuccess() {
-        TankGameLogic.GetInstance().Init()
+        TankUIManager.GetInstance().Init()
         ccl.SubjectManager.GetInstance().Init()
-
-        let node = new cc.Node()
-        let layerProperty = node.addComponent(TankBegin)
-        layerProperty.uiType = ccl.UIEnum.UI_NORMAL
-        layerProperty.layerName = "TankRes/Prefabs/TankBegin"
-        layerProperty.mainPrefabPropty = { bundleName: "Tank", prefabName: "TankRes/Prefabs/TankBegin" }
-
-        ccl.UIGraphManager.GetInstance<ccl.UIGraphManager>().AddNode(layerProperty)
+        ccl.SubjectManager.GetInstance<ccl.SubjectManager>().NotifyObserver(NoticeTable.Tank_UI_GameBegin_Open, null)
     }
 
     GetNode(name: string) {

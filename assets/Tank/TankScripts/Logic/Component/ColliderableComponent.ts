@@ -33,6 +33,10 @@ export enum ColliderType {
      */
     ENEMY_BULLET,
     /**
+     * 老鹰。
+     */
+    PROTECTOR,
+    /**
      * 结束。
      */
     FINAL

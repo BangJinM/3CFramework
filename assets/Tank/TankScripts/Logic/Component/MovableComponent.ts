@@ -1,6 +1,6 @@
 import * as cc from "cc";
 import * as ccl from "ccl";
-import { TankGameLogic } from "../TankGameLogic";
+import { NoticeTable } from "../../Config/NoticeTable";
 import { ColliderableComponent, ColliderType, TankQuadBoundary } from "./ColliderableComponent";
 import { IBaseActor } from "./IBaseActor";
 import { TankQuadTreeManager } from "./TankQuadTreeManager";
@@ -55,7 +55,7 @@ export class MoveableSystem extends ccl.ECSSystem {
                 }
                 let objects = tankQuadTreeManager.GetCollisionObjects(colliderTypes, quadBoundary)
                 if (objects.size > 0) {
-                    TankGameLogic.GetInstance<TankGameLogic>().OnContact(collisionComp.boundary, objects)
+                    ccl.SubjectManager.GetInstance<ccl.SubjectManager>().NotifyObserver(NoticeTable.OnContact, { selfCollision: collisionComp.boundary, collisions: objects })
                 } else {
                     tankQuadTreeManager.RemoveColliderEventComp(collisionComp)
                     collisionComp.boundary.x = quadBoundary.x

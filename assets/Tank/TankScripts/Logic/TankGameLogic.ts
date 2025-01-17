@@ -1,6 +1,6 @@
 import * as cc from "cc";
 import * as ccl from "ccl";
-import { Notify } from "../TankGlobalConfig";
+import { NoticeTable } from "../Config/NoticeTable";
 import { TankMain } from "../TankMain";
 import { ApprSystem } from "./Component/ApprComponent";
 import { ColliderableComponent, ColliderableSystem, ColliderType, TankQuadBoundary } from "./Component/ColliderableComponent";
@@ -26,7 +26,8 @@ export class TankGameLogic extends ccl.ISingleton {
 
     Init(): void {
         let subjectManager: ccl.SubjectManager = ccl.SubjectManager.GetInstance()
-        subjectManager.AddObserver(Notify.TankGameStart, this.OnGameStart.bind(this))
+        subjectManager.AddObserver(NoticeTable.TankGameStart, this.OnGameStart.bind(this))
+        subjectManager.AddObserver(NoticeTable.OnContact, this.OnContact.bind(this))
 
         let tankQuadTreeManager: TankQuadTreeManager = TankQuadTreeManager.GetInstance<TankQuadTreeManager>()
         tankQuadTreeManager.quadBoundary.width = tankQuadTreeManager.quadBoundary.height = 32 * 32
@@ -92,26 +93,82 @@ export class TankGameLogic extends ccl.ISingleton {
         })
     }
 
-    OnContact(selfQuadBoundary: TankQuadBoundary, otherQuadBoundarys: Set<TankQuadBoundary>) {
+    OnContact(data) {
+        let selfQuadBoundary: TankQuadBoundary = data.selfCollision
+        let otherQuadBoundarys: Set<TankQuadBoundary> = data.collisions
+
         // ccl.Logger.info(`OnBeginContact, ${selfQuadBoundary.entity}`)
         let selfCollider = this.tankWorld.GetComponent(selfQuadBoundary.entity, ColliderableComponent)
         let selfObj = this.tankWorld.GetEntity<IBaseActor>(selfQuadBoundary.entity)
 
+        // 子弹碰撞到边界墙
+        let BulletHitBoundary = (otherObj: IBaseActor) => {
+            selfObj.node.destroy()
+            this.tankWorld.RemoveEntity(selfObj.id)
+        }
+        // 碰撞到玩家
+        let HitPlayer = (otherObj: IBaseActor) => {
+            selfObj.node.destroy()
+            this.tankWorld.RemoveEntity(selfObj.id)
+
+            otherObj.node.destroy()
+            this.tankWorld.RemoveEntity(otherObj.id)
+        }
+        // 碰撞到敌人
+        let HitEnemy = (otherObj: IBaseActor) => {
+            selfObj.node.destroy()
+            this.tankWorld.RemoveEntity(selfObj.id)
+
+            otherObj.node.destroy()
+            this.tankWorld.RemoveEntity(otherObj.id)
+        }
+        // 碰撞到地形
+        let HitTerrain = (otherObj: IBaseActor) => {
+            selfObj.node.destroy()
+            this.tankWorld.RemoveEntity(selfObj.id)
+
+            otherObj.node.destroy()
+            this.tankWorld.RemoveEntity(otherObj.id)
+        }
+        // 碰撞到老鹰
+        let HitProtector = (otherObj: IBaseActor) => {
+            selfObj.node.destroy()
+            this.tankWorld.RemoveEntity(selfObj.id)
+
+            otherObj.node.destroy()
+            this.tankWorld.RemoveEntity(otherObj.id)
+        }
+        // 碰撞到子弹
+        let HitBullet = (otherObj: IBaseActor) => {
+            selfObj.node.destroy()
+            this.tankWorld.RemoveEntity(selfObj.id)
+
+            otherObj.node.destroy()
+            this.tankWorld.RemoveEntity(otherObj.id)
+        }
+
+        let funcs = {
+            [ColliderType.ENEMY_BULLET]: {
+                [ColliderType.BOUNDARY]: BulletHitBoundary,
+                [ColliderType.NORMAL]: HitTerrain,
+                [ColliderType.PLAYER]: HitPlayer,
+                [ColliderType.PLAYER_BULLET]: HitBullet,
+                [ColliderType.PROTECTOR]: HitProtector,
+            },
+            [ColliderType.PLAYER_BULLET]: {
+                [ColliderType.BOUNDARY]: BulletHitBoundary,
+                [ColliderType.NORMAL]: HitTerrain,
+                [ColliderType.ENEMY]: HitEnemy,
+                [ColliderType.ENEMY_BULLET]: HitBullet,
+                [ColliderType.PROTECTOR]: HitProtector,
+            },
+        }
+
         for (const element of otherQuadBoundarys) {
             let otherCollider = this.tankWorld.GetComponent(element.entity, ColliderableComponent)
-            let otherObj = this.tankWorld.GetEntity<IBaseActor>(element.entity)
-            if (selfCollider.type == ColliderType.ENEMY_BULLET || selfCollider.type == ColliderType.PLAYER_BULLET) {
-                if (otherCollider.type == ColliderType.BOUNDARY) {
-                    selfObj.node.destroy()
-                    this.tankWorld.RemoveEntity(selfObj.id)
-                }
-                else if (otherCollider.type == ColliderType.NORMAL) {
-                    selfObj.node.destroy()
-                    this.tankWorld.RemoveEntity(selfObj.id)
-
-                    otherObj.node.destroy()
-                    this.tankWorld.RemoveEntity(otherObj.id)
-                }
+            if (funcs[selfCollider.type] && funcs[selfCollider.type][otherCollider.type]) {
+                let otherObj = this.tankWorld.GetEntity<IBaseActor>(element.entity)
+                funcs[selfCollider.type][otherCollider.type](otherObj)
             }
         }
     }
