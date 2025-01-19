@@ -22,6 +22,7 @@ export class QuadTreeDebug extends cc.Component {
         ctx.clear();
 
         let draw = (quadTree: ccl.QuadTree) => {
+            if (!quadTree) return
             if (quadTree.children.length <= 0) {
 
                 ctx.lineWidth = 4;

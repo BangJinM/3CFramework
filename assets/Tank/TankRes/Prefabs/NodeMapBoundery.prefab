@@ -35,13 +35,10 @@
     "_components": [
       {
         "__id__": 26
-      },
-      {
-        "__id__": 28
       }
     ],
     "_prefab": {
-      "__id__": 30
+      "__id__": 28
     },
     "_lpos": {
       "__type__": "cc.Vec3",
@@ -607,51 +604,6 @@
   {
     "__type__": "cc.CompPrefabInfo",
     "fileId": "7edJQpYkxGMqwxHdljKv2h"
-  },
-  {
-    "__type__": "cc.Sprite",
-    "_name": "",
-    "_objFlags": 0,
-    "__editorExtras__": {},
-    "node": {
-      "__id__": 1
-    },
-    "_enabled": true,
-    "__prefab": {
-      "__id__": 29
-    },
-    "_customMaterial": null,
-    "_srcBlendFactor": 2,
-    "_dstBlendFactor": 4,
-    "_color": {
-      "__type__": "cc.Color",
-      "r": 0,
-      "g": 0,
-      "b": 0,
-      "a": 255
-    },
-    "_spriteFrame": {
-      "__uuid__": "b730527c-3233-41c2-aaf7-7cdab58f9749@f9941",
-      "__expectedType__": "cc.SpriteFrame"
-    },
-    "_type": 1,
-    "_fillType": 0,
-    "_sizeMode": 0,
-    "_fillCenter": {
-      "__type__": "cc.Vec2",
-      "x": 0,
-      "y": 0
-    },
-    "_fillStart": 0,
-    "_fillRange": 0,
-    "_isTrimmedMode": true,
-    "_useGrayscale": false,
-    "_atlas": null,
-    "_id": ""
-  },
-  {
-    "__type__": "cc.CompPrefabInfo",
-    "fileId": "4fWedK5aNPgoI+gFG2RVXK"
   },
   {
     "__type__": "cc.PrefabInfo",

@@ -4,25 +4,27 @@ import { NoticeTable } from "../Config/NoticeTable";
 import { TankMain } from "../TankMain";
 import { ApprSystem } from "./Component/ApprComponent";
 import { ColliderableComponent, ColliderableSystem, ColliderType, TankQuadBoundary } from "./Component/ColliderableComponent";
-import { FirableComponent, FirableSystem } from "./Component/FirableComponent";
+import { FirableSystem } from "./Component/FirableComponent";
 import { IBaseActor } from "./Component/IBaseActor";
 import { MoveableComponent, MoveableSystem, MoveType } from "./Component/MovableComponent";
-import { PlayableComponent, PlayableSystem } from "./Component/PlayableComponent";
+import { PlayableSystem } from "./Component/PlayableComponent";
 import { TankQuadTreeManager } from "./Component/TankQuadTreeManager";
+import { EnemyManager } from "./EnemyManager";
+import { PlayerManager } from "./PlayerManager";
+import { SceneManager } from "./SceneManager";
 
 @cc._decorator.ccclass("TankGameLogic")
 export class TankGameLogic extends ccl.ISingleton {
     actors: Set<IBaseActor> = new Set()
     tankWorld: ccl.ECSWorld = new ccl.ECSWorld()
+    enemyManager: EnemyManager = null;
+    playerManager: PlayerManager = null;
+    sceneManager: SceneManager = null;
 
     level = 0
-    players: IBaseActor[] = []
-    enemies: cc.Node[] = []
     protectorId: number = 0
-    terrainIds: number[] = []
     protectorNode: cc.Node = null
     actorNode: cc.Node = null
-    mapNode: cc.Node;
 
     Init(): void {
         let subjectManager: ccl.SubjectManager = ccl.SubjectManager.GetInstance()
@@ -34,10 +36,17 @@ export class TankGameLogic extends ccl.ISingleton {
         tankQuadTreeManager.quadBoundary.x = tankQuadTreeManager.quadBoundary.y = -16 * 32
         tankQuadTreeManager.Init()
 
+        this.playerManager = new PlayerManager()
+        this.enemyManager = new EnemyManager()
+        this.sceneManager = new SceneManager()
+
+        this.sceneManager.Init(this.tankWorld)
+        this.enemyManager.Init(this.tankWorld)
+        this.playerManager.Init(this.tankWorld)
+
         let tankMain: TankMain = TankMain.GetInstance()
-        this.mapNode = tankMain.GetNode("TankCanvas/NODE_GAME/NODE_MAP")
-        this.actorNode = tankMain.GetNode("TankCanvas/NODE_GAME/NODE_ACTER")
         this.protectorNode = tankMain.GetNode("TankCanvas/NODE_GAME/NODE_MAIN")
+        this.actorNode = tankMain.GetNode("TankCanvas/NODE_GAME/NODE_ACTER")
 
         this.tankWorld.AddSystem(ApprSystem)
         this.tankWorld.AddSystem(MoveableSystem)
@@ -45,11 +54,15 @@ export class TankGameLogic extends ccl.ISingleton {
         this.tankWorld.AddSystem(FirableSystem)
         this.tankWorld.AddSystem(PlayableSystem)
 
+        this.InitBoundary()
+    }
+
+    InitBoundary() {
         ccl.Resources.Loader.LoadPrefabAsset("TankRes/Prefabs/NodeMapBoundery", ccl.BundleManager.GetInstance<ccl.BundleManager>().GetBundle("Tank"), (iResource: ccl.IResource) => {
             if (!iResource.oriAsset) return
 
             let bulletNode = ccl.Resources.UIUtils.Clone(iResource.oriAsset as cc.Prefab)
-            tankMain.GetNode("TankCanvas/NODE_GAME/NODE_MAP_BOUNDARY").addChild(bulletNode)
+            TankMain.GetInstance<TankMain>().GetNode("TankCanvas/NODE_GAME/NODE_MAP_BOUNDARY").addChild(bulletNode)
 
             for (const element of bulletNode.children) {
                 let actorId = this.tankWorld.CreateEntity(IBaseActor, bulletNode)
@@ -67,11 +80,9 @@ export class TankGameLogic extends ccl.ISingleton {
 
 
     OnGameStart() {
-        this.level = 1
-        this.InitProtector()
-        this.InitPlayer()
-        this.CreateEnemy()
-        this.CreateWalls(this.level)
+        this.level = 3
+
+        ccl.SubjectManager.GetInstance<ccl.SubjectManager>().NotifyObserver(NoticeTable.SceneChange, { level: this.level })
     }
 
     OnFire(position: cc.Vec3, direction: cc.Vec3, level: number, type: ColliderType) {
@@ -85,7 +96,7 @@ export class TankGameLogic extends ccl.ISingleton {
             let actorId = this.tankWorld.CreateEntity(IBaseActor, bulletNode)
 
             let boundary = new TankQuadBoundary(actorId)
-            boundary.width = boundary.height = 8
+            boundary.width = boundary.height = 64
             boundary.x = bulletNode.position.x - boundary.width / 2
             boundary.y = bulletNode.position.y - boundary.height / 2
             this.tankWorld.AddComponent(actorId, ColliderableComponent, type, boundary)
@@ -121,6 +132,8 @@ export class TankGameLogic extends ccl.ISingleton {
 
             otherObj.node.destroy()
             this.tankWorld.RemoveEntity(otherObj.id)
+
+            ccl.SubjectManager.GetInstance<ccl.SubjectManager>().NotifyObserver(NoticeTable.EnemyDie, { level: 1 })
         }
         // 碰撞到地形
         let HitTerrain = (otherObj: IBaseActor) => {
@@ -173,78 +186,6 @@ export class TankGameLogic extends ccl.ISingleton {
         }
     }
 
-
-    InitPlayer() {
-        ccl.Resources.Loader.LoadPrefabAsset("TankRes/Prefabs/Player", ccl.BundleManager.GetInstance<ccl.BundleManager>().GetBundle("Tank"), (iResource: ccl.IResource) => {
-            if (!iResource.oriAsset) return
-
-            let playerNode = ccl.Resources.UIUtils.Clone(iResource.oriAsset as cc.Prefab)
-            this.actorNode.addChild(playerNode)
-
-            let actorId = this.tankWorld.CreateEntity(IBaseActor, playerNode)
-            let actorObj = this.tankWorld.GetEntity<IBaseActor>(actorId)
-
-            let boundary = new TankQuadBoundary(actorId)
-            boundary.width = boundary.height = 64
-            boundary.x = playerNode.position.x - boundary.width / 2
-            boundary.y = playerNode.position.y - boundary.height / 2
-            this.tankWorld.AddComponent(actorId, ColliderableComponent, ColliderType.PLAYER, boundary)
-
-            this.tankWorld.AddComponent(actorId, MoveableComponent, cc.Vec3.ZERO, MoveType.CONTROLLER1, 1)
-            this.tankWorld.AddComponent(actorId, FirableComponent)
-            this.tankWorld.AddComponent(actorId, PlayableComponent, [cc.KeyCode.KEY_W, cc.KeyCode.KEY_S, cc.KeyCode.KEY_D, cc.KeyCode.KEY_A], cc.KeyCode.SPACE)
-
-            this.players[0] = actorObj
-        })
-
-        ccl.Resources.Loader.LoadPrefabAsset("TankRes/Prefabs/Player", ccl.BundleManager.GetInstance<ccl.BundleManager>().GetBundle("Tank"), (iResource: ccl.IResource) => {
-            if (!iResource.oriAsset) return
-
-            let playerNode = ccl.Resources.UIUtils.Clone(iResource.oriAsset as cc.Prefab)
-            this.actorNode.addChild(playerNode)
-
-            let actorId = this.tankWorld.CreateEntity(IBaseActor, playerNode)
-            let actorObj = this.tankWorld.GetEntity<IBaseActor>(actorId)
-
-            playerNode.setPosition(new cc.Vec3(-300, -13 * 32 + 32, 0))
-
-            let boundary = new TankQuadBoundary(actorId)
-            boundary.width = boundary.height = 64
-            boundary.x = playerNode.position.x - boundary.width / 2
-            boundary.y = playerNode.position.y - boundary.height / 2
-            this.tankWorld.AddComponent(actorId, ColliderableComponent, ColliderType.PLAYER, boundary)
-            this.tankWorld.AddComponent(actorId, MoveableComponent, cc.Vec3.ZERO, MoveType.CONTROLLER1)
-            this.tankWorld.AddComponent(actorId, FirableComponent)
-            this.tankWorld.AddComponent(actorId, PlayableComponent, [cc.KeyCode.KEY_I, cc.KeyCode.KEY_K, cc.KeyCode.KEY_J, cc.KeyCode.KEY_L], cc.KeyCode.SPACE)
-
-            this.players[1] = actorObj
-        })
-    }
-
-    CreateEnemy() {
-        let posX = [0, -13 * 32 + 32, 13 * 32 - 32]
-
-        ccl.Resources.Loader.LoadPrefabAsset("TankRes/Prefabs/Enemy", ccl.BundleManager.GetInstance<ccl.BundleManager>().GetBundle("Tank"), (iResource: ccl.IResource) => {
-            if (!iResource.oriAsset) return
-
-            let enemyNode = ccl.Resources.UIUtils.Clone(iResource.oriAsset as cc.Prefab)
-            this.actorNode.addChild(enemyNode)
-
-            let actorId = this.tankWorld.CreateEntity(IBaseActor, enemyNode)
-
-            let posXIndex = Math.ceil(cc.math.random() * 3)
-            enemyNode.setPosition(new cc.Vec3(posX[posXIndex], 13 * 32 - 32, 0))
-
-            let boundary = new TankQuadBoundary(actorId)
-            boundary.width = boundary.height = 64
-            boundary.x = enemyNode.position.x - boundary.width / 2
-            boundary.y = enemyNode.position.y - boundary.height / 2
-            this.tankWorld.AddComponent(actorId, ColliderableComponent, ColliderType.ENEMY, boundary)
-            this.tankWorld.AddComponent(actorId, MoveableComponent, cc.Vec3.ZERO, MoveType.RANDOM)
-            this.tankWorld.AddComponent(actorId, FirableComponent, true)
-        })
-    }
-
     InitProtector() {
         ccl.Resources.Loader.LoadPrefabAsset("TankRes/Prefabs/Protector", ccl.BundleManager.GetInstance<ccl.BundleManager>().GetBundle("Tank"), (iResource: ccl.IResource) => {
             if (!iResource.oriAsset) return
@@ -262,56 +203,13 @@ export class TankGameLogic extends ccl.ISingleton {
         })
     }
 
-    CreateWall(type: number, posX, posY, iResource: ccl.IResource) {
-        if (type <= 0) return
-        let position = new cc.Vec3(posX * 32 + 16, - posY * 32 - 16, 0)
-        let wallNode = ccl.Resources.UIUtils.Clone(iResource.oriAsset as cc.Prefab)
-
-        wallNode.setPosition(position)
-        wallNode.layer = this.mapNode.layer
-
-        this.mapNode.addChild(wallNode)
-
-        let actorId = this.tankWorld.CreateEntity(IBaseActor, wallNode)
-
-        let boundary = new TankQuadBoundary(actorId)
-        boundary.width = boundary.height = 32
-        boundary.x = wallNode.position.x - boundary.width / 2
-        boundary.y = wallNode.position.y - boundary.height / 2
-        this.tankWorld.AddComponent(actorId, ColliderableComponent, ColliderType.NORMAL, boundary)
-    }
-
-    CreateWalls(level: number) {
-        let tankMain: TankMain = TankMain.GetInstance()
-        let mapNode = tankMain.GetNode("TankCanvas/NODE_GAME/NODE_MAP")
-        mapNode.destroyAllChildren()
-        mapNode.removeAllChildren()
-
-        ccl.Resources.Loader.LoadAsset(`TankRes/maps/${level.toString()}`, cc.TextAsset, ccl.BundleManager.GetInstance<ccl.BundleManager>().GetBundle("Tank"), (iResource: ccl.IResource) => {
-            if (!iResource.oriAsset) return
-            let text = (iResource.oriAsset as cc.TextAsset).text
-            let index = 0
-            iResource.oriAsset.addRef()
-            ccl.Resources.Loader.LoadPrefabAsset("TankRes/Prefabs/Wall", ccl.BundleManager.GetInstance<ccl.BundleManager>().GetBundle("Tank"), (iResource: ccl.IResource) => {
-                for (let y = 0; y < 26; y++) {
-                    for (let x = 0; x < 26; x++) {
-                        this.CreateWall(text[index] ? parseInt(text[index]) : 0, x - 13, y - 13, iResource)
-                        index++
-                    }
-                }
-            })
-
-            iResource.oriAsset.decRef()
-        })
-    }
-
     LevelUp() {
-        this.level = 1
-        this.CreateWalls(this.level)
+        this.level = 3
     }
 
     Update(deltaTime: number): void {
         this.tankWorld.Update(deltaTime)
+        this.enemyManager.Update(deltaTime)
     }
 
     ActorDie() {
