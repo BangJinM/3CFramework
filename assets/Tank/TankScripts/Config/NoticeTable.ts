@@ -7,6 +7,7 @@ export enum NoticeTable {
     SceneChange,
 
     OnContact,
+    OnFire,
     EnemyDie,
 
     Tank_UI_GameBegin_Open,

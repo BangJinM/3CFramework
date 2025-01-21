@@ -1,6 +1,6 @@
 import * as cc from "cc";
 import * as ccl from "ccl";
-import { TankGameLogic } from "../TankGameLogic";
+import { NoticeTable } from "../../Config/NoticeTable";
 import { ColliderType } from "./ColliderableComponent";
 import { FirableComponent } from "./FirableComponent";
 import { IBaseActor } from "./IBaseActor";
@@ -29,7 +29,7 @@ export class PlayableSystem extends ccl.ECSSystem {
                 let firableComp: FirableComponent = this.ecsWorld.GetComponent(entity, FirableComponent)
                 if (firableComp && firableComp.cTime >= firableComp.duration) {
                     let actorObj = this.ecsWorld.GetEntity<IBaseActor>(entity)
-                    TankGameLogic.GetInstance<TankGameLogic>().OnFire(actorObj.node.position, playableComp.lastDirection, 1, ColliderType.PLAYER_BULLET)
+                    ccl.SubjectManager.GetInstance<ccl.SubjectManager>().NotifyObserver(NoticeTable.OnFire, [actorObj.node.position, playableComp.lastDirection, 1, ColliderType.PLAYER_BULLET])
                 }
             }
         }

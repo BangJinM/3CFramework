@@ -1,7 +1,6 @@
 import * as cc from "cc";
 import * as ccl from "ccl";
 import { NoticeTable } from "./Config/NoticeTable";
-import { TankGameLogic } from "./Logic/TankGameLogic";
 @cc._decorator.ccclass('TankBegin')
 export class TankBegin extends ccl.BaseUIContainer {
     uiType = ccl.UIEnum.UI_NORMAL
@@ -10,10 +9,8 @@ export class TankBegin extends ccl.BaseUIContainer {
 
     OnChildUILoad(): void {
         this.childNode.getChildByName("button_orange").on(cc.Button.EventType.CLICK, () => {
-            TankGameLogic.GetInstance().Init()
             ccl.SubjectManager.GetInstance<ccl.SubjectManager>().NotifyObserver(NoticeTable.Tank_UI_GameBegin_End, {})
             ccl.SubjectManager.GetInstance<ccl.SubjectManager>().NotifyObserver(NoticeTable.TankGameStart, null)
-            ccl.Logger.info("Error")
         })
     }
 }   
