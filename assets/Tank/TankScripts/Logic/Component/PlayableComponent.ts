@@ -22,13 +22,7 @@ export class PlayableSystem extends ccl.ECSSystem {
             let playableComp = this.ecsWorld.GetComponent<PlayableComponent>(entity, PlayableComponent)
             if (playableComp.isKeyBoard(event.keyCode)) {
                 playableComp.keyDown(event.keyCode)
-                if (playableComp.keyDowns.size > 0) {
-                    let moveComp = this.ecsWorld.GetComponent(entity, MoveableComponent)
-                    let array = Array.from(playableComp.keyDowns)
-                    let keyCode = array[array.length - 1]
-                    playableComp.lastDirection = playableComp.Direction[playableComp.keyBoardMap.get(keyCode)] || cc.Vec3.ZERO
-                    moveComp.direction = playableComp.Direction[playableComp.keyBoardMap.get(keyCode)] || cc.Vec3.ZERO
-                }
+                this.UpdateDirection(entity, playableComp)
             }
 
             if (event.keyCode == playableComp.fireKey) {
@@ -46,18 +40,20 @@ export class PlayableSystem extends ccl.ECSSystem {
             let playableComp = this.ecsWorld.GetComponent<PlayableComponent>(entity, PlayableComponent)
             if (playableComp.isKeyBoard(event.keyCode)) {
                 playableComp.keyUp(event.keyCode)
-
-                let moveComp = this.ecsWorld.GetComponent(entity, MoveableComponent)
-                if (playableComp.keyDowns.size > 0) {
-                    let array = Array.from(playableComp.keyDowns)
-                    let keyCode = array[array.length - 1]
-                    moveComp.direction = playableComp.Direction[playableComp.keyBoardMap.get(keyCode)] || cc.Vec3.ZERO
-                }
-                else {
-                    moveComp.direction = cc.Vec3.ZERO
-                }
-
+                this.UpdateDirection(entity, playableComp)
             }
+        }
+    }
+
+    UpdateDirection(entity, playableComp) {
+        let moveComp = this.ecsWorld.GetComponent(entity, MoveableComponent)
+        if (playableComp.keyDowns.size > 0) {
+            let array = Array.from(playableComp.keyDowns)
+            let keyCode = array[array.length - 1]
+            moveComp.direction = playableComp.Direction[playableComp.keyBoardMap.get(keyCode)] || cc.Vec3.ZERO
+        }
+        else {
+            moveComp.direction = cc.Vec3.ZERO
         }
     }
 

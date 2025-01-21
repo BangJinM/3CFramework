@@ -9,9 +9,7 @@ export enum MoveType {
     /** 直走 */
     FORWARD,
     /** 控制 */
-    CONTROLLER1,
-    /** 控制 */
-    CONTROLLER2,
+    CONTROLLER,
     /** 随机 */
     RANDOM
 }
@@ -32,16 +30,34 @@ export class MoveableSystem extends ccl.ECSSystem {
 
         for (const element of entities) {
             let moveComp = this.ecsWorld.GetComponent(element, MoveableComponent)
+
             let entityObj = this.ecsWorld.GetEntity<IBaseActor>(element)
             quadBoundary.entity = element
 
             let position = entityObj.node.position.clone()
-            position.x += moveComp.direction.x * moveComp.speed
-            position.y += moveComp.direction.y * moveComp.speed
+
+            // 如果是主控玩家，则步进为 16
+            if (moveComp.moveType == MoveType.CONTROLLER) {
+                // 如果坐标是16的倍数，才允许转向
+                if ((moveComp.tmepDirection.x && position.x % 16 == 0) || (moveComp.tmepDirection.y && position.y % 16 == 0)) {
+                    moveComp.tmepDirection.x = 0
+                    moveComp.tmepDirection.y = 0
+                }
+                if (moveComp.tmepDirection.equals(cc.Vec3.ZERO) && (moveComp.direction.x != 0 || moveComp.direction.y != 0)) {
+                    moveComp.tmepDirection.x = moveComp.direction.x
+                    moveComp.tmepDirection.y = moveComp.direction.y
+                }
+                position.x += moveComp.tmepDirection.x * moveComp.speed
+                position.y += moveComp.tmepDirection.y * moveComp.speed
+            }
+            else {
+                position.x += moveComp.direction.x * moveComp.speed
+                position.y += moveComp.direction.y * moveComp.speed
+            }
 
             let collisionComp: ColliderableComponent = this.ecsWorld.GetComponent(element, ColliderableComponent)
-            quadBoundary.x = entityObj.node.position.x + moveComp.direction.x * moveComp.speed - collisionComp.boundary.width / 2
-            quadBoundary.y = entityObj.node.position.y + moveComp.direction.y * moveComp.speed - collisionComp.boundary.height / 2
+            quadBoundary.x = position.x - collisionComp.boundary.width / 2
+            quadBoundary.y = position.y - collisionComp.boundary.height / 2
             quadBoundary.width = collisionComp.boundary.width
             quadBoundary.height = collisionComp.boundary.height
             if (moveComp.moveType == MoveType.FORWARD) {
@@ -62,13 +78,15 @@ export class MoveableSystem extends ccl.ECSSystem {
                     collisionComp.boundary.y = quadBoundary.y
                     tankQuadTreeManager.AddColliderEventComp(collisionComp)
                 }
-            } else if (moveComp.moveType == MoveType.CONTROLLER1 || moveComp.moveType == MoveType.CONTROLLER2) {
+            } else if (moveComp.moveType == MoveType.CONTROLLER) {
                 if (!tankQuadTreeManager.IsCollisions([ColliderType.NORMAL, ColliderType.PLAYER, ColliderType.ENEMY, ColliderType.BOUNDARY], quadBoundary)) {
                     entityObj.node.setPosition(position)
                     tankQuadTreeManager.RemoveColliderEventComp(collisionComp)
                     collisionComp.boundary.x = quadBoundary.x
                     collisionComp.boundary.y = quadBoundary.y
                     tankQuadTreeManager.AddColliderEventComp(collisionComp)
+                } else {
+                    moveComp.tmepDirection.x = moveComp.tmepDirection.y = 0
                 }
             } else {
                 let isCollide: boolean = TankQuadTreeManager.GetInstance<TankQuadTreeManager>().IsCollisions([ColliderType.NORMAL, ColliderType.BOUNDARY], quadBoundary)
@@ -94,10 +112,16 @@ export class MoveableSystem extends ccl.ECSSystem {
 
 @ccl.ecs_component(MoveableSystem)
 export class MoveableComponent extends ccl.ECSComponent {
+    /** 速度 */
     speed: number = 1;
+    /** 移动类型 */
     moveType: MoveType = MoveType.FORWARD;
+    /** 方向 */
     direction: cc.Vec3 = cc.Vec3.ZERO;
+    tmepDirection: cc.Vec3 = new cc.Vec3(0, 0, 0);
+    /** 可自由移动 */
     time: number = 0
+    /** 累计移动时间 */
     cTime: number = 0
 
     constructor(id: number, direction: cc.Vec3 = cc.Vec3.ZERO, moveType: MoveType = MoveType.FORWARD, speed: number = 1) {

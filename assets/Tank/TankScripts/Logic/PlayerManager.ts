@@ -22,7 +22,7 @@ export class PlayerManager {
         this.birthPlace.push(new cc.Vec3(64 + 32, -13 * 32 + 32, 0))
 
         this.CreatePlayer(0)
-        this.CreatePlayer(1)
+        // this.CreatePlayer(1)
     }
 
     CreatePlayer(index: number) {
@@ -41,7 +41,7 @@ export class PlayerManager {
             boundary.y = playerNode.position.y - boundary.height / 2
             this.tankWorld.AddComponent(actorId, ColliderableComponent, ColliderType.PLAYER, boundary)
 
-            this.tankWorld.AddComponent(actorId, MoveableComponent, cc.Vec3.ZERO, MoveType.CONTROLLER1, 1)
+            this.tankWorld.AddComponent(actorId, MoveableComponent, cc.Vec3.ZERO, MoveType.CONTROLLER, 1)
             this.tankWorld.AddComponent(actorId, FirableComponent)
             this.tankWorld.AddComponent(actorId, PlayableComponent, [cc.KeyCode.KEY_W, cc.KeyCode.KEY_S, cc.KeyCode.KEY_D, cc.KeyCode.KEY_A], cc.KeyCode.SPACE)
 

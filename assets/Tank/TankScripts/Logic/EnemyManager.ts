@@ -47,8 +47,6 @@ export class EnemyManager {
             this.tankWorld.AddComponent(actorId, MoveableComponent, cc.Vec3.ZERO, MoveType.RANDOM)
             this.tankWorld.AddComponent(actorId, FirableComponent, true)
         })
-
-
     }
 
     Update(deltaTime: number): void {

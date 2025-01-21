@@ -1,10 +1,10 @@
 import * as cc from "cc";
 import * as ccl from "ccl";
+import { NoticeTable } from "../Config/NoticeTable";
 import { TankMain } from "../TankMain";
 import { ApprComponent } from "./Component/ApprComponent";
 import { ColliderableComponent, ColliderType, TankQuadBoundary } from "./Component/ColliderableComponent";
 import { IBaseActor } from "./Component/IBaseActor";
-import { NoticeTable } from "../Config/NoticeTable";
 
 export class SceneManager {
     mapNode: cc.Node = null;
@@ -71,5 +71,4 @@ export class SceneManager {
             iResource.oriAsset.decRef()
         })
     }
-
 }
