@@ -3,7 +3,7 @@ import * as ccl from "ccl";
 import { TankMain } from "../TankMain";
 import { ColliderableComponent, ColliderType, TankQuadBoundary } from "./Component/ColliderableComponent";
 import { FirableComponent } from "./Component/FirableComponent";
-import { IBaseActor } from "./Component/IBaseActor";
+import { DirectionType, IBaseActor } from "./Component/IBaseActor";
 import { MoveableComponent, MoveType } from "./Component/MovableComponent";
 import { PlayableComponent } from "./Component/PlayableComponent";
 
@@ -22,7 +22,6 @@ export class PlayerManager {
         this.birthPlace.push(new cc.Vec3(64 + 32, -13 * 32 + 32, 0))
 
         this.CreatePlayer(0)
-        // this.CreatePlayer(1)
     }
 
     CreatePlayer(index: number) {
@@ -34,6 +33,8 @@ export class PlayerManager {
             this.actorNode.addChild(playerNode)
 
             let actorId = this.tankWorld.CreateEntity(IBaseActor, playerNode)
+            let actorObj = this.tankWorld.GetEntity<IBaseActor>(actorId)
+            actorObj.setDirection(DirectionType.SOUTH)
 
             let boundary = new TankQuadBoundary(actorId)
             boundary.width = boundary.height = 64
@@ -41,9 +42,9 @@ export class PlayerManager {
             boundary.y = playerNode.position.y - boundary.height / 2
             this.tankWorld.AddComponent(actorId, ColliderableComponent, ColliderType.PLAYER, boundary)
 
-            this.tankWorld.AddComponent(actorId, MoveableComponent, cc.Vec3.ZERO, MoveType.CONTROLLER, 1)
+            this.tankWorld.AddComponent(actorId, MoveableComponent, false, MoveType.CONTROLLER, 1)
             this.tankWorld.AddComponent(actorId, FirableComponent)
-            this.tankWorld.AddComponent(actorId, PlayableComponent, [cc.KeyCode.KEY_W, cc.KeyCode.KEY_S, cc.KeyCode.KEY_D, cc.KeyCode.KEY_A], cc.KeyCode.SPACE)
+            this.tankWorld.AddComponent(actorId, PlayableComponent, [{ key: cc.KeyCode.KEY_W, value: DirectionType.NORTH }, { key: cc.KeyCode.KEY_S, value: DirectionType.SOUTH }, { key: cc.KeyCode.KEY_D, value: DirectionType.EAST }, { key: cc.KeyCode.KEY_A, value: DirectionType.WEST }], cc.KeyCode.SPACE)
 
             this.players.push(actorId)
         })

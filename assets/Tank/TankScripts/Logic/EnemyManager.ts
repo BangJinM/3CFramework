@@ -3,7 +3,7 @@ import * as ccl from "ccl";
 import { TankMain } from "../TankMain";
 import { ColliderableComponent, ColliderType, TankQuadBoundary } from "./Component/ColliderableComponent";
 import { FirableComponent } from "./Component/FirableComponent";
-import { IBaseActor } from "./Component/IBaseActor";
+import { DirectionType, IBaseActor } from "./Component/IBaseActor";
 import { MoveableComponent, MoveType } from "./Component/MovableComponent";
 
 @cc._decorator.ccclass("EnemyManager")
@@ -35,6 +35,8 @@ export class EnemyManager {
             this.actorNode.addChild(enemyNode)
 
             let actorId = this.tankWorld.CreateEntity(IBaseActor, enemyNode)
+            let actorObj = this.tankWorld.GetEntity<IBaseActor>(actorId)
+            actorObj.setDirection(DirectionType.SOUTH)
 
             let posXIndex = Math.ceil(cc.math.random() * 3)
             enemyNode.setPosition(new cc.Vec3(posX[posXIndex], 13 * 32 - 32, 0))
@@ -44,13 +46,13 @@ export class EnemyManager {
             boundary.x = enemyNode.position.x - boundary.width / 2
             boundary.y = enemyNode.position.y - boundary.height / 2
             this.tankWorld.AddComponent(actorId, ColliderableComponent, ColliderType.ENEMY, boundary)
-            this.tankWorld.AddComponent(actorId, MoveableComponent, cc.Vec3.ZERO, MoveType.RANDOM)
+            this.tankWorld.AddComponent(actorId, MoveableComponent, true, MoveType.RANDOM)
             this.tankWorld.AddComponent(actorId, FirableComponent, true)
         })
     }
 
     Update(deltaTime: number): void {
-        if (this.remainingEnemyCount > 0 && this.liveCount <= this.liveMaxCount) {
+        if (this.remainingEnemyCount > 0 && this.liveCount < this.liveMaxCount) {
             this.CreateEnemy(1)
 
             this.liveCount++

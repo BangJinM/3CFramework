@@ -3,7 +3,7 @@ import * as ccl from "ccl";
 import { NoticeTable } from "../../Config/NoticeTable";
 import { ColliderType } from "./ColliderableComponent";
 import { FirableComponent } from "./FirableComponent";
-import { IBaseActor } from "./IBaseActor";
+import { DirectionType, IBaseActor } from "./IBaseActor";
 import { MoveableComponent } from "./MovableComponent";
 
 export class PlayableSystem extends ccl.ECSSystem {
@@ -22,14 +22,13 @@ export class PlayableSystem extends ccl.ECSSystem {
             let playableComp = this.ecsWorld.GetComponent<PlayableComponent>(entity, PlayableComponent)
             if (playableComp.isKeyBoard(event.keyCode)) {
                 playableComp.keyDown(event.keyCode)
-                this.UpdateDirection(entity, playableComp)
             }
 
             if (event.keyCode == playableComp.fireKey) {
                 let firableComp: FirableComponent = this.ecsWorld.GetComponent(entity, FirableComponent)
                 if (firableComp && firableComp.cTime >= firableComp.duration) {
                     let actorObj = this.ecsWorld.GetEntity<IBaseActor>(entity)
-                    ccl.SubjectManager.GetInstance<ccl.SubjectManager>().NotifyObserver(NoticeTable.OnFire, [actorObj.node.position, playableComp.lastDirection, 1, ColliderType.PLAYER_BULLET])
+                    ccl.SubjectManager.GetInstance<ccl.SubjectManager>().NotifyObserver(NoticeTable.OnFire, [actorObj.node.position, actorObj.direction, 1, ColliderType.PLAYER_BULLET])
                 }
             }
         }
@@ -40,45 +39,51 @@ export class PlayableSystem extends ccl.ECSSystem {
             let playableComp = this.ecsWorld.GetComponent<PlayableComponent>(entity, PlayableComponent)
             if (playableComp.isKeyBoard(event.keyCode)) {
                 playableComp.keyUp(event.keyCode)
-                this.UpdateDirection(entity, playableComp)
             }
         }
     }
 
-    UpdateDirection(entity, playableComp) {
-        let moveComp = this.ecsWorld.GetComponent(entity, MoveableComponent)
-        if (playableComp.keyDowns.size > 0) {
-            let array = Array.from(playableComp.keyDowns)
-            let keyCode = array[array.length - 1]
-            moveComp.direction = playableComp.Direction[playableComp.keyBoardMap.get(keyCode)] || cc.Vec3.ZERO
-        }
-        else {
-            moveComp.direction = cc.Vec3.ZERO
+
+    OnUpdate(deltaTime: number): void {
+        let entities = this.GetEntities()
+        for (const entity of entities) {
+            let playableComp = this.ecsWorld.GetComponent<PlayableComponent>(entity, PlayableComponent)
+            let entityObj = this.ecsWorld.GetEntity<IBaseActor>(entity)
+
+            let keyCode = playableComp.GetKeyCode()
+            if (keyCode != playableComp.lastKeyCode) {
+                let dir = playableComp.GetDirection(playableComp.lastKeyCode)
+                let moveXEnd = (dir == DirectionType.EAST || dir == DirectionType.WEST) && entityObj.node.position.x % 8 == 0
+                let moveYEnd = (dir == DirectionType.SOUTH || dir == DirectionType.NORTH) && entityObj.node.position.y % 8 == 0
+
+                let moveComp = this.ecsWorld.GetComponent(entity, MoveableComponent)
+                if (playableComp.lastKeyCode == -1 || moveXEnd || moveYEnd) {
+                    playableComp.lastKeyCode = keyCode
+                    moveComp.moving = false
+                }
+                moveComp.moving = playableComp.lastKeyCode != -1
+
+                let direction = playableComp.keyBoardMap.get(playableComp.lastKeyCode)
+                if (direction != undefined && direction != entityObj.direction) {
+                    entityObj.setDirection(direction)
+                }
+            }
         }
     }
-
-    OnUpdate(deltaTime: number): void { }
 }
 
 @ccl.ecs_component(PlayableSystem)
 export class PlayableComponent extends ccl.ECSComponent {
-    Direction = [
-        new cc.Vec3(0, 1, 0),
-        new cc.Vec3(0, -1, 0),
-        new cc.Vec3(1, 0, 0),
-        new cc.Vec3(-1, 0, 0),
-    ]
-    lastDirection: cc.Vec3 = new cc.Vec3(0, 1, 0);
-
-    keyBoardMap: Map<number, number> = new Map();
+    lastKeyCode: number = -1;
+    keyBoardMap: Map<number, DirectionType> = new Map();
     keyDowns: Set<number> = new Set<number>();
     fireKey: number = cc.KeyCode.SPACE;
 
-    constructor(id: number, keyBoards: number[], fireKey: number = cc.KeyCode.SPACE) {
+    constructor(id: number, keyBoards: { key: number, value: DirectionType }[], fireKey: number = cc.KeyCode.SPACE) {
         super(id);
 
-        for (const key in keyBoards) {
-            this.keyBoardMap.set(keyBoards[key], Number(key));
+        for (const config of keyBoards) {
+            this.keyBoardMap.set(config.key, config.value);
         }
         this.fireKey = fireKey;
     }
@@ -92,5 +97,14 @@ export class PlayableComponent extends ccl.ECSComponent {
 
     keyUp(keyCode: number) {
         this.keyDowns.delete(keyCode);
+    }
+
+    GetDirection(keyCode: number): DirectionType {
+        return this.keyBoardMap.get(keyCode);
+    }
+
+    GetKeyCode(): number {
+        let array = Array.from(this.keyDowns)
+        return array.length >= 1 ? array[array.length - 1] : -1
     }
 }

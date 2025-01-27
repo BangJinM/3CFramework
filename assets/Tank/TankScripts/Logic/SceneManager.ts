@@ -2,7 +2,6 @@ import * as cc from "cc";
 import * as ccl from "ccl";
 import { NoticeTable } from "../Config/NoticeTable";
 import { TankMain } from "../TankMain";
-import { ApprComponent } from "./Component/ApprComponent";
 import { ColliderableComponent, ColliderType, TankQuadBoundary } from "./Component/ColliderableComponent";
 import { IBaseActor } from "./Component/IBaseActor";
 
@@ -38,14 +37,13 @@ export class SceneManager {
 
         this.mapNode.addChild(wallNode)
 
-        let actorId = this.tankWorld.CreateEntity(IBaseActor, wallNode)
+        let actorId = this.tankWorld.CreateEntity(IBaseActor, wallNode, walls[type], ccl.BundleManager.GetInstance<ccl.BundleManager>().GetBundle("Tank"))
 
         let boundary = new TankQuadBoundary(actorId)
         boundary.width = boundary.height = 32
         boundary.x = wallNode.position.x - boundary.width / 2
         boundary.y = wallNode.position.y - boundary.height / 2
         this.tankWorld.AddComponent(actorId, ColliderableComponent, ColliderType.NORMAL, boundary)
-        this.tankWorld.AddComponent(actorId, ApprComponent, walls[type], "Tank")
     }
 
     CreateWalls(level: number) {

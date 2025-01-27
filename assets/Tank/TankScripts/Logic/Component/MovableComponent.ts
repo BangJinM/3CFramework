@@ -2,7 +2,7 @@ import * as cc from "cc";
 import * as ccl from "ccl";
 import { NoticeTable } from "../../Config/NoticeTable";
 import { ColliderableComponent, ColliderType, TankQuadBoundary } from "./ColliderableComponent";
-import { IBaseActor } from "./IBaseActor";
+import { Direction, IBaseActor } from "./IBaseActor";
 import { TankQuadTreeManager } from "./TankQuadTreeManager";
 
 export enum MoveType {
@@ -21,6 +21,7 @@ export class MoveableSystem extends ccl.ECSSystem {
         new cc.Vec3(0, 1, 0),
         new cc.Vec3(0, -1, 0)
     ]
+    position: cc.Vec3 = new cc.Vec3(0, 0, 0)
 
     OnUpdate(deltaTime: number): void {
         let entities = this.GetEntities()
@@ -30,38 +31,21 @@ export class MoveableSystem extends ccl.ECSSystem {
 
         for (const element of entities) {
             let moveComp = this.ecsWorld.GetComponent(element, MoveableComponent)
+            if (!moveComp.moving) continue
 
             let entityObj = this.ecsWorld.GetEntity<IBaseActor>(element)
             quadBoundary.entity = element
 
-            let position = entityObj.node.position.clone()
-
-            // 如果是主控玩家，则步进为 16
-            if (moveComp.moveType == MoveType.CONTROLLER) {
-                // 如果坐标是16的倍数，才允许转向
-                if ((moveComp.tmepDirection.x && position.x % 16 == 0) || (moveComp.tmepDirection.y && position.y % 16 == 0)) {
-                    moveComp.tmepDirection.x = 0
-                    moveComp.tmepDirection.y = 0
-                }
-                if (moveComp.tmepDirection.equals(cc.Vec3.ZERO) && (moveComp.direction.x != 0 || moveComp.direction.y != 0)) {
-                    moveComp.tmepDirection.x = moveComp.direction.x
-                    moveComp.tmepDirection.y = moveComp.direction.y
-                }
-                position.x += moveComp.tmepDirection.x * moveComp.speed
-                position.y += moveComp.tmepDirection.y * moveComp.speed
-            }
-            else {
-                position.x += moveComp.direction.x * moveComp.speed
-                position.y += moveComp.direction.y * moveComp.speed
-            }
+            cc.Vec3.multiplyScalar(this.position, Direction.GetDirection(entityObj.direction), moveComp.speed)
+            this.position.add(entityObj.node.getPosition())
 
             let collisionComp: ColliderableComponent = this.ecsWorld.GetComponent(element, ColliderableComponent)
-            quadBoundary.x = position.x - collisionComp.boundary.width / 2
-            quadBoundary.y = position.y - collisionComp.boundary.height / 2
+            quadBoundary.x = this.position.x - collisionComp.boundary.width / 2
+            quadBoundary.y = this.position.y - collisionComp.boundary.height / 2
             quadBoundary.width = collisionComp.boundary.width
             quadBoundary.height = collisionComp.boundary.height
             if (moveComp.moveType == MoveType.FORWARD) {
-                entityObj.node.setPosition(position)
+                entityObj.node.setPosition(this.position.clone())
 
                 let colliderTypes = [ColliderType.NORMAL, ColliderType.BOUNDARY]
                 if (collisionComp.type == ColliderType.PLAYER_BULLET) {
@@ -80,18 +64,16 @@ export class MoveableSystem extends ccl.ECSSystem {
                 }
             } else if (moveComp.moveType == MoveType.CONTROLLER) {
                 if (!tankQuadTreeManager.IsCollisions([ColliderType.NORMAL, ColliderType.PLAYER, ColliderType.ENEMY, ColliderType.BOUNDARY], quadBoundary)) {
-                    entityObj.node.setPosition(position)
+                    entityObj.node.setPosition(this.position.clone())
                     tankQuadTreeManager.RemoveColliderEventComp(collisionComp)
                     collisionComp.boundary.x = quadBoundary.x
                     collisionComp.boundary.y = quadBoundary.y
                     tankQuadTreeManager.AddColliderEventComp(collisionComp)
-                } else {
-                    moveComp.tmepDirection.x = moveComp.tmepDirection.y = 0
                 }
             } else {
                 let isCollide: boolean = TankQuadTreeManager.GetInstance<TankQuadTreeManager>().IsCollisions([ColliderType.NORMAL, ColliderType.BOUNDARY], quadBoundary)
                 if (!isCollide) {
-                    entityObj.node.setPosition(position)
+                    entityObj.node.setPosition(this.position.clone())
                     tankQuadTreeManager.RemoveColliderEventComp(collisionComp)
                     collisionComp.boundary.x = quadBoundary.x
                     collisionComp.boundary.y = quadBoundary.y
@@ -103,7 +85,7 @@ export class MoveableSystem extends ccl.ECSSystem {
                     moveComp.time = cc.math.random() * 4 + 2
 
                     let dir = Math.ceil(cc.math.random() * 4)
-                    moveComp.direction = this.Direction[dir - 1]
+                    entityObj.setDirection(dir - 1)
                 }
             }
         }
@@ -116,18 +98,16 @@ export class MoveableComponent extends ccl.ECSComponent {
     speed: number = 1;
     /** 移动类型 */
     moveType: MoveType = MoveType.FORWARD;
-    /** 方向 */
-    direction: cc.Vec3 = cc.Vec3.ZERO;
-    tmepDirection: cc.Vec3 = new cc.Vec3(0, 0, 0);
+    moving: boolean = false
     /** 可自由移动 */
     time: number = 0
     /** 累计移动时间 */
     cTime: number = 0
 
-    constructor(id: number, direction: cc.Vec3 = cc.Vec3.ZERO, moveType: MoveType = MoveType.FORWARD, speed: number = 1) {
+    constructor(id: number, isMoving: boolean = false, moveType: MoveType = MoveType.FORWARD, speed: number = 1) {
         super(id);
 
-        this.direction = direction;
+        this.moving = isMoving;
         this.moveType = moveType;
         this.speed = speed;
     }

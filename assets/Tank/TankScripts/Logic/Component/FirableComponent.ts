@@ -3,7 +3,6 @@ import * as ccl from "ccl";
 import { NoticeTable } from "../../Config/NoticeTable";
 import { ColliderType } from "./ColliderableComponent";
 import { IBaseActor } from "./IBaseActor";
-import { MoveableComponent } from "./MovableComponent";
 
 export class FirableSystem extends ccl.ECSSystem {
     Direction = [
@@ -23,8 +22,7 @@ export class FirableSystem extends ccl.ECSSystem {
             firableComp.cTime += deltaTime
             if (firableComp.auto) {
                 if (firableComp && firableComp.cTime >= firableComp.duration) {
-                    let moveableComp = this.ecsWorld.GetComponent(element, MoveableComponent)
-                    ccl.SubjectManager.GetInstance<ccl.SubjectManager>().NotifyObserver(NoticeTable.OnFire, [entityObj.node.position, moveableComp.direction, 1, ColliderType.ENEMY_BULLET])
+                    ccl.SubjectManager.GetInstance<ccl.SubjectManager>().NotifyObserver(NoticeTable.OnFire, [entityObj.node.position, entityObj.direction, 1, ColliderType.ENEMY_BULLET])
                     firableComp.cTime = 0
                 }
             }

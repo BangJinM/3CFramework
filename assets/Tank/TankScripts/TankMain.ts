@@ -1,7 +1,6 @@
 import * as cc from 'cc';
 import * as ccl from 'ccl';
 import { NoticeTable } from './Config/NoticeTable';
-import { ApprSystem } from './Logic/Component/ApprComponent';
 import { ColliderableComponent, ColliderableSystem, ColliderType, TankQuadBoundary } from './Logic/Component/ColliderableComponent';
 import { FirableSystem } from './Logic/Component/FirableComponent';
 import { IBaseActor } from './Logic/Component/IBaseActor';
@@ -68,7 +67,6 @@ export class TankMain extends ccl.ISingleton {
         this.protectorNode = this.GetNode("TankCanvas/NODE_GAME/NODE_MAIN")
         this.actorNode = this.GetNode("TankCanvas/NODE_GAME/NODE_ACTER")
 
-        this.tankWorld.AddSystem(ApprSystem)
         this.tankWorld.AddSystem(MoveableSystem)
         this.tankWorld.AddSystem(ColliderableSystem)
         this.tankWorld.AddSystem(FirableSystem)
@@ -102,8 +100,7 @@ export class TankMain extends ccl.ISingleton {
 
     OnFire(data: any[]) {
         let position: cc.Vec3 = data[0]
-        let direction: cc.Vec3 = data[1]
-        let level: number = data[2]
+        let direction: number = data[1]
         let type: ColliderType = data[3]
         ccl.Resources.Loader.LoadPrefabAsset("TankRes/Prefabs/Bullet", ccl.BundleManager.GetInstance<ccl.BundleManager>().GetBundle("Tank"), (iResource: ccl.IResource) => {
             if (!iResource.oriAsset) return
@@ -113,13 +110,15 @@ export class TankMain extends ccl.ISingleton {
             bulletNode.position = position.clone()
 
             let actorId = this.tankWorld.CreateEntity(IBaseActor, bulletNode)
+            let actorObj = this.tankWorld.GetEntity<IBaseActor>(actorId)
+            actorObj.setDirection(direction)
 
             let boundary = new TankQuadBoundary(actorId)
             boundary.width = boundary.height = 64
             boundary.x = bulletNode.position.x - boundary.width / 2
             boundary.y = bulletNode.position.y - boundary.height / 2
             this.tankWorld.AddComponent(actorId, ColliderableComponent, type, boundary)
-            this.tankWorld.AddComponent(actorId, MoveableComponent, direction, MoveType.FORWARD, 1.5)
+            this.tankWorld.AddComponent(actorId, MoveableComponent, true, MoveType.FORWARD, 1.5)
         })
     }
 
@@ -223,8 +222,8 @@ export class TankMain extends ccl.ISingleton {
     }
 
     Update(deltaTime: number): void {
-        this.tankWorld.Update(deltaTime)
-        this.enemyManager.Update(deltaTime)
+        this.tankWorld?.Update(deltaTime)
+        this.enemyManager?.Update(deltaTime)
     }
 }
 
